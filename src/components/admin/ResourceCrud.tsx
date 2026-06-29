@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { ImageUpload, ImageListUpload } from "./ImageUpload";
 
 export type FieldDef = {
   name: string;
