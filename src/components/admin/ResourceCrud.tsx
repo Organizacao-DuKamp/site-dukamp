@@ -146,8 +146,11 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
   const [values, setValues] = useState<any>(() => {
     const v: any = {};
     fields.forEach((f) => {
-      v[f.name] = initial?.[f.name] ?? f.defaultValue ?? (f.type === "boolean" ? false : f.type === "number" ? 0 : f.type === "imageList" ? [] : "");
-      if (f.type === "imageList" && Array.isArray(v[f.name])) v[f.name] = v[f.name].join("\n");
+      if (f.type === "imageList") {
+        v[f.name] = Array.isArray(initial?.[f.name]) ? initial[f.name] : (f.defaultValue ?? []);
+      } else {
+        v[f.name] = initial?.[f.name] ?? f.defaultValue ?? (f.type === "boolean" ? false : f.type === "number" ? 0 : "");
+      }
     });
     return v;
   });
@@ -162,7 +165,7 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
     fields.forEach((f) => {
       let v = values[f.name];
       if (f.type === "number") v = v === "" || v == null ? null : Number(v);
-      if (f.type === "imageList") v = String(v || "").split("\n").map((s: string) => s.trim()).filter(Boolean);
+      if (f.type === "imageList") { out[f.name] = Array.isArray(v) ? v : []; return; }
       if (f.type === "select" && v === "") v = null;
       if (v === "") v = null;
       out[f.name] = v;
