@@ -136,7 +136,7 @@ export function Header() {
               </SheetContent>
             </Sheet>
 
-            <div className="hidden md:flex items-center gap-1 ml-2 pl-2 border-l">
+            <div className="flex items-center gap-1 ml-2 pl-2 border-l">
               {socials.map(({ href, label, Icon }) => (
                 <a
                   key={label}
