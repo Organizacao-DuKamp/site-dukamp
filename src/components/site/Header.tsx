@@ -1,10 +1,11 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingCart, Search, User, Menu, LogOut } from "lucide-react";
+import { ShoppingCart, Search, User, LogOut, Facebook, Instagram, Youtube } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCart } from "@/lib/cart";
+import { useCart, formatBRL } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
+import { useSiteSettings, whatsappLink } from "@/lib/site-settings";
 import {
   Sheet,
   SheetContent,
@@ -12,11 +13,29 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { formatBRL } from "@/lib/cart";
+
+const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.66a8.16 8.16 0 0 0 4.77 1.52V6.73a4.85 4.85 0 0 1-1.84-.04Z" />
+  </svg>
+);
+const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <path d="M.057 24l1.687-6.163a11.867 11.867 0 0 1-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.82 11.82 0 0 1 8.413 3.488 11.82 11.82 0 0 1 3.48 8.414c-.003 6.555-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 0 0 1.51 5.26l.6.95-1 3.648 3.74-.978.94.42zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z" />
+  </svg>
+);
+
+const socials = [
+  { href: "https://facebook.com/dukamp", label: "Facebook", Icon: Facebook },
+  { href: "https://instagram.com/dukamp", label: "Instagram", Icon: Instagram },
+  { href: "https://youtube.com/dukamp", label: "YouTube", Icon: Youtube },
+  { href: "https://tiktok.com/@dukamp", label: "TikTok", Icon: TikTokIcon },
+];
 
 export function Header() {
   const { count, items, total, remove } = useCart();
   const { user, isAdmin, signOut } = useAuth();
+  const { data: settings } = useSiteSettings();
   const [q, setQ] = useState("");
   const navigate = useNavigate();
 
@@ -24,6 +43,8 @@ export function Header() {
     e.preventDefault();
     if (q.trim()) navigate({ to: "/produtos", search: { q: q.trim() } as any });
   }
+
+  const wa = whatsappLink(settings?.phone, "Olá, gostaria de mais informações.");
 
   return (
     <header className="border-b bg-card sticky top-0 z-40">
@@ -50,14 +71,6 @@ export function Header() {
               />
             </div>
           </form>
-
-          <nav className="hidden lg:flex items-center gap-1 text-sm">
-            <Link to="/" className="px-3 py-2 hover:text-primary">Início</Link>
-            <Link to="/catalogos" className="px-3 py-2 hover:text-primary">Catálogos</Link>
-            <Link to="/produtos" className="px-3 py-2 hover:text-primary">Produtos</Link>
-            <Link to="/sobre" className="px-3 py-2 hover:text-primary">Sobre</Link>
-            <Link to="/contato" className="px-3 py-2 hover:text-primary">Contato</Link>
-          </nav>
 
           <div className="flex items-center gap-1 ml-auto">
             {user ? (
@@ -123,21 +136,29 @@ export function Header() {
               </SheetContent>
             </Sheet>
 
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden"><Menu className="h-5 w-5" /></Button>
-              </SheetTrigger>
-              <SheetContent side="left">
-                <SheetHeader><SheetTitle>Menu</SheetTitle></SheetHeader>
-                <nav className="mt-4 flex flex-col">
-                  <Link to="/" className="py-2">Início</Link>
-                  <Link to="/catalogos" className="py-2">Catálogos</Link>
-                  <Link to="/produtos" className="py-2">Produtos</Link>
-                  <Link to="/sobre" className="py-2">Sobre</Link>
-                  <Link to="/contato" className="py-2">Contato</Link>
-                </nav>
-              </SheetContent>
-            </Sheet>
+            <div className="hidden md:flex items-center gap-1 ml-2 pl-2 border-l">
+              {socials.map(({ href, label, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={label}
+                  className="h-8 w-8 grid place-items-center rounded hover:bg-accent text-muted-foreground hover:text-primary"
+                >
+                  <Icon className="h-4 w-4" />
+                </a>
+              ))}
+              <a
+                href={wa}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="WhatsApp"
+                className="h-8 w-8 grid place-items-center rounded hover:bg-accent text-muted-foreground hover:text-primary"
+              >
+                <WhatsAppIcon className="h-4 w-4" />
+              </a>
+            </div>
           </div>
         </div>
 
