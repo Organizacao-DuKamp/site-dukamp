@@ -37,6 +37,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
   const image = p.images?.[0] || "/placeholder.svg";
   const installments = 6;
   const displayPrice = priceForAccount(p, accountType);
+  const displayPix = pixPriceForAccount(p, accountType);
   const parcela = displayPrice / installments;
   const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor" : null;
   const wa = whatsappLink(
