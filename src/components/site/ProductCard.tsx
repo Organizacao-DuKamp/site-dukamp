@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useSiteSettings, whatsappLink } from "@/lib/site-settings";
+import { useAuth, priceForAccount } from "@/lib/auth";
 import { toast } from "sonner";
 
 export type ProductLite = {
@@ -11,6 +12,9 @@ export type ProductLite = {
   slug: string;
   code: string;
   price: number;
+  consumer_price?: number | null;
+  reseller_price?: number | null;
+  producer_price?: number | null;
   pix_price: number | null;
   images: string[];
   brand: string | null;
@@ -26,12 +30,15 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export function ProductCard({ p }: { p: ProductLite }) {
   const { add } = useCart();
   const { data: settings } = useSiteSettings();
+  const { accountType } = useAuth();
   const image = p.images?.[0] || "/placeholder.svg";
   const installments = 6;
-  const parcela = p.price / installments;
+  const displayPrice = priceForAccount(p, accountType);
+  const parcela = displayPrice / installments;
+  const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor" : null;
   const wa = whatsappLink(
     settings?.phone,
-    `Olá, tenho interesse no produto: ${p.name} (cód. ${p.code}) - ${formatBRL(p.price)}`,
+    `Olá, tenho interesse no produto: ${p.name} (cód. ${p.code}) - ${formatBRL(displayPrice)}`,
   );
 
   return (
