@@ -40,6 +40,10 @@ function SettingsPage() {
     <div className="max-w-2xl">
       <h1 className="text-2xl font-bold mb-6">Configurações do Site</h1>
       <div className="space-y-4 rounded-lg border bg-card p-6">
+        <div>
+          <Label>Logo do site (se vazio, mostra o ícone padrão "D")</Label>
+          <ImageUpload value={form.logo_url ?? ""} onChange={(v) => set("logo_url", v)} folder="logo" />
+        </div>
         <div><Label>Nome do site</Label><Input value={form.site_name ?? ""} onChange={(e) => set("site_name", e.target.value)} /></div>
         <div><Label>Slogan</Label><Input value={form.tagline ?? ""} onChange={(e) => set("tagline", e.target.value)} /></div>
         <div><Label>E-mail</Label><Input value={form.email ?? ""} onChange={(e) => set("email", e.target.value)} /></div>
