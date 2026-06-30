@@ -43,7 +43,7 @@ const socials = [
 
 export function Header() {
   const { count, items, total, remove } = useCart();
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, accountType, signOut } = useAuth();
   const { ticket, openChat } = useSupport();
   const { data: settings } = useSiteSettings();
   const [q, setQ] = useState("");
