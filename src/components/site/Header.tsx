@@ -62,7 +62,7 @@ export function Header() {
         <div className="flex h-16 items-center gap-4">
           <Link to="/" className="flex items-center gap-2 shrink-0">
             {settings?.logo_url ? (
-              <img src={settings.logo_url} alt={settings?.site_name ?? "Logo"} className="h-9 w-9 rounded-lg object-cover" />
+              <img src={settings.logo_url} alt={settings?.site_name ?? "Logo"} className="h-9 w-auto max-w-[160px] object-contain" />
             ) : (
               <div className="h-9 w-9 rounded-lg bg-primary grid place-items-center text-primary-foreground font-bold">
                 D
