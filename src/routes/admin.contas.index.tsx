@@ -110,8 +110,8 @@ function ContasPage() {
                 <TableCell className="font-medium">{u.full_name || <span className="text-muted-foreground italic">sem nome</span>}</TableCell>
                 <TableCell className="text-sm">{u.email}</TableCell>
                 <TableCell>
-                  <Badge variant={u.account_type === "admin" ? "default" : u.account_type === "cliente" ? "secondary" : "outline"} className="capitalize">
-                    {u.account_type ?? "cliente"}
+                  <Badge variant={u.account_type === "admin" ? "default" : u.account_type === "cliente" ? "secondary" : "outline"}>
+                    {u.account_type === "produtor" ? "Produtor Rural" : u.account_type === "revendedor" ? "Revendedor" : u.account_type === "admin" ? "Admin" : "Consumidor"}
                   </Badge>
                 </TableCell>
                 <TableCell className="hidden md:table-cell text-xs text-muted-foreground">
