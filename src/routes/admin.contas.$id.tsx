@@ -21,6 +21,7 @@ function ContaDetalhe() {
   const nav = useNavigate();
 
   const { data, isLoading } = useQuery({
+    enabled: isMasterAdmin,
     queryKey: ["account", id],
     queryFn: async () => {
       const [profileR, rolesR] = await Promise.all([
