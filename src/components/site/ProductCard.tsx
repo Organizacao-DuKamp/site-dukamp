@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart, formatBRL } from "@/lib/cart";
@@ -32,6 +32,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export function ProductCard({ p }: { p: ProductLite }) {
+  const navigate = useNavigate();
   const { add } = useCart();
   const { data: settings } = useSiteSettings();
   const { accountType } = useAuth();
@@ -52,10 +53,14 @@ export function ProductCard({ p }: { p: ProductLite }) {
   };
 
   return (
-    <Link
-      to="/produtos/$slug"
-      params={{ slug: p.slug }}
-      className="group rounded-lg border bg-card overflow-hidden flex flex-col hover:shadow-lg transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    <div
+      role="link"
+      tabIndex={0}
+      onClick={() => navigate({ to: "/produtos/$slug", params: { slug: p.slug } })}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") navigate({ to: "/produtos/$slug", params: { slug: p.slug } });
+      }}
+      className="group cursor-pointer rounded-lg border bg-card overflow-hidden flex flex-col hover:shadow-lg transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="aspect-square bg-white overflow-hidden">
         <img src={image} alt={p.name} className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform" />
@@ -101,6 +106,6 @@ export function ProductCard({ p }: { p: ProductLite }) {
           </a>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
