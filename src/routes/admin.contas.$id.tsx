@@ -16,7 +16,7 @@ export const Route = createFileRoute("/admin/contas/$id")({
 
 function ContaDetalhe() {
   const { id } = Route.useParams();
-  const { user: me } = useAuth();
+  const { user: me, isMasterAdmin, loading: authLoading } = useAuth();
   const qc = useQueryClient();
   const nav = useNavigate();
 
