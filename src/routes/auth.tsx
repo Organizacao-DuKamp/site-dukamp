@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { traduzErroAuth } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Entrar — Dukamp" }] }),
@@ -64,7 +65,7 @@ function LoginForm({ onLogin }: { onLogin: (e: string, p: string) => Promise<{ e
     setLoading(true);
     const { error } = await onLogin(email, password);
     setLoading(false);
-    if (error) toast.error(error);
+    if (error) toast.error(traduzErroAuth(error));
     else toast.success("Bem-vindo!");
   }
 
@@ -115,7 +116,7 @@ function RegisterForm() {
     });
     setLoading(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(traduzErroAuth(error.message));
       setChallenge(makeChallenge());
       setAnswer("");
     } else {
