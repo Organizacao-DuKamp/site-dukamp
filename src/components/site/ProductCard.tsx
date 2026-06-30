@@ -22,6 +22,7 @@ export type ProductLite = {
   images: string[];
   brand: string | null;
   stock: number;
+  installments?: number | null;
 };
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -35,7 +36,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
   const { data: settings } = useSiteSettings();
   const { accountType } = useAuth();
   const image = p.images?.[0] || "/placeholder.svg";
-  const installments = 6;
+  const installments = Math.max(1, Number(p.installments ?? 1));
   const displayPrice = priceForAccount(p, accountType);
   const displayPix = pixPriceForAccount(p, accountType);
   const parcela = displayPrice / installments;
@@ -65,9 +66,11 @@ export function ProductCard({ p }: { p: ProductLite }) {
           {displayPix != null && (
             <div className="text-xs text-primary font-medium">ou {formatBRL(displayPix)} no PIX</div>
           )}
-          <div className="text-xs text-muted-foreground">
-            em até {installments}x de {formatBRL(parcela)}
-          </div>
+          {installments > 1 && (
+            <div className="text-xs text-muted-foreground">
+              em até {installments}x de {formatBRL(parcela)}
+            </div>
+          )}
         </div>
         <div className="mt-auto pt-3 space-y-2">
           <Button
