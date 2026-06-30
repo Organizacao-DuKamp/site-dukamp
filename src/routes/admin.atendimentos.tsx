@@ -89,21 +89,21 @@ function AtendimentosPage() {
     .filter(Boolean) as TicketRow[];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 min-w-0">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <MessageSquare className="h-6 w-6" /> Atendimentos
+        <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+          <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6" /> Atendimentos
         </h1>
       </div>
 
-      <div className="grid lg:grid-cols-[360px_1fr] gap-4">
-        <div className="space-y-2">
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4 min-w-0">
+        <div className="space-y-2 min-w-0">
           <Input
             placeholder="Buscar por nome ou e-mail..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <div className="border rounded-lg bg-card divide-y max-h-[70vh] overflow-y-auto">
+          <div className="border rounded-lg bg-card divide-y max-h-[40vh] lg:max-h-[70vh] overflow-y-auto">
             {filtered.length === 0 && (
               <div className="p-6 text-center text-sm text-muted-foreground">Nenhum atendimento.</div>
             )}
@@ -119,17 +119,17 @@ function AtendimentosPage() {
                   }
                   className={`w-full text-left p-3 hover:bg-accent flex flex-col gap-1 ${isOpen ? "bg-accent/50" : ""}`}
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium truncate">
+                  <div className="flex items-center justify-between gap-2 min-w-0">
+                    <span className="text-sm font-medium truncate min-w-0">
                       {t.user_name || t.user_email || t.user_id.slice(0, 8)}
                     </span>
                     {t.unread > 0 && (
-                      <Badge className="bg-destructive text-destructive-foreground">{t.unread}</Badge>
+                      <Badge className="bg-destructive text-destructive-foreground shrink-0">{t.unread}</Badge>
                     )}
                   </div>
-                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground gap-2">
                     <StatusBadge status={t.status} />
-                    <span>{new Date(t.last_message_at).toLocaleString("pt-BR")}</span>
+                    <span className="truncate">{new Date(t.last_message_at).toLocaleString("pt-BR")}</span>
                   </div>
                 </button>
               );
@@ -137,9 +137,9 @@ function AtendimentosPage() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4 content-start">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 content-start min-w-0">
           {openTickets.length === 0 && (
-            <div className="md:col-span-2 border rounded-lg bg-card p-10 text-center text-sm text-muted-foreground">
+            <div className="xl:col-span-2 border rounded-lg bg-card p-6 sm:p-10 text-center text-sm text-muted-foreground">
               Selecione um atendimento para responder.
             </div>
           )}
