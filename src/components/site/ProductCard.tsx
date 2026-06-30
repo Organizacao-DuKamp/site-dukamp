@@ -46,20 +46,25 @@ export function ProductCard({ p }: { p: ProductLite }) {
     `Olá, tenho interesse no produto: ${p.name} (cód. ${p.code}) - ${formatBRL(displayPrice)}`,
   );
 
+  const stopNav = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   return (
-    <div className="group rounded-lg border bg-card overflow-hidden flex flex-col hover:shadow-lg transition-shadow">
-      <Link to="/produtos/$slug" params={{ slug: p.slug }} className="aspect-square bg-white overflow-hidden block">
+    <Link
+      to="/produtos/$slug"
+      params={{ slug: p.slug }}
+      className="group rounded-lg border bg-card overflow-hidden flex flex-col hover:shadow-lg transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      <div className="aspect-square bg-white overflow-hidden">
         <img src={image} alt={p.name} className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform" />
-      </Link>
+      </div>
       <div className="p-4 flex-1 flex flex-col">
         {p.brand && <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.brand}</div>}
-        <Link
-          to="/produtos/$slug"
-          params={{ slug: p.slug }}
-          className="font-medium text-sm line-clamp-2 mt-1 min-h-[2.5rem] hover:text-primary"
-        >
+        <div className="font-medium text-sm line-clamp-2 mt-1 min-h-[2.5rem] group-hover:text-primary">
           {p.name}
-        </Link>
+        </div>
         <div className="mt-3 space-y-0.5">
           {tierLabel && <div className="text-[10px] uppercase tracking-wider text-primary font-semibold">Preço {tierLabel}</div>}
           <div className="text-xl font-bold text-foreground">{formatBRL(displayPrice)}</div>
@@ -77,7 +82,8 @@ export function ProductCard({ p }: { p: ProductLite }) {
             size="sm"
             className="w-full"
             disabled={p.stock <= 0}
-            onClick={() => {
+            onClick={(e) => {
+              stopNav(e);
               add({ id: p.id, name: p.name, price: displayPrice, image });
               toast.success("Adicionado ao carrinho");
             }}
@@ -88,12 +94,13 @@ export function ProductCard({ p }: { p: ProductLite }) {
             href={wa}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
             className="w-full inline-flex items-center justify-center gap-1 rounded-md bg-[#25D366] hover:bg-[#1ebe57] text-white text-sm font-medium h-9 px-3 transition-colors"
           >
             <WhatsAppIcon className="h-4 w-4" /> Comprar pelo WhatsApp
           </a>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
