@@ -21,6 +21,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProdutosSlugRouteImport } from './routes/produtos.$slug'
 import { Route as CatalogosSlugRouteImport } from './routes/catalogos.$slug'
+import { Route as AdminSolicitacoesRouteImport } from './routes/admin.solicitacoes'
 import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
 import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
@@ -92,6 +93,11 @@ const CatalogosSlugRoute = CatalogosSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CatalogosRoute,
 } as any)
+const AdminSolicitacoesRoute = AdminSolicitacoesRouteImport.update({
+  id: '/solicitacoes',
+  path: '/solicitacoes',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminProdutosRoute = AdminProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/produtos': typeof AdminProdutosRoute
+  '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/admin/categorias'
     | '/admin/configuracoes'
     | '/admin/produtos'
+    | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin/'
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
     | '/admin/categorias'
     | '/admin/configuracoes'
     | '/admin/produtos'
+    | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/admin/categorias'
     | '/admin/configuracoes'
     | '/admin/produtos'
+    | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin/'
@@ -388,6 +400,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogosSlugRouteImport
       parentRoute: typeof CatalogosRoute
     }
+    '/admin/solicitacoes': {
+      id: '/admin/solicitacoes'
+      path: '/solicitacoes'
+      fullPath: '/admin/solicitacoes'
+      preLoaderRoute: typeof AdminSolicitacoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/produtos': {
       id: '/admin/produtos'
       path: '/produtos'
@@ -469,6 +488,7 @@ interface AdminRouteChildren {
   AdminCategoriasRoute: typeof AdminCategoriasRoute
   AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
   AdminProdutosRoute: typeof AdminProdutosRoute
+  AdminSolicitacoesRoute: typeof AdminSolicitacoesRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminContasIdRoute: typeof AdminContasIdRoute
   AdminContasIndexRoute: typeof AdminContasIndexRoute
@@ -482,6 +502,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCategoriasRoute: AdminCategoriasRoute,
   AdminConfiguracoesRoute: AdminConfiguracoesRoute,
   AdminProdutosRoute: AdminProdutosRoute,
+  AdminSolicitacoesRoute: AdminSolicitacoesRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminContasIdRoute: AdminContasIdRoute,
   AdminContasIndexRoute: AdminContasIndexRoute,
