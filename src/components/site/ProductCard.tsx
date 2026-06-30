@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useSiteSettings, whatsappLink } from "@/lib/site-settings";
-import { useAuth, priceForAccount } from "@/lib/auth";
+import { useAuth, priceForAccount, pixPriceForAccount } from "@/lib/auth";
 import { toast } from "sonner";
 
 export type ProductLite = {
@@ -16,6 +16,9 @@ export type ProductLite = {
   reseller_price?: number | null;
   producer_price?: number | null;
   pix_price: number | null;
+  consumer_pix_price?: number | null;
+  reseller_pix_price?: number | null;
+  producer_pix_price?: number | null;
   images: string[];
   brand: string | null;
   stock: number;
@@ -34,6 +37,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
   const image = p.images?.[0] || "/placeholder.svg";
   const installments = 6;
   const displayPrice = priceForAccount(p, accountType);
+  const displayPix = pixPriceForAccount(p, accountType);
   const parcela = displayPrice / installments;
   const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor" : null;
   const wa = whatsappLink(
@@ -58,8 +62,8 @@ export function ProductCard({ p }: { p: ProductLite }) {
         <div className="mt-3 space-y-0.5">
           {tierLabel && <div className="text-[10px] uppercase tracking-wider text-primary font-semibold">Preço {tierLabel}</div>}
           <div className="text-xl font-bold text-foreground">{formatBRL(displayPrice)}</div>
-          {p.pix_price && !tierLabel && (
-            <div className="text-xs text-primary font-medium">ou {formatBRL(p.pix_price)} no PIX</div>
+          {displayPix != null && (
+            <div className="text-xs text-primary font-medium">ou {formatBRL(displayPix)} no PIX</div>
           )}
           <div className="text-xs text-muted-foreground">
             em até {installments}x de {formatBRL(parcela)}

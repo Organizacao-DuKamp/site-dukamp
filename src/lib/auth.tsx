@@ -102,3 +102,15 @@ export function priceForAccount(p: { price?: number | null; consumer_price?: num
   if (t === "produtor" && p.producer_price != null) return Number(p.producer_price);
   return Number(p.consumer_price ?? p.price ?? 0);
 }
+
+/** Resolve PIX price for the user's account type. Returns null if no PIX configured for that tier. */
+export function pixPriceForAccount(
+  p: { pix_price?: number | null; consumer_pix_price?: number | null; reseller_pix_price?: number | null; producer_pix_price?: number | null },
+  t: AccountType,
+): number | null {
+  let v: number | null | undefined;
+  if (t === "revendedor") v = p.reseller_pix_price;
+  else if (t === "produtor") v = p.producer_pix_price;
+  else v = p.consumer_pix_price ?? p.pix_price;
+  return v != null ? Number(v) : null;
+}
