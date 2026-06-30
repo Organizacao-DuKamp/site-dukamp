@@ -38,7 +38,7 @@ export function ImageUpload({
     if (!files?.[0]) return;
     setBusy(true);
     try {
-      const url = await uploadOne(files[0]);
+      const url = await uploadOne(files[0], folder);
       onChange(url);
     } catch (e: any) {
       toast.error(e.message ?? "Erro ao enviar imagem");
