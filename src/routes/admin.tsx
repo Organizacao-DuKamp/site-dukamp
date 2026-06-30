@@ -26,7 +26,8 @@ const NAV = [
   { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ];
 
-function SidebarContent({ pathname, onNavigate, signOut }: { pathname: string; onNavigate?: () => void; signOut: () => void }) {
+function SidebarContent({ pathname, onNavigate, signOut, isMaster }: { pathname: string; onNavigate?: () => void; signOut: () => void; isMaster: boolean }) {
+  const items = NAV.filter((n) => n.to !== "/admin/contas" || isMaster);
   return (
     <>
       <Link to="/admin" onClick={onNavigate} className="flex items-center gap-2 px-4 h-16 border-b">
@@ -37,7 +38,7 @@ function SidebarContent({ pathname, onNavigate, signOut }: { pathname: string; o
         </div>
       </Link>
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-        {NAV.map((n) => {
+        {items.map((n) => {
           const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
           return (
             <Link
