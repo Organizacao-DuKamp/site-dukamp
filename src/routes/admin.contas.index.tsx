@@ -14,6 +14,9 @@ export const Route = createFileRoute("/admin/contas/")({
 });
 
 function ContasPage() {
+  const { isMasterAdmin, loading } = useAuth();
+  if (loading) return null;
+  if (!isMasterAdmin) return <AccessDenied />;
   const [q, setQ] = useState("");
 
   const { data, isLoading } = useQuery({
