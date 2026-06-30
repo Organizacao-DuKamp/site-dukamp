@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import {
   LayoutDashboard, Package, Tag, FolderTree, Image as ImageIcon,
-  Megaphone, Users, Settings, LogOut, ExternalLink,
+  Megaphone, Users, Settings, LogOut, ExternalLink, MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -20,6 +20,7 @@ const NAV = [
   { to: "/admin/categorias", label: "Categorias", icon: Tag },
   { to: "/admin/banners", label: "Banners", icon: ImageIcon },
   { to: "/admin/anuncios", label: "Anúncios", icon: Megaphone },
+  { to: "/admin/atendimentos", label: "Atendimentos", icon: MessageSquare },
   { to: "/admin/administradores", label: "Administradores", icon: Users },
   { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ];
