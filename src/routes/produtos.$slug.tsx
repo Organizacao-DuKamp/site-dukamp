@@ -21,14 +21,30 @@ function Page() {
   const { add } = useCart();
   const { accountType } = useAuth();
   const [activeImg, setActiveImg] = useState(0);
-  const { data: p } = useQuery({
+  const { data: p, isLoading, isFetched } = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => (await supabase.from("products").select("*").eq("slug", slug).maybeSingle()).data,
   });
+  if (isLoading || !isFetched) {
+    return (
+      <SiteLayout>
+        <div className="grid md:grid-cols-2 gap-8 animate-pulse">
+          <div className="aspect-square rounded-lg bg-muted" />
+          <div className="space-y-3">
+            <div className="h-6 w-2/3 bg-muted rounded" />
+            <div className="h-4 w-1/3 bg-muted rounded" />
+            <div className="h-10 w-1/2 bg-muted rounded mt-6" />
+            <div className="h-10 w-40 bg-muted rounded mt-4" />
+          </div>
+        </div>
+      </SiteLayout>
+    );
+  }
   if (!p) return <SiteLayout><p>Produto não encontrado.</p></SiteLayout>;
   const images: string[] = (p.images && p.images.length > 0) ? p.images : ["/placeholder.svg"];
   const displayPrice = priceForAccount(p as any, accountType);
   const displayPix = pixPriceForAccount(p as any, accountType);
+  const installments = Math.max(1, Number(p.installments ?? 1));
   const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor Rural" : null;
   return (
     <SiteLayout>
