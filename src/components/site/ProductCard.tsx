@@ -56,8 +56,9 @@ export function ProductCard({ p }: { p: ProductLite }) {
           {p.name}
         </Link>
         <div className="mt-3 space-y-0.5">
-          <div className="text-xl font-bold text-foreground">{formatBRL(p.price)}</div>
-          {p.pix_price && (
+          {tierLabel && <div className="text-[10px] uppercase tracking-wider text-primary font-semibold">Preço {tierLabel}</div>}
+          <div className="text-xl font-bold text-foreground">{formatBRL(displayPrice)}</div>
+          {p.pix_price && !tierLabel && (
             <div className="text-xs text-primary font-medium">ou {formatBRL(p.pix_price)} no PIX</div>
           )}
           <div className="text-xs text-muted-foreground">
@@ -70,7 +71,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
             className="w-full"
             disabled={p.stock <= 0}
             onClick={() => {
-              add({ id: p.id, name: p.name, price: p.price, image });
+              add({ id: p.id, name: p.name, price: displayPrice, image });
               toast.success("Adicionado ao carrinho");
             }}
           >
