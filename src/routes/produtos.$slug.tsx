@@ -23,6 +23,7 @@ function Page() {
   if (!p) return <SiteLayout><p>Produto não encontrado.</p></SiteLayout>;
   const image = p.images?.[0] || "/placeholder.svg";
   const displayPrice = priceForAccount(p as any, accountType);
+  const displayPix = pixPriceForAccount(p as any, accountType);
   const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor" : null;
   return (
     <SiteLayout>
