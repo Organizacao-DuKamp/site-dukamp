@@ -22,6 +22,7 @@ export type ProductLite = {
   images: string[];
   brand: string | null;
   stock: number;
+  installments?: number | null;
 };
 
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
