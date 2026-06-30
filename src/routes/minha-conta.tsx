@@ -120,7 +120,7 @@ function MinhaConta() {
                     {(name || user.email || "?").slice(0, 1).toUpperCase()}
                   </div>
                 )}
-                <ImageUpload value={avatar} onChange={setAvatar} />
+                <ImageUpload value={avatar} onChange={setAvatar} folder={`avatars/${user.id}`} />
               </div>
 
               <div className="flex-1 w-full space-y-4">

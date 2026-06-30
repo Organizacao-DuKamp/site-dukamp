@@ -22,13 +22,13 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProdutosSlugRouteImport } from './routes/produtos.$slug'
 import { Route as CatalogosSlugRouteImport } from './routes/catalogos.$slug'
 import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
-import { Route as AdminContasRouteImport } from './routes/admin.contas'
 import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminCatalogosRouteImport } from './routes/admin.catalogos'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAtendimentosRouteImport } from './routes/admin.atendimentos'
 import { Route as AdminAnunciosRouteImport } from './routes/admin.anuncios'
+import { Route as AdminContasIndexRouteImport } from './routes/admin.contas.index'
 import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
 import { Route as AdminContasIdRouteImport } from './routes/admin.contas.$id'
 
@@ -97,11 +97,6 @@ const AdminProdutosRoute = AdminProdutosRouteImport.update({
   path: '/produtos',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminContasRoute = AdminContasRouteImport.update({
-  id: '/contas',
-  path: '/contas',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
@@ -132,15 +127,20 @@ const AdminAnunciosRoute = AdminAnunciosRouteImport.update({
   path: '/anuncios',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminContasIndexRoute = AdminContasIndexRouteImport.update({
+  id: '/contas/',
+  path: '/contas/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiPublicInitAdminRoute = ApiPublicInitAdminRouteImport.update({
   id: '/api/public/init-admin',
   path: '/api/public/init-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminContasIdRoute = AdminContasIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AdminContasRoute,
+  id: '/contas/$id',
+  path: '/contas/$id',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -159,13 +159,13 @@ export interface FileRoutesByFullPath {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
-  '/admin/contas': typeof AdminContasRouteWithChildren
   '/admin/produtos': typeof AdminProdutosRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
+  '/admin/contas/': typeof AdminContasIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -182,13 +182,13 @@ export interface FileRoutesByTo {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
-  '/admin/contas': typeof AdminContasRouteWithChildren
   '/admin/produtos': typeof AdminProdutosRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin': typeof AdminIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
+  '/admin/contas': typeof AdminContasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -207,13 +207,13 @@ export interface FileRoutesById {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
-  '/admin/contas': typeof AdminContasRouteWithChildren
   '/admin/produtos': typeof AdminProdutosRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
+  '/admin/contas/': typeof AdminContasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -233,13 +233,13 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
-    | '/admin/contas'
     | '/admin/produtos'
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin/'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
+    | '/admin/contas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -256,13 +256,13 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
-    | '/admin/contas'
     | '/admin/produtos'
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
+    | '/admin/contas'
   id:
     | '__root__'
     | '/'
@@ -280,13 +280,13 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
-    | '/admin/contas'
     | '/admin/produtos'
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin/'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
+    | '/admin/contas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -395,13 +395,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProdutosRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/contas': {
-      id: '/admin/contas'
-      path: '/contas'
-      fullPath: '/admin/contas'
-      preLoaderRoute: typeof AdminContasRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/configuracoes': {
       id: '/admin/configuracoes'
       path: '/configuracoes'
@@ -444,6 +437,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnunciosRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/contas/': {
+      id: '/admin/contas/'
+      path: '/contas'
+      fullPath: '/admin/contas/'
+      preLoaderRoute: typeof AdminContasIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/public/init-admin': {
       id: '/api/public/init-admin'
       path: '/api/public/init-admin'
@@ -453,25 +453,13 @@ declare module '@tanstack/react-router' {
     }
     '/admin/contas/$id': {
       id: '/admin/contas/$id'
-      path: '/$id'
+      path: '/contas/$id'
       fullPath: '/admin/contas/$id'
       preLoaderRoute: typeof AdminContasIdRouteImport
-      parentRoute: typeof AdminContasRoute
+      parentRoute: typeof AdminRoute
     }
   }
 }
-
-interface AdminContasRouteChildren {
-  AdminContasIdRoute: typeof AdminContasIdRoute
-}
-
-const AdminContasRouteChildren: AdminContasRouteChildren = {
-  AdminContasIdRoute: AdminContasIdRoute,
-}
-
-const AdminContasRouteWithChildren = AdminContasRoute._addFileChildren(
-  AdminContasRouteChildren,
-)
 
 interface AdminRouteChildren {
   AdminAnunciosRoute: typeof AdminAnunciosRoute
@@ -480,9 +468,10 @@ interface AdminRouteChildren {
   AdminCatalogosRoute: typeof AdminCatalogosRoute
   AdminCategoriasRoute: typeof AdminCategoriasRoute
   AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
-  AdminContasRoute: typeof AdminContasRouteWithChildren
   AdminProdutosRoute: typeof AdminProdutosRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminContasIdRoute: typeof AdminContasIdRoute
+  AdminContasIndexRoute: typeof AdminContasIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -492,9 +481,10 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogosRoute: AdminCatalogosRoute,
   AdminCategoriasRoute: AdminCategoriasRoute,
   AdminConfiguracoesRoute: AdminConfiguracoesRoute,
-  AdminContasRoute: AdminContasRouteWithChildren,
   AdminProdutosRoute: AdminProdutosRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminContasIdRoute: AdminContasIdRoute,
+  AdminContasIndexRoute: AdminContasIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
