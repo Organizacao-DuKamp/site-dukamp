@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart, formatBRL } from "@/lib/cart";
@@ -32,7 +32,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export function ProductCard({ p }: { p: ProductLite }) {
-  const { add } = useCart();
+  const navigate = useNavigate();
   const { data: settings } = useSiteSettings();
   const { accountType } = useAuth();
   const image = p.images?.[0] || "/placeholder.svg";
