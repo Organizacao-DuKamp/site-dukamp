@@ -26,7 +26,8 @@ const NAV = [
   { to: "/admin/configuracoes", label: "Configurações", icon: Settings },
 ];
 
-function SidebarContent({ pathname, onNavigate, signOut }: { pathname: string; onNavigate?: () => void; signOut: () => void }) {
+function SidebarContent({ pathname, onNavigate, signOut, isMaster }: { pathname: string; onNavigate?: () => void; signOut: () => void; isMaster: boolean }) {
+  const items = NAV.filter((n) => n.to !== "/admin/contas" || isMaster);
   return (
     <>
       <Link to="/admin" onClick={onNavigate} className="flex items-center gap-2 px-4 h-16 border-b">
@@ -37,7 +38,7 @@ function SidebarContent({ pathname, onNavigate, signOut }: { pathname: string; o
         </div>
       </Link>
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
-        {NAV.map((n) => {
+        {items.map((n) => {
           const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
           return (
             <Link
@@ -64,7 +65,7 @@ function SidebarContent({ pathname, onNavigate, signOut }: { pathname: string; o
 }
 
 function AdminLayout() {
-  const { user, isAdmin, loading, signOut } = useAuth();
+  const { user, isAdmin, isMasterAdmin, loading, signOut } = useAuth();
   const nav = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -90,7 +91,7 @@ function AdminLayout() {
   return (
     <div className="min-h-screen flex bg-muted/30">
       <aside className="hidden lg:flex w-60 bg-sidebar border-r flex-col shrink-0">
-        <SidebarContent pathname={pathname} signOut={signOut} />
+        <SidebarContent pathname={pathname} signOut={signOut} isMaster={isMasterAdmin} />
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -102,7 +103,7 @@ function AdminLayout() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-64 flex flex-col">
-              <SidebarContent pathname={pathname} onNavigate={() => setMobileOpen(false)} signOut={signOut} />
+              <SidebarContent pathname={pathname} onNavigate={() => setMobileOpen(false)} signOut={signOut} isMaster={isMasterAdmin} />
             </SheetContent>
           </Sheet>
           <div className="flex items-center gap-2">

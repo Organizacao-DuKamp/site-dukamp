@@ -6,17 +6,30 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Eye, UserCircle } from "lucide-react";
+import { Search, Eye, UserCircle, ShieldAlert } from "lucide-react";
 import { PROTECTED_ADMIN_EMAIL } from "@/lib/constants";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/admin/contas/")({
   component: ContasPage,
 });
 
+function AccessDenied() {
+  return (
+    <div className="max-w-md mx-auto mt-12 text-center space-y-2">
+      <ShieldAlert className="h-10 w-10 mx-auto text-muted-foreground" />
+      <h1 className="text-xl font-bold">Acesso restrito</h1>
+      <p className="text-sm text-muted-foreground">Apenas o Administrador Mestre pode gerenciar contas.</p>
+    </div>
+  );
+}
+
 function ContasPage() {
+  const { isMasterAdmin, loading } = useAuth();
   const [q, setQ] = useState("");
 
   const { data, isLoading } = useQuery({
+    enabled: isMasterAdmin,
     queryKey: ["admin-accounts"],
     queryFn: async () => {
       const [profilesR, rolesR] = await Promise.all([
@@ -43,6 +56,9 @@ function ContasPage() {
         (u.email ?? "").toLowerCase().includes(term),
     );
   }, [data, q]);
+
+  if (loading) return null;
+  if (!isMasterAdmin) return <AccessDenied />;
 
   return (
     <div className="space-y-4">

@@ -1,11 +1,13 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { PROTECTED_ADMIN_EMAIL } from "@/lib/constants";
 
 type AuthCtx = {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
+  isMasterAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
@@ -57,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <Ctx.Provider value={{ user, session, isAdmin, loading, signIn, signOut }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ user, session, isAdmin, isMasterAdmin: (user?.email ?? "").toLowerCase() === PROTECTED_ADMIN_EMAIL.toLowerCase(), loading, signIn, signOut }}>{children}</Ctx.Provider>
   );
 }
 

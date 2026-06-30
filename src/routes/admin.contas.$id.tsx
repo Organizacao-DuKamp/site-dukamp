@@ -16,11 +16,12 @@ export const Route = createFileRoute("/admin/contas/$id")({
 
 function ContaDetalhe() {
   const { id } = Route.useParams();
-  const { user: me } = useAuth();
+  const { user: me, isMasterAdmin, loading: authLoading } = useAuth();
   const qc = useQueryClient();
   const nav = useNavigate();
 
   const { data, isLoading } = useQuery({
+    enabled: isMasterAdmin,
     queryKey: ["account", id],
     queryFn: async () => {
       const [profileR, rolesR] = await Promise.all([
@@ -71,6 +72,15 @@ function ContaDetalhe() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  if (authLoading) return null;
+  if (!isMasterAdmin) {
+    return (
+      <div className="max-w-md mx-auto mt-12 text-center space-y-2">
+        <h1 className="text-xl font-bold">Acesso restrito</h1>
+        <p className="text-sm text-muted-foreground">Apenas o Administrador Mestre pode gerenciar contas.</p>
+      </div>
+    );
+  }
   if (isLoading) return <div className="text-sm text-muted-foreground">Carregando...</div>;
   if (!data?.profile) {
     return (
