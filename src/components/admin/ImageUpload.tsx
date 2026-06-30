@@ -25,9 +25,11 @@ async function uploadOne(file: File, folder?: string): Promise<string> {
 export function ImageUpload({
   value,
   onChange,
+  folder,
 }: {
   value: string;
   onChange: (v: string) => void;
+  folder?: string;
 }) {
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
