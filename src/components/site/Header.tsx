@@ -1,10 +1,11 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingCart, Search, User, LogOut, Facebook, Instagram, Youtube } from "lucide-react";
+import { ShoppingCart, Search, User, LogOut, Facebook, Instagram, Youtube, LayoutDashboard, MessageCircle, UserCircle } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
+import { useSupport } from "@/lib/support";
 import { useSiteSettings, whatsappLink } from "@/lib/site-settings";
 import {
   Sheet,
@@ -13,6 +14,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
@@ -35,6 +44,7 @@ const socials = [
 export function Header() {
   const { count, items, total, remove } = useCart();
   const { user, isAdmin, signOut } = useAuth();
+  const { ticket, openChat } = useSupport();
   const { data: settings } = useSiteSettings();
   const [q, setQ] = useState("");
   const navigate = useNavigate();
@@ -74,16 +84,42 @@ export function Header() {
 
           <div className="flex items-center gap-1 ml-auto">
             {user ? (
-              <>
-                {isAdmin && (
-                  <Button asChild variant="ghost" size="sm">
-                    <Link to="/admin">Admin</Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" title="Minha conta">
+                    <UserCircle className="h-6 w-6" />
                   </Button>
-                )}
-                <Button variant="ghost" size="icon" onClick={() => signOut()} title="Sair">
-                  <LogOut className="h-5 w-5" />
-                </Button>
-              </>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="truncate">{user.email}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {isAdmin ? (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin"><LayoutDashboard className="h-4 w-4 mr-2" />Painel Administrativo</Link>
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard"><LayoutDashboard className="h-4 w-4 mr-2" />Meu Painel</Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (isAdmin) navigate({ to: "/admin/atendimentos" });
+                      else openChat();
+                    }}
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Atendimento{!isAdmin && ticket && ticket.status !== "closed" ? " (aberto)" : ""}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to={isAdmin ? "/admin" : "/dashboard"}><User className="h-4 w-4 mr-2" />Minha Conta</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    <LogOut className="h-4 w-4 mr-2" />Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Button asChild variant="ghost" size="icon" title="Entrar">
                 <Link to="/auth"><User className="h-5 w-5" /></Link>

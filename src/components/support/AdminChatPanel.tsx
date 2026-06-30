@@ -88,7 +88,7 @@ export function AdminChatPanel({ ticket: initial, onClose }: Props) {
   }
 
   return (
-    <div className="border rounded-lg bg-card flex flex-col h-[500px] overflow-hidden">
+    <div className="border rounded-lg bg-card flex flex-col h-[70vh] sm:h-[500px] min-w-0 overflow-hidden">
       <div className="flex items-center justify-between px-3 py-2 border-b">
         <div className="text-sm font-semibold truncate">Ticket #{ticket.id.slice(0, 8)}</div>
         <div className="flex items-center gap-2">
