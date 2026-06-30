@@ -61,12 +61,16 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center gap-4">
           <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="h-9 w-9 rounded-lg bg-primary grid place-items-center text-primary-foreground font-bold">
-              D
-            </div>
+            {settings?.logo_url ? (
+              <img src={settings.logo_url} alt={settings?.site_name ?? "Logo"} className="h-9 w-9 rounded-lg object-cover" />
+            ) : (
+              <div className="h-9 w-9 rounded-lg bg-primary grid place-items-center text-primary-foreground font-bold">
+                D
+              </div>
+            )}
             <div className="hidden sm:block">
-              <div className="font-bold leading-tight">Dukamp</div>
-              <div className="text-xs text-muted-foreground leading-tight">Saúde Animal</div>
+              <div className="font-bold leading-tight">{settings?.site_name ?? "Dukamp"}</div>
+              <div className="text-xs text-muted-foreground leading-tight">{settings?.tagline ?? "Saúde Animal"}</div>
             </div>
           </Link>
 
