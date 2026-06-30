@@ -222,6 +222,7 @@ export type Database = {
           catalog_id: string | null
           category_id: string | null
           code: string
+          consumer_pix_price: number | null
           consumer_price: number | null
           created_at: string
           description: string | null
@@ -232,7 +233,9 @@ export type Database = {
           name: string
           pix_price: number | null
           price: number
+          producer_pix_price: number | null
           producer_price: number | null
+          reseller_pix_price: number | null
           reseller_price: number | null
           slug: string
           stock: number
@@ -245,6 +248,7 @@ export type Database = {
           catalog_id?: string | null
           category_id?: string | null
           code: string
+          consumer_pix_price?: number | null
           consumer_price?: number | null
           created_at?: string
           description?: string | null
@@ -255,7 +259,9 @@ export type Database = {
           name: string
           pix_price?: number | null
           price?: number
+          producer_pix_price?: number | null
           producer_price?: number | null
+          reseller_pix_price?: number | null
           reseller_price?: number | null
           slug: string
           stock?: number
@@ -268,6 +274,7 @@ export type Database = {
           catalog_id?: string | null
           category_id?: string | null
           code?: string
+          consumer_pix_price?: number | null
           consumer_price?: number | null
           created_at?: string
           description?: string | null
@@ -278,7 +285,9 @@ export type Database = {
           name?: string
           pix_price?: number | null
           price?: number
+          producer_pix_price?: number | null
           producer_price?: number | null
+          reseller_pix_price?: number | null
           reseller_price?: number | null
           slug?: string
           stock?: number
