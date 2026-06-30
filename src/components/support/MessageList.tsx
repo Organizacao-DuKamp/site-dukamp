@@ -1,4 +1,4 @@
-import { useSupport, type SupportMessage } from "@/lib/support";
+import { type SupportMessage } from "@/lib/support";
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
@@ -43,6 +43,3 @@ export function MessageList({
   );
 }
 
-export function useUnusedSupportCtxFix() {
-  useSupport();
-}
