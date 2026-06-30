@@ -1,4 +1,4 @@
-import { useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart, formatBRL } from "@/lib/cart";
@@ -32,7 +32,6 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export function ProductCard({ p }: { p: ProductLite }) {
-  const navigate = useNavigate();
   const { add } = useCart();
   const { data: settings } = useSiteSettings();
   const { accountType } = useAuth();
@@ -48,20 +47,22 @@ export function ProductCard({ p }: { p: ProductLite }) {
   );
 
   const stopNav = (e: React.MouseEvent) => {
-    e.preventDefault();
     e.stopPropagation();
   };
 
   return (
     <div
-      role="link"
-      tabIndex={0}
-      onClick={() => navigate({ to: "/produtos/$slug", params: { slug: p.slug } })}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") navigate({ to: "/produtos/$slug", params: { slug: p.slug } });
-      }}
-      className="group cursor-pointer rounded-lg border bg-card overflow-hidden flex flex-col hover:shadow-lg transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="group relative rounded-lg border bg-card overflow-hidden flex flex-col hover:shadow-lg transition-shadow"
     >
+      <Link
+        to="/produtos/$slug"
+        params={{ slug: p.slug }}
+        preload="intent"
+        aria-label={`Ver detalhes de ${p.name}`}
+        className="absolute inset-0 z-10 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <span className="sr-only">Ver detalhes de {p.name}</span>
+      </Link>
       <div className="aspect-square bg-white overflow-hidden">
         <img src={image} alt={p.name} className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform" />
       </div>
@@ -85,7 +86,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
         <div className="mt-auto pt-3 space-y-2">
           <Button
             size="sm"
-            className="w-full"
+            className="relative z-20 w-full"
             disabled={p.stock <= 0}
             onClick={(e) => {
               stopNav(e);
@@ -100,7 +101,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="w-full inline-flex items-center justify-center gap-1 rounded-md bg-[#25D366] hover:bg-[#1ebe57] text-white text-sm font-medium h-9 px-3 transition-colors"
+            className="relative z-20 w-full inline-flex items-center justify-center gap-1 rounded-md bg-[#25D366] hover:bg-[#1ebe57] text-white text-sm font-medium h-9 px-3 transition-colors"
           >
             <WhatsAppIcon className="h-4 w-4" /> Comprar pelo WhatsApp
           </a>
