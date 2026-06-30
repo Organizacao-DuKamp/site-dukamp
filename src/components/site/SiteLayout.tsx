@@ -3,6 +3,7 @@ import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { MainNav } from "./MainNav";
 import { InstitutionalSidebar } from "./InstitutionalSidebar";
+import { ApprovalNoticeModal } from "./ApprovalNoticeModal";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
@@ -18,6 +19,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         </div>
       </div>
       <Footer />
+      <ApprovalNoticeModal />
     </div>
   );
 }

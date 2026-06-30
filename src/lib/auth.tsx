@@ -11,6 +11,8 @@ type AuthCtx = {
   isAdmin: boolean;
   isMasterAdmin: boolean;
   accountType: AccountType;
+  approvalNotice: AccountType | null;
+  dismissApprovalNotice: () => Promise<void>;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
@@ -23,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [accountType, setAccountType] = useState<AccountType>("cliente");
+  const [approvalNotice, setApprovalNotice] = useState<AccountType | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,6 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setIsAdmin(false);
         setAccountType("cliente");
+        setApprovalNotice(null);
       }
     });
     supabase.auth.getSession().then(({ data }) => {
@@ -48,11 +52,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function loadProfile(userId: string) {
     const [rolesR, profileR] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle(),
-      supabase.from("profiles").select("account_type").eq("id", userId).maybeSingle(),
+      (supabase as any).from("profiles").select("account_type, approval_notified").eq("id", userId).maybeSingle(),
     ]);
     setIsAdmin(!!rolesR.data);
-    const t = ((profileR.data as any)?.account_type ?? "cliente") as AccountType;
+    const p: any = profileR.data ?? {};
+    const t = (p.account_type ?? "cliente") as AccountType;
     setAccountType(t);
+    if (p.approval_notified === false && (t === "revendedor" || t === "produtor")) {
+      setApprovalNotice(t);
+    } else {
+      setApprovalNotice(null);
+    }
+  }
+
+  async function dismissApprovalNotice() {
+    const u = user;
+    setApprovalNotice(null);
+    if (!u) return;
+    await (supabase as any).from("profiles").update({ approval_notified: true }).eq("id", u.id);
   }
 
   async function signIn(email: string, password: string) {
@@ -67,7 +84,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <Ctx.Provider value={{
       user, session, isAdmin,
       isMasterAdmin: (user?.email ?? "").toLowerCase() === PROTECTED_ADMIN_EMAIL.toLowerCase(),
-      accountType, loading, signIn, signOut,
+      accountType, approvalNotice, dismissApprovalNotice,
+      loading, signIn, signOut,
     }}>{children}</Ctx.Provider>
   );
 }

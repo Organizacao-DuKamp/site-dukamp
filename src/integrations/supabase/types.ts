@@ -305,6 +305,7 @@ export type Database = {
       profiles: {
         Row: {
           account_type: Database["public"]["Enums"]["account_type"]
+          approval_notified: boolean
           avatar_url: string | null
           cnpj: string | null
           contact_email: string | null
@@ -319,6 +320,7 @@ export type Database = {
         }
         Insert: {
           account_type?: Database["public"]["Enums"]["account_type"]
+          approval_notified?: boolean
           avatar_url?: string | null
           cnpj?: string | null
           contact_email?: string | null
@@ -333,6 +335,7 @@ export type Database = {
         }
         Update: {
           account_type?: Database["public"]["Enums"]["account_type"]
+          approval_notified?: boolean
           avatar_url?: string | null
           cnpj?: string | null
           contact_email?: string | null

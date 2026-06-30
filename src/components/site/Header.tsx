@@ -43,7 +43,7 @@ const socials = [
 
 export function Header() {
   const { count, items, total, remove } = useCart();
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, accountType, signOut } = useAuth();
   const { ticket, openChat } = useSupport();
   const { data: settings } = useSiteSettings();
   const [q, setQ] = useState("");
@@ -91,7 +91,14 @@ export function Header() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel className="truncate">{user.email}</DropdownMenuLabel>
+                  <DropdownMenuLabel className="truncate">
+                    <div className="truncate">{user.email}</div>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <span className="inline-flex items-center rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                        {accountType}
+                      </span>
+                    </div>
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {isAdmin ? (
                     <DropdownMenuItem asChild>
