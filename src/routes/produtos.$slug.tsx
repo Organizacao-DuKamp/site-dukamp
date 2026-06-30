@@ -106,7 +106,7 @@ function Page() {
           </Button>
           <div className="mt-6 text-sm text-muted-foreground">
             <div>Estoque: {p.stock}</div>
-            <div>Peso: {p.weight} kg</div>
+            {p.weight != null && <div>Peso: {p.weight} kg</div>}
           </div>
           {p.description && (
             <div className="mt-6">
