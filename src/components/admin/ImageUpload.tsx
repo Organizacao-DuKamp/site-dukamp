@@ -6,9 +6,10 @@ import { toast } from "sonner";
 
 const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
 
-async function uploadOne(file: File): Promise<string> {
+async function uploadOne(file: File, folder?: string): Promise<string> {
   const ext = file.name.split(".").pop() || "bin";
-  const path = `${crypto.randomUUID()}.${ext}`;
+  const base = `${crypto.randomUUID()}.${ext}`;
+  const path = folder ? `${folder.replace(/^\/+|\/+$/g, "")}/${base}` : base;
   const { error } = await supabase.storage.from("media").upload(path, file, {
     contentType: file.type,
     upsert: false,

@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Eye, UserCircle } from "lucide-react";
 import { PROTECTED_ADMIN_EMAIL } from "@/lib/constants";
 
-export const Route = createFileRoute("/admin/contas")({
+export const Route = createFileRoute("/admin/contas/")({
   component: ContasPage,
 });
 
