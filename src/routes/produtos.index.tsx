@@ -37,7 +37,7 @@ function Page() {
       <h1 className="text-2xl font-bold mb-2">Produtos</h1>
       {q && <p className="text-sm text-muted-foreground mb-4">Resultados para "{q}"</p>}
       {categoria && <p className="text-sm text-muted-foreground mb-4">Categoria: {categoria}</p>}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
         {prods.data?.map((p) => <ProductCard key={p.id} p={p as any} />)}
       </div>
       {prods.data?.length === 0 && <p className="text-muted-foreground">Nenhum produto encontrado.</p>}

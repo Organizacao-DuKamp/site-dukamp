@@ -65,7 +65,7 @@ function Home() {
             </Link>
           </Button>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {featured.data?.map((p) => (
             <ProductCard key={p.id} p={p as any} />
           ))}
@@ -87,7 +87,7 @@ function Home() {
                 </Link>
               </Button>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               {prods.map((p) => (
                 <ProductCard key={p.id} p={p as any} />
               ))}
