@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_requests: {
+        Row: {
+          cnpj: string | null
+          contact_email: string
+          cpf: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          phone: string
+          requested_type: Database["public"]["Enums"]["requested_account_type"]
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["account_request_status"]
+          uf: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cnpj?: string | null
+          contact_email: string
+          cpf?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          phone: string
+          requested_type: Database["public"]["Enums"]["requested_account_type"]
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["account_request_status"]
+          uf: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cnpj?: string | null
+          contact_email?: string
+          cpf?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string
+          requested_type?: Database["public"]["Enums"]["requested_account_type"]
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["account_request_status"]
+          uf?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       banners: {
         Row: {
           active: boolean
@@ -165,6 +222,7 @@ export type Database = {
           catalog_id: string | null
           category_id: string | null
           code: string
+          consumer_price: number | null
           created_at: string
           description: string | null
           featured: boolean
@@ -174,6 +232,8 @@ export type Database = {
           name: string
           pix_price: number | null
           price: number
+          producer_price: number | null
+          reseller_price: number | null
           slug: string
           stock: number
           updated_at: string
@@ -185,6 +245,7 @@ export type Database = {
           catalog_id?: string | null
           category_id?: string | null
           code: string
+          consumer_price?: number | null
           created_at?: string
           description?: string | null
           featured?: boolean
@@ -194,6 +255,8 @@ export type Database = {
           name: string
           pix_price?: number | null
           price?: number
+          producer_price?: number | null
+          reseller_price?: number | null
           slug: string
           stock?: number
           updated_at?: string
@@ -205,6 +268,7 @@ export type Database = {
           catalog_id?: string | null
           category_id?: string | null
           code?: string
+          consumer_price?: number | null
           created_at?: string
           description?: string | null
           featured?: boolean
@@ -214,6 +278,8 @@ export type Database = {
           name?: string
           pix_price?: number | null
           price?: number
+          producer_price?: number | null
+          reseller_price?: number | null
           slug?: string
           stock?: number
           updated_at?: string
@@ -238,27 +304,45 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_type: Database["public"]["Enums"]["account_type"]
           avatar_url: string | null
+          cnpj: string | null
+          contact_email: string | null
+          cpf: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          phone: string | null
+          uf: string | null
           updated_at: string
         }
         Insert: {
+          account_type?: Database["public"]["Enums"]["account_type"]
           avatar_url?: string | null
+          cnpj?: string | null
+          contact_email?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
+          phone?: string | null
+          uf?: string | null
           updated_at?: string
         }
         Update: {
+          account_type?: Database["public"]["Enums"]["account_type"]
           avatar_url?: string | null
+          cnpj?: string | null
+          contact_email?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          phone?: string | null
+          uf?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -381,6 +465,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_account_request: {
+        Args: { _request_id: string; _reviewer: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -391,7 +479,10 @@ export type Database = {
       is_master_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
+      account_request_status: "pending" | "approved" | "rejected"
+      account_type: "cliente" | "revendedor" | "produtor" | "admin"
       app_role: "admin" | "user"
+      requested_account_type: "revendedor" | "produtor"
       ticket_status: "open" | "in_progress" | "closed"
     }
     CompositeTypes: {
@@ -520,7 +611,10 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      account_request_status: ["pending", "approved", "rejected"],
+      account_type: ["cliente", "revendedor", "produtor", "admin"],
       app_role: ["admin", "user"],
+      requested_account_type: ["revendedor", "produtor"],
       ticket_status: ["open", "in_progress", "closed"],
     },
   },
