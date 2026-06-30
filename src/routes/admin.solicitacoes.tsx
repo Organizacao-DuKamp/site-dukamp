@@ -77,7 +77,7 @@ function SolicitacoesPage() {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold">Solicitações</h1>
-        <p className="text-sm text-muted-foreground">Pedidos de cadastro como Produtor ou Revendedor.</p>
+        <p className="text-sm text-muted-foreground">Pedidos de cadastro como Produtor Rural ou Revendedor.</p>
       </div>
 
       <div className="flex gap-2">
@@ -112,7 +112,7 @@ function SolicitacoesPage() {
                   <div>{r.full_name}</div>
                   <div className="text-xs text-muted-foreground">{r.email}</div>
                 </TableCell>
-                <TableCell><Badge variant="secondary">{r.requested_type}</Badge></TableCell>
+                <TableCell><Badge variant="secondary">{r.requested_type === "produtor" ? "Produtor Rural" : r.requested_type === "revendedor" ? "Revendedor" : r.requested_type}</Badge></TableCell>
                 <TableCell>{r.uf}</TableCell>
                 <TableCell className="text-xs">{r.cnpj ? `CNPJ: ${r.cnpj}` : `CPF: ${r.cpf}`}</TableCell>
                 <TableCell className="hidden md:table-cell text-xs">
@@ -150,7 +150,7 @@ function SolicitacoesPage() {
             <CardTitle className="text-sm flex items-center gap-2"><Clock className="h-4 w-4" /> Como funciona</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
-            Ao aprovar, o tipo da conta do solicitante é atualizado automaticamente (Produtor ou Revendedor) e os dados cadastrais (UF, documento, telefone) são copiados para o perfil dele.
+            Ao aprovar, o tipo da conta do solicitante é atualizado automaticamente (Produtor Rural ou Revendedor) e os dados cadastrais (UF, documento, telefone) são copiados para o perfil dele.
           </CardContent>
         </Card>
       )}

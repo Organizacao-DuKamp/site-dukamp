@@ -101,7 +101,7 @@ export function Header() {
                     <div className="truncate">{user.email}</div>
                     <div className="mt-1 flex items-center gap-1.5">
                       <span className="inline-flex items-center rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                        {accountType}
+                        {accountType === "cliente" ? "Consumidor" : accountType === "produtor" ? "Produtor Rural" : accountType === "revendedor" ? "Revendedor" : "Admin"}
                       </span>
                     </div>
                   </DropdownMenuLabel>

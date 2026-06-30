@@ -24,7 +24,7 @@ function Page() {
   const image = p.images?.[0] || "/placeholder.svg";
   const displayPrice = priceForAccount(p as any, accountType);
   const displayPix = pixPriceForAccount(p as any, accountType);
-  const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor" : null;
+  const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor Rural" : null;
   return (
     <SiteLayout>
       <div className="grid md:grid-cols-2 gap-8">
