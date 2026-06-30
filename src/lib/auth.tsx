@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <Ctx.Provider value={{ user, session, isAdmin, loading, signIn, signOut }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ user, session, isAdmin, isMasterAdmin: (user?.email ?? "").toLowerCase() === PROTECTED_ADMIN_EMAIL.toLowerCase(), loading, signIn, signOut }}>{children}</Ctx.Provider>
   );
 }
 
