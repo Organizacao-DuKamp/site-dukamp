@@ -29,7 +29,6 @@ import { Route as AdminCatalogosRouteImport } from './routes/admin.catalogos'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAtendimentosRouteImport } from './routes/admin.atendimentos'
 import { Route as AdminAnunciosRouteImport } from './routes/admin.anuncios'
-import { Route as AdminAdministradoresRouteImport } from './routes/admin.administradores'
 import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
 import { Route as AdminContasIdRouteImport } from './routes/admin.contas.$id'
 
@@ -133,11 +132,6 @@ const AdminAnunciosRoute = AdminAnunciosRouteImport.update({
   path: '/anuncios',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAdministradoresRoute = AdminAdministradoresRouteImport.update({
-  id: '/administradores',
-  path: '/administradores',
-  getParentRoute: () => AdminRoute,
-} as any)
 const ApiPublicInitAdminRoute = ApiPublicInitAdminRouteImport.update({
   id: '/api/public/init-admin',
   path: '/api/public/init-admin',
@@ -159,7 +153,6 @@ export interface FileRoutesByFullPath {
   '/minha-conta': typeof MinhaContaRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
-  '/admin/administradores': typeof AdminAdministradoresRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
   '/admin/atendimentos': typeof AdminAtendimentosRoute
   '/admin/banners': typeof AdminBannersRoute
@@ -183,7 +176,6 @@ export interface FileRoutesByTo {
   '/minha-conta': typeof MinhaContaRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
-  '/admin/administradores': typeof AdminAdministradoresRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
   '/admin/atendimentos': typeof AdminAtendimentosRoute
   '/admin/banners': typeof AdminBannersRoute
@@ -209,7 +201,6 @@ export interface FileRoutesById {
   '/minha-conta': typeof MinhaContaRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
-  '/admin/administradores': typeof AdminAdministradoresRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
   '/admin/atendimentos': typeof AdminAtendimentosRoute
   '/admin/banners': typeof AdminBannersRoute
@@ -236,7 +227,6 @@ export interface FileRouteTypes {
     | '/minha-conta'
     | '/produtos'
     | '/sobre'
-    | '/admin/administradores'
     | '/admin/anuncios'
     | '/admin/atendimentos'
     | '/admin/banners'
@@ -260,7 +250,6 @@ export interface FileRouteTypes {
     | '/minha-conta'
     | '/produtos'
     | '/sobre'
-    | '/admin/administradores'
     | '/admin/anuncios'
     | '/admin/atendimentos'
     | '/admin/banners'
@@ -285,7 +274,6 @@ export interface FileRouteTypes {
     | '/minha-conta'
     | '/produtos'
     | '/sobre'
-    | '/admin/administradores'
     | '/admin/anuncios'
     | '/admin/atendimentos'
     | '/admin/banners'
@@ -456,13 +444,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnunciosRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/administradores': {
-      id: '/admin/administradores'
-      path: '/administradores'
-      fullPath: '/admin/administradores'
-      preLoaderRoute: typeof AdminAdministradoresRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/api/public/init-admin': {
       id: '/api/public/init-admin'
       path: '/api/public/init-admin'
@@ -493,7 +474,6 @@ const AdminContasRouteWithChildren = AdminContasRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
-  AdminAdministradoresRoute: typeof AdminAdministradoresRoute
   AdminAnunciosRoute: typeof AdminAnunciosRoute
   AdminAtendimentosRoute: typeof AdminAtendimentosRoute
   AdminBannersRoute: typeof AdminBannersRoute
@@ -506,7 +486,6 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminAdministradoresRoute: AdminAdministradoresRoute,
   AdminAnunciosRoute: AdminAnunciosRoute,
   AdminAtendimentosRoute: AdminAtendimentosRoute,
   AdminBannersRoute: AdminBannersRoute,
