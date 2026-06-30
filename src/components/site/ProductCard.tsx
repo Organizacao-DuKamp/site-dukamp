@@ -66,9 +66,11 @@ export function ProductCard({ p }: { p: ProductLite }) {
           {displayPix != null && (
             <div className="text-xs text-primary font-medium">ou {formatBRL(displayPix)} no PIX</div>
           )}
-          <div className="text-xs text-muted-foreground">
-            em até {installments}x de {formatBRL(parcela)}
-          </div>
+          {installments > 1 && (
+            <div className="text-xs text-muted-foreground">
+              em até {installments}x de {formatBRL(parcela)}
+            </div>
+          )}
         </div>
         <div className="mt-auto pt-3 space-y-2">
           <Button
