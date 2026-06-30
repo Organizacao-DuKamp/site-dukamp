@@ -49,8 +49,8 @@ function AtendimentosPage() {
       arr.map((t) => ({
         ...t,
         unread: counts.get(t.id) ?? 0,
-        user_name: pmap.get(t.user_id)?.full_name ?? null,
-        user_email: pmap.get(t.user_id)?.email ?? null,
+        user_name: (pmap.get(t.user_id) as any)?.full_name ?? null,
+        user_email: (pmap.get(t.user_id) as any)?.email ?? null,
       })),
     );
   }

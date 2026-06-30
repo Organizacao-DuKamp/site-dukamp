@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ProdutosRouteImport } from './routes/produtos'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as CatalogosRouteImport } from './routes/catalogos'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -24,6 +25,7 @@ import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configura
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminCatalogosRouteImport } from './routes/admin.catalogos'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
+import { Route as AdminAtendimentosRouteImport } from './routes/admin.atendimentos'
 import { Route as AdminAnunciosRouteImport } from './routes/admin.anuncios'
 import { Route as AdminAdministradoresRouteImport } from './routes/admin.administradores'
 import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
@@ -36,6 +38,11 @@ const SobreRoute = SobreRouteImport.update({
 const ProdutosRoute = ProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContatoRoute = ContatoRouteImport.update({
@@ -103,6 +110,11 @@ const AdminBannersRoute = AdminBannersRouteImport.update({
   path: '/banners',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAtendimentosRoute = AdminAtendimentosRouteImport.update({
+  id: '/atendimentos',
+  path: '/atendimentos',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAnunciosRoute = AdminAnunciosRouteImport.update({
   id: '/anuncios',
   path: '/anuncios',
@@ -125,10 +137,12 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/catalogos': typeof CatalogosRouteWithChildren
   '/contato': typeof ContatoRoute
+  '/dashboard': typeof DashboardRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
   '/admin/administradores': typeof AdminAdministradoresRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
+  '/admin/atendimentos': typeof AdminAtendimentosRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
@@ -144,10 +158,12 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/catalogos': typeof CatalogosRouteWithChildren
   '/contato': typeof ContatoRoute
+  '/dashboard': typeof DashboardRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
   '/admin/administradores': typeof AdminAdministradoresRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
+  '/admin/atendimentos': typeof AdminAtendimentosRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
@@ -165,10 +181,12 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/catalogos': typeof CatalogosRouteWithChildren
   '/contato': typeof ContatoRoute
+  '/dashboard': typeof DashboardRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
   '/admin/administradores': typeof AdminAdministradoresRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
+  '/admin/atendimentos': typeof AdminAtendimentosRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
@@ -187,10 +205,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/catalogos'
     | '/contato'
+    | '/dashboard'
     | '/produtos'
     | '/sobre'
     | '/admin/administradores'
     | '/admin/anuncios'
+    | '/admin/atendimentos'
     | '/admin/banners'
     | '/admin/catalogos'
     | '/admin/categorias'
@@ -206,10 +226,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/catalogos'
     | '/contato'
+    | '/dashboard'
     | '/produtos'
     | '/sobre'
     | '/admin/administradores'
     | '/admin/anuncios'
+    | '/admin/atendimentos'
     | '/admin/banners'
     | '/admin/catalogos'
     | '/admin/categorias'
@@ -226,10 +248,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/catalogos'
     | '/contato'
+    | '/dashboard'
     | '/produtos'
     | '/sobre'
     | '/admin/administradores'
     | '/admin/anuncios'
+    | '/admin/atendimentos'
     | '/admin/banners'
     | '/admin/catalogos'
     | '/admin/categorias'
@@ -247,6 +271,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CatalogosRoute: typeof CatalogosRouteWithChildren
   ContatoRoute: typeof ContatoRoute
+  DashboardRoute: typeof DashboardRoute
   ProdutosRoute: typeof ProdutosRouteWithChildren
   SobreRoute: typeof SobreRoute
   ApiPublicInitAdminRoute: typeof ApiPublicInitAdminRoute
@@ -266,6 +291,13 @@ declare module '@tanstack/react-router' {
       path: '/produtos'
       fullPath: '/produtos'
       preLoaderRoute: typeof ProdutosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contato': {
@@ -359,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBannersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/atendimentos': {
+      id: '/admin/atendimentos'
+      path: '/atendimentos'
+      fullPath: '/admin/atendimentos'
+      preLoaderRoute: typeof AdminAtendimentosRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/anuncios': {
       id: '/admin/anuncios'
       path: '/anuncios'
@@ -386,6 +425,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAdministradoresRoute: typeof AdminAdministradoresRoute
   AdminAnunciosRoute: typeof AdminAnunciosRoute
+  AdminAtendimentosRoute: typeof AdminAtendimentosRoute
   AdminBannersRoute: typeof AdminBannersRoute
   AdminCatalogosRoute: typeof AdminCatalogosRoute
   AdminCategoriasRoute: typeof AdminCategoriasRoute
@@ -397,6 +437,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAdministradoresRoute: AdminAdministradoresRoute,
   AdminAnunciosRoute: AdminAnunciosRoute,
+  AdminAtendimentosRoute: AdminAtendimentosRoute,
   AdminBannersRoute: AdminBannersRoute,
   AdminCatalogosRoute: AdminCatalogosRoute,
   AdminCategoriasRoute: AdminCategoriasRoute,
@@ -437,6 +478,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CatalogosRoute: CatalogosRouteWithChildren,
   ContatoRoute: ContatoRoute,
+  DashboardRoute: DashboardRoute,
   ProdutosRoute: ProdutosRouteWithChildren,
   SobreRoute: SobreRoute,
   ApiPublicInitAdminRoute: ApiPublicInitAdminRoute,
