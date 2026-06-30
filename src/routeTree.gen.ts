@@ -18,6 +18,8 @@ import { Route as CatalogosRouteImport } from './routes/catalogos'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProdutosIndexRouteImport } from './routes/produtos.index'
+import { Route as CatalogosIndexRouteImport } from './routes/catalogos.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProdutosSlugRouteImport } from './routes/produtos.$slug'
 import { Route as CatalogosSlugRouteImport } from './routes/catalogos.$slug'
@@ -77,6 +79,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProdutosIndexRoute = ProdutosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProdutosRoute,
+} as any)
+const CatalogosIndexRoute = CatalogosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CatalogosRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
@@ -170,6 +182,8 @@ export interface FileRoutesByFullPath {
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/catalogos/': typeof CatalogosIndexRoute
+  '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/admin/contas/': typeof AdminContasIndexRoute
@@ -177,11 +191,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/catalogos': typeof CatalogosRouteWithChildren
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
-  '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
   '/admin/atendimentos': typeof AdminAtendimentosRoute
@@ -194,6 +206,8 @@ export interface FileRoutesByTo {
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/catalogos': typeof CatalogosIndexRoute
+  '/produtos': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/admin/contas': typeof AdminContasIndexRoute
@@ -220,6 +234,8 @@ export interface FileRoutesById {
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/catalogos/': typeof CatalogosIndexRoute
+  '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/admin/contas/': typeof AdminContasIndexRoute
@@ -247,6 +263,8 @@ export interface FileRouteTypes {
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin/'
+    | '/catalogos/'
+    | '/produtos/'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
     | '/admin/contas/'
@@ -254,11 +272,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
-    | '/catalogos'
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
-    | '/produtos'
     | '/sobre'
     | '/admin/anuncios'
     | '/admin/atendimentos'
@@ -271,6 +287,8 @@ export interface FileRouteTypes {
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin'
+    | '/catalogos'
+    | '/produtos'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
     | '/admin/contas'
@@ -296,6 +314,8 @@ export interface FileRouteTypes {
     | '/catalogos/$slug'
     | '/produtos/$slug'
     | '/admin/'
+    | '/catalogos/'
+    | '/produtos/'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
     | '/admin/contas/'
@@ -378,6 +398,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/produtos/': {
+      id: '/produtos/'
+      path: '/'
+      fullPath: '/produtos/'
+      preLoaderRoute: typeof ProdutosIndexRouteImport
+      parentRoute: typeof ProdutosRoute
+    }
+    '/catalogos/': {
+      id: '/catalogos/'
+      path: '/'
+      fullPath: '/catalogos/'
+      preLoaderRoute: typeof CatalogosIndexRouteImport
+      parentRoute: typeof CatalogosRoute
     }
     '/admin/': {
       id: '/admin/'
@@ -512,10 +546,12 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface CatalogosRouteChildren {
   CatalogosSlugRoute: typeof CatalogosSlugRoute
+  CatalogosIndexRoute: typeof CatalogosIndexRoute
 }
 
 const CatalogosRouteChildren: CatalogosRouteChildren = {
   CatalogosSlugRoute: CatalogosSlugRoute,
+  CatalogosIndexRoute: CatalogosIndexRoute,
 }
 
 const CatalogosRouteWithChildren = CatalogosRoute._addFileChildren(
@@ -524,10 +560,12 @@ const CatalogosRouteWithChildren = CatalogosRoute._addFileChildren(
 
 interface ProdutosRouteChildren {
   ProdutosSlugRoute: typeof ProdutosSlugRoute
+  ProdutosIndexRoute: typeof ProdutosIndexRoute
 }
 
 const ProdutosRouteChildren: ProdutosRouteChildren = {
   ProdutosSlugRoute: ProdutosSlugRoute,
+  ProdutosIndexRoute: ProdutosIndexRoute,
 }
 
 const ProdutosRouteWithChildren = ProdutosRoute._addFileChildren(
