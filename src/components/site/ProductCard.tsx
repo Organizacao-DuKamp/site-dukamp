@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useSiteSettings, whatsappLink } from "@/lib/site-settings";
-import { useAuth, priceForAccount } from "@/lib/auth";
+import { useAuth, priceForAccount, pixPriceForAccount } from "@/lib/auth";
 import { toast } from "sonner";
 
 export type ProductLite = {
@@ -16,6 +16,9 @@ export type ProductLite = {
   reseller_price?: number | null;
   producer_price?: number | null;
   pix_price: number | null;
+  consumer_pix_price?: number | null;
+  reseller_pix_price?: number | null;
+  producer_pix_price?: number | null;
   images: string[];
   brand: string | null;
   stock: number;
