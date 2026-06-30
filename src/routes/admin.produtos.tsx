@@ -25,9 +25,10 @@ function ProductsAdmin() {
       columns={[
         { key: "name", label: "Nome" },
         { key: "code", label: "Código" },
-        { key: "consumer_price", label: "Cliente", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
+        { key: "consumer_price", label: "Consumidor", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
         { key: "reseller_price", label: "Revendedor", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
-        { key: "producer_price", label: "Produtor", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
+        { key: "producer_price", label: "Produtor Rural", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
+
         { key: "stock", label: "Estoque" },
         { key: "active", label: "Ativo", format: (v) => v ? "Sim" : "Não" },
       ]}
