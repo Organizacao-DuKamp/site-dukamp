@@ -65,7 +65,7 @@ function SidebarContent({ pathname, onNavigate, signOut, isMaster }: { pathname:
 }
 
 function AdminLayout() {
-  const { user, isAdmin, loading, signOut } = useAuth();
+  const { user, isAdmin, isMasterAdmin, loading, signOut } = useAuth();
   const nav = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
