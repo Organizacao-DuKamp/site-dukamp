@@ -33,7 +33,7 @@ function ContasPage() {
     queryKey: ["admin-accounts"],
     queryFn: async () => {
       const [profilesR, rolesR] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, email, avatar_url, created_at"),
+        supabase.from("profiles").select("id, full_name, email, avatar_url, created_at, account_type" as any),
         supabase.from("user_roles").select("user_id, role"),
       ]);
       if (profilesR.error) throw profilesR.error;
