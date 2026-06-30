@@ -4,6 +4,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { formatBRL, useCart } from "@/lib/cart";
+import { useAuth, priceForAccount } from "@/lib/auth";
 import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 
@@ -14,12 +15,15 @@ export const Route = createFileRoute("/produtos/$slug")({
 function Page() {
   const { slug } = Route.useParams();
   const { add } = useCart();
+  const { accountType } = useAuth();
   const { data: p } = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => (await supabase.from("products").select("*").eq("slug", slug).maybeSingle()).data,
   });
   if (!p) return <SiteLayout><p>Produto não encontrado.</p></SiteLayout>;
   const image = p.images?.[0] || "/placeholder.svg";
+  const displayPrice = priceForAccount(p as any, accountType);
+  const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor" : null;
   return (
     <SiteLayout>
       <div className="grid md:grid-cols-2 gap-8">
@@ -31,14 +35,15 @@ function Page() {
           <h1 className="text-2xl font-bold mt-1">{p.name}</h1>
           <div className="text-xs text-muted-foreground mt-1">Cód: {p.code}</div>
           <div className="mt-4">
-            <div className="text-3xl font-bold">{formatBRL(p.price)}</div>
-            {p.pix_price && <div className="text-sm text-primary mt-1">ou {formatBRL(p.pix_price)} no PIX</div>}
+            {tierLabel && <div className="text-[11px] uppercase tracking-wider text-primary font-semibold">Preço {tierLabel}</div>}
+            <div className="text-3xl font-bold">{formatBRL(displayPrice)}</div>
+            {p.pix_price && !tierLabel && <div className="text-sm text-primary mt-1">ou {formatBRL(p.pix_price)} no PIX</div>}
             {p.installments > 1 && <div className="text-sm text-muted-foreground">em até {p.installments}x sem juros</div>}
           </div>
           <Button
             className="mt-6 w-full md:w-auto"
             disabled={p.stock <= 0}
-            onClick={() => { add({ id: p.id, name: p.name, price: p.price, image }); toast.success("Adicionado ao carrinho"); }}
+            onClick={() => { add({ id: p.id, name: p.name, price: displayPrice, image }); toast.success("Adicionado ao carrinho"); }}
           >
             <ShoppingCart className="h-4 w-4 mr-2" /> {p.stock > 0 ? "Adicionar ao carrinho" : "Indisponível"}
           </Button>
