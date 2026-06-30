@@ -35,11 +35,13 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 const socials = [
-  { href: "https://facebook.com/dukamp", label: "Facebook", Icon: Facebook },
-  { href: "https://instagram.com/dukamp", label: "Instagram", Icon: Instagram },
-  { href: "https://youtube.com/dukamp", label: "YouTube", Icon: Youtube },
-  { href: "https://tiktok.com/@dukamp", label: "TikTok", Icon: TikTokIcon },
+  { href: "https://www.facebook.com/dukampsaudeanimal/", label: "Facebook", Icon: Facebook },
+  { href: "https://www.instagram.com/dukampsaudeanimal/", label: "Instagram", Icon: Instagram },
+  { href: "https://www.youtube.com/c/DUKAMP?reload=9", label: "YouTube", Icon: Youtube },
+  { href: "https://www.tiktok.com/@dukamp", label: "TikTok", Icon: TikTokIcon },
 ];
+
+const WHATSAPP_URL = "https://wa.me/551732753106?text=" + encodeURIComponent("Olá, gostaria de mais informações.");
 
 export function Header() {
   const { count, items, total, remove } = useCart();
