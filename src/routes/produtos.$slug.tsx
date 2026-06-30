@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { formatBRL, useCart } from "@/lib/cart";
 import { useAuth, priceForAccount, pixPriceForAccount } from "@/lib/auth";
 import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/produtos/$slug")({
   component: Page,
@@ -16,20 +20,56 @@ function Page() {
   const { slug } = Route.useParams();
   const { add } = useCart();
   const { accountType } = useAuth();
+  const [activeImg, setActiveImg] = useState(0);
   const { data: p } = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => (await supabase.from("products").select("*").eq("slug", slug).maybeSingle()).data,
   });
   if (!p) return <SiteLayout><p>Produto não encontrado.</p></SiteLayout>;
-  const image = p.images?.[0] || "/placeholder.svg";
+  const images: string[] = (p.images && p.images.length > 0) ? p.images : ["/placeholder.svg"];
   const displayPrice = priceForAccount(p as any, accountType);
   const displayPix = pixPriceForAccount(p as any, accountType);
   const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor Rural" : null;
   return (
     <SiteLayout>
       <div className="grid md:grid-cols-2 gap-8">
-        <div className="aspect-square rounded-lg bg-muted overflow-hidden">
-          <img src={image} alt={p.name} className="w-full h-full object-cover" />
+        <div className="space-y-3">
+          {images.length > 1 ? (
+            <Carousel opts={{ loop: true, startIndex: activeImg }} className="w-full">
+              <CarouselContent>
+                {images.map((src, i) => (
+                  <CarouselItem key={i}>
+                    <div className="aspect-square rounded-lg bg-white border overflow-hidden">
+                      <img src={src} alt={`${p.name} ${i + 1}`} className="w-full h-full object-contain p-4" />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-2" />
+              <CarouselNext className="right-2" />
+            </Carousel>
+          ) : (
+            <div className="aspect-square rounded-lg bg-white border overflow-hidden">
+              <img src={images[0]} alt={p.name} className="w-full h-full object-contain p-4" />
+            </div>
+          )}
+          {images.length > 1 && (
+            <div className="grid grid-cols-5 gap-2">
+              {images.map((src, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setActiveImg(i)}
+                  className={cn(
+                    "aspect-square rounded border bg-white overflow-hidden",
+                    activeImg === i ? "ring-2 ring-primary" : "hover:border-primary/60",
+                  )}
+                >
+                  <img src={src} alt={`thumb ${i + 1}`} className="w-full h-full object-contain p-1" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div>
           {p.brand && <div className="text-xs uppercase text-muted-foreground tracking-wider">{p.brand}</div>}
