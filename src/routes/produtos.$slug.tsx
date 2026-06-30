@@ -4,7 +4,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { formatBRL, useCart } from "@/lib/cart";
-import { useAuth, priceForAccount } from "@/lib/auth";
+import { useAuth, priceForAccount, pixPriceForAccount } from "@/lib/auth";
 import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 
