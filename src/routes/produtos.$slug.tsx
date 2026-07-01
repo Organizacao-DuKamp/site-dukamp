@@ -45,7 +45,7 @@ function Page() {
   const displayPrice = priceForAccount(p as any, accountType);
   const displayPix = pixPriceForAccount(p as any, accountType);
   const installments = Math.max(1, Number(p.installments ?? 1));
-  const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor Rural" : null;
+  const tierLabel = accountType === "produtor" ? "Produtor Rural" : null;
   return (
     <SiteLayout>
       <div className="grid md:grid-cols-2 gap-8">
