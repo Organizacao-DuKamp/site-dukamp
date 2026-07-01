@@ -121,12 +121,14 @@ function Page() {
       for (const r of rows) {
         try {
           const shouldBeActive = r.saldo > 0;
+          const stockInt = Math.max(0, Math.round(r.saldo));
           const found = existing.get(r.code);
           if (found) {
-            const patch: { consumer_price: number; producer_price: number; price: number; active?: boolean } = {
+            const patch: { consumer_price: number; producer_price: number; price: number; stock: number; active?: boolean } = {
               consumer_price: r.preco1,
               producer_price: r.preco2,
               price: r.preco1,
+              stock: stockInt,
             };
             if (found.active !== shouldBeActive) {
               patch.active = shouldBeActive;
@@ -143,6 +145,7 @@ function Page() {
               consumer_price: r.preco1,
               producer_price: r.preco2,
               price: r.preco1,
+              stock: stockInt,
               active: shouldBeActive,
             });
             if (error) throw error;

@@ -29,6 +29,7 @@ function Home() {
         .select("*")
         .eq("active", true)
         .eq("featured", true)
+        .gt("stock", 0)
         .limit(12);
       return data ?? [];
     },
@@ -47,7 +48,7 @@ function Home() {
   const allProducts = useQuery({
     queryKey: ["products", "all-by-cat"],
     queryFn: async () => {
-      const { data } = await supabase.from("products").select("*").eq("active", true).limit(100);
+      const { data } = await supabase.from("products").select("*").eq("active", true).gt("stock", 0).limit(100);
       return data ?? [];
     },
   });
