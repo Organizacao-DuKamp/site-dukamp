@@ -116,6 +116,26 @@ export function ResourceCrud({ title, table, columns, fields, orderBy, searchFie
         </Dialog>
       </div>
 
+      {searchField && (
+        <form
+          onSubmit={(e) => { e.preventDefault(); setPage(1); setSearch(searchInput.trim()); }}
+          className="mb-4 flex gap-2"
+        >
+          <Input
+            placeholder={searchPlaceholder ?? "Pesquisar..."}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+          <Button type="submit" variant="outline">Buscar</Button>
+          {search && (
+            <Button type="button" variant="ghost" onClick={() => { setSearchInput(""); setSearch(""); setPage(1); }}>
+              Limpar
+            </Button>
+          )}
+        </form>
+      )}
+
+
       <div className="rounded-lg border bg-card overflow-hidden">
         <Table>
           <TableHeader>
