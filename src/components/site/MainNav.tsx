@@ -1,40 +1,68 @@
 import { Link } from "@tanstack/react-router";
 import { Menu } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { InstitutionalSidebar } from "./InstitutionalSidebar";
-
-const items = [
-  { label: "Início", to: "/" as const },
-  { label: "Bovinos de Corte", to: "/produtos" as const, search: { categoria: "bovinos-de-corte" } },
-  { label: "Bovinos de Leite", to: "/produtos" as const, search: { categoria: "bovinos-de-leite" } },
-  { label: "Equinos", to: "/produtos" as const, search: { categoria: "equinos" } },
-  { label: "Ovinos", to: "/produtos" as const, search: { categoria: "ovinos" } },
-  { label: "Suínos", to: "/produtos" as const, search: { categoria: "suinos" } },
-  { label: "Aves", to: "/produtos" as const, search: { categoria: "aves" } },
-  { label: "Equipe de Vendas", to: "/contato" as const },
-  { label: "Nossas Unidades", to: "/unidades" as const },
-];
+import { supabase } from "@/integrations/supabase/client";
 
 export function MainNav() {
   const [open, setOpen] = useState(false);
+  const catalogs = useQuery({
+    queryKey: ["catalogs", "nav"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("catalogs")
+        .select("id,name,slug")
+        .eq("active", true)
+        .order("sort_order");
+      return data ?? [];
+    },
+  });
+
+  const renderLinks = (onClick?: () => void, className?: string, activeClassName?: string) => (
+    <>
+      <li>
+        <Link to="/" onClick={onClick} className={className} activeProps={activeClassName ? { className: activeClassName } : undefined}>
+          Início
+        </Link>
+      </li>
+      {catalogs.data?.map((c) => (
+        <li key={c.id}>
+          <Link
+            to="/catalogos/$slug"
+            params={{ slug: c.slug }}
+            onClick={onClick}
+            className={className}
+            activeProps={activeClassName ? { className: activeClassName } : undefined}
+          >
+            {c.name}
+          </Link>
+        </li>
+      ))}
+      <li>
+        <Link to="/contato" onClick={onClick} className={className} activeProps={activeClassName ? { className: activeClassName } : undefined}>
+          Equipe de Vendas
+        </Link>
+      </li>
+      <li>
+        <Link to="/unidades" onClick={onClick} className={className} activeProps={activeClassName ? { className: activeClassName } : undefined}>
+          Nossas Unidades
+        </Link>
+      </li>
+    </>
+  );
+
+  const deskCls = "block px-4 py-3 hover:bg-white/10 transition-colors";
+  const deskActive = "block px-4 py-3 bg-white/15";
+  const mobCls = "block py-2.5 px-2 text-sm border-b hover:text-primary";
+
   return (
     <nav className="bg-[#0f4d2a] text-white border-b border-black/10">
       <div className="container mx-auto px-2">
         {/* Desktop */}
         <ul className="hidden lg:flex items-center gap-1 overflow-x-auto whitespace-nowrap text-sm font-medium">
-          {items.map((it) => (
-            <li key={it.label}>
-              <Link
-                to={it.to}
-                search={(it as any).search}
-                className="block px-4 py-3 hover:bg-white/10 transition-colors"
-                activeProps={{ className: "block px-4 py-3 bg-white/15" }}
-              >
-                {it.label}
-              </Link>
-            </li>
-          ))}
+          {renderLinks(undefined, deskCls, deskActive)}
         </ul>
 
         {/* Mobile */}
@@ -47,20 +75,7 @@ export function MainNav() {
               <SheetHeader>
                 <SheetTitle>Categorias</SheetTitle>
               </SheetHeader>
-              <ul className="mt-4 flex flex-col">
-                {items.map((it) => (
-                  <li key={it.label}>
-                    <Link
-                      to={it.to}
-                      search={(it as any).search}
-                      onClick={() => setOpen(false)}
-                      className="block py-2.5 px-2 text-sm border-b hover:text-primary"
-                    >
-                      {it.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <ul className="mt-4 flex flex-col">{renderLinks(() => setOpen(false), mobCls)}</ul>
               <div className="mt-6">
                 <InstitutionalSidebar />
               </div>
