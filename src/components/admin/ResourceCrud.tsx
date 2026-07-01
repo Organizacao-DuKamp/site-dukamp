@@ -120,7 +120,7 @@ export function ResourceCrud({ title, table, columns, fields, orderBy }: Props) 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {list.data?.map((row: any) => (
+            {list.data?.rows.map((row: any) => (
               <TableRow key={row.id}>
                 {columns.map((c) => (
                   <TableCell key={c.key}>{c.format ? c.format(row[c.key], row) : String(row[c.key] ?? "")}</TableCell>
@@ -137,12 +137,21 @@ export function ResourceCrud({ title, table, columns, fields, orderBy }: Props) 
                 </TableCell>
               </TableRow>
             ))}
-            {list.data?.length === 0 && (
+            {list.data && list.data.rows.length === 0 && (
               <TableRow><TableCell colSpan={columns.length + 1} className="text-center text-muted-foreground py-8">Nenhum registro</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
       </div>
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Página {page} de {totalPages} · {total} registros</span>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>Anterior</Button>
+            <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>Próxima</Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

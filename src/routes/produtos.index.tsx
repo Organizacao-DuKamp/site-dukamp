@@ -42,7 +42,7 @@ function Page() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const goto = (p: number) =>
-    navigate({ search: (prev) => ({ ...prev, page: p }) });
+    navigate({ search: (prev: Search) => ({ ...prev, page: p }) });
 
   return (
     <SiteLayout>
