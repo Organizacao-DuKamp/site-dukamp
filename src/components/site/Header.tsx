@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingCart, Search, User, LogOut, Facebook, Instagram, Youtube, LayoutDashboard, MessageCircle, UserCircle } from "lucide-react";
+import { ShoppingCart, Search, User, LogOut, Facebook, Instagram, Youtube, LayoutDashboard, MessageCircle, UserCircle, Minus, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

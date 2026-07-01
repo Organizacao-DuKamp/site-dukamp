@@ -16,6 +16,7 @@ import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as CatalogosRouteImport } from './routes/catalogos'
+import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -71,6 +72,11 @@ const ContatoRoute = ContatoRouteImport.update({
 const CatalogosRoute = CatalogosRouteImport.update({
   id: '/catalogos',
   path: '/catalogos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CarrinhoRoute = CarrinhoRouteImport.update({
+  id: '/carrinho',
+  path: '/carrinho',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/carrinho': typeof CarrinhoRoute
   '/catalogos': typeof CatalogosRouteWithChildren
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/carrinho': typeof CarrinhoRoute
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
+  '/carrinho': typeof CarrinhoRoute
   '/catalogos': typeof CatalogosRouteWithChildren
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/carrinho'
     | '/catalogos'
     | '/contato'
     | '/dashboard'
@@ -302,6 +312,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/carrinho'
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
@@ -330,6 +341,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/carrinho'
     | '/catalogos'
     | '/contato'
     | '/dashboard'
@@ -361,6 +373,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CarrinhoRoute: typeof CarrinhoRoute
   CatalogosRoute: typeof CatalogosRouteWithChildren
   ContatoRoute: typeof ContatoRoute
   DashboardRoute: typeof DashboardRoute
@@ -421,6 +434,13 @@ declare module '@tanstack/react-router' {
       path: '/catalogos'
       fullPath: '/catalogos'
       preLoaderRoute: typeof CatalogosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/carrinho': {
+      id: '/carrinho'
+      path: '/carrinho'
+      fullPath: '/carrinho'
+      preLoaderRoute: typeof CarrinhoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -637,6 +657,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
+  CarrinhoRoute: CarrinhoRoute,
   CatalogosRoute: CatalogosRouteWithChildren,
   ContatoRoute: ContatoRoute,
   DashboardRoute: DashboardRoute,
