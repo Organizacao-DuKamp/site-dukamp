@@ -25,10 +25,6 @@ export function Footer() {
       nav({ to: "/auth" });
       return;
     }
-    if (isAdmin) {
-      nav({ to: "/admin/atendimentos" });
-      return;
-    }
     openChat();
   }
 
