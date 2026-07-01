@@ -123,7 +123,7 @@ function Page() {
           const shouldBeActive = r.saldo > 0;
           const found = existing.get(r.code);
           if (found) {
-            const patch: Record<string, unknown> = {
+            const patch: { consumer_price: number; producer_price: number; price: number; active?: boolean } = {
               consumer_price: r.preco1,
               producer_price: r.preco2,
               price: r.preco1,

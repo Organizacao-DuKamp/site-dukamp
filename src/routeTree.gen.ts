@@ -33,6 +33,7 @@ import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configura
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminCatalogosRouteImport } from './routes/admin.catalogos'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
+import { Route as AdminAtualizarValoresRouteImport } from './routes/admin.atualizar-valores'
 import { Route as AdminAtendimentosRouteImport } from './routes/admin.atendimentos'
 import { Route as AdminAnunciosRouteImport } from './routes/admin.anuncios'
 import { Route as AdminContasIndexRouteImport } from './routes/admin.contas.index'
@@ -159,6 +160,11 @@ const AdminBannersRoute = AdminBannersRouteImport.update({
   path: '/banners',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAtualizarValoresRoute = AdminAtualizarValoresRouteImport.update({
+  id: '/atualizar-valores',
+  path: '/atualizar-valores',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAtendimentosRoute = AdminAtendimentosRouteImport.update({
   id: '/atendimentos',
   path: '/atendimentos',
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/unidades': typeof UnidadesRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
   '/admin/atendimentos': typeof AdminAtendimentosRoute
+  '/admin/atualizar-valores': typeof AdminAtualizarValoresRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/unidades': typeof UnidadesRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
   '/admin/atendimentos': typeof AdminAtendimentosRoute
+  '/admin/atualizar-valores': typeof AdminAtualizarValoresRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   '/unidades': typeof UnidadesRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
   '/admin/atendimentos': typeof AdminAtendimentosRoute
+  '/admin/atualizar-valores': typeof AdminAtualizarValoresRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/unidades'
     | '/admin/anuncios'
     | '/admin/atendimentos'
+    | '/admin/atualizar-valores'
     | '/admin/banners'
     | '/admin/catalogos'
     | '/admin/categorias'
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/unidades'
     | '/admin/anuncios'
     | '/admin/atendimentos'
+    | '/admin/atualizar-valores'
     | '/admin/banners'
     | '/admin/catalogos'
     | '/admin/categorias'
@@ -351,6 +362,7 @@ export interface FileRouteTypes {
     | '/unidades'
     | '/admin/anuncios'
     | '/admin/atendimentos'
+    | '/admin/atualizar-valores'
     | '/admin/banners'
     | '/admin/catalogos'
     | '/admin/categorias'
@@ -555,6 +567,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBannersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/atualizar-valores': {
+      id: '/admin/atualizar-valores'
+      path: '/atualizar-valores'
+      fullPath: '/admin/atualizar-valores'
+      preLoaderRoute: typeof AdminAtualizarValoresRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/atendimentos': {
       id: '/admin/atendimentos'
       path: '/atendimentos'
@@ -596,6 +615,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAnunciosRoute: typeof AdminAnunciosRoute
   AdminAtendimentosRoute: typeof AdminAtendimentosRoute
+  AdminAtualizarValoresRoute: typeof AdminAtualizarValoresRoute
   AdminBannersRoute: typeof AdminBannersRoute
   AdminCatalogosRoute: typeof AdminCatalogosRoute
   AdminCategoriasRoute: typeof AdminCategoriasRoute
@@ -611,6 +631,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAnunciosRoute: AdminAnunciosRoute,
   AdminAtendimentosRoute: AdminAtendimentosRoute,
+  AdminAtualizarValoresRoute: AdminAtualizarValoresRoute,
   AdminBannersRoute: AdminBannersRoute,
   AdminCatalogosRoute: AdminCatalogosRoute,
   AdminCategoriasRoute: AdminCategoriasRoute,
