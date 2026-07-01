@@ -38,22 +38,27 @@ type Props = {
   columns: ColumnDef[];
   fields: FieldDef[];
   orderBy?: { column: string; ascending?: boolean };
+  searchField?: string;
+  searchPlaceholder?: string;
 };
 
 const PAGE_SIZE = 25;
 
-export function ResourceCrud({ title, table, columns, fields, orderBy }: Props) {
+export function ResourceCrud({ title, table, columns, fields, orderBy, searchField, searchPlaceholder }: Props) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
   const [page, setPage] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
 
   const list = useQuery({
-    queryKey: ["admin", table, page],
+    queryKey: ["admin", table, page, search],
     queryFn: async () => {
       const from = (page - 1) * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
       let q = supabase.from(table as any).select("*", { count: "exact" });
+      if (searchField && search) q = q.ilike(searchField, `%${search}%`);
       if (orderBy) q = q.order(orderBy.column, { ascending: orderBy.ascending ?? true });
       const { data, error, count } = await q.range(from, to);
       if (error) throw error;
@@ -110,6 +115,26 @@ export function ResourceCrud({ title, table, columns, fields, orderBy }: Props) 
           </DialogContent>
         </Dialog>
       </div>
+
+      {searchField && (
+        <form
+          onSubmit={(e) => { e.preventDefault(); setPage(1); setSearch(searchInput.trim()); }}
+          className="mb-4 flex gap-2"
+        >
+          <Input
+            placeholder={searchPlaceholder ?? "Pesquisar..."}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+          <Button type="submit" variant="outline">Buscar</Button>
+          {search && (
+            <Button type="button" variant="ghost" onClick={() => { setSearchInput(""); setSearch(""); setPage(1); }}>
+              Limpar
+            </Button>
+          )}
+        </form>
+      )}
+
 
       <div className="rounded-lg border bg-card overflow-hidden">
         <Table>
