@@ -50,7 +50,7 @@ export function Footer() {
         <div>
           <div className="font-semibold mb-3">Institucional</div>
           <ul className="space-y-2 text-muted-foreground">
-            <li><Link to="/sobre" className="hover:text-primary">Nossas Unidades</Link></li>
+            <li><Link to="/unidades" className="hover:text-primary">Nossas Unidades</Link></li>
             <li><Link to="/sobre" className="hover:text-primary">Sobre Nós</Link></li>
             <li>
               <a href="/contato" onClick={handleFaleConosco} className="hover:text-primary cursor-pointer">

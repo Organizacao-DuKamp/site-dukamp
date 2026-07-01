@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnidadesRouteImport } from './routes/unidades'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as MinhaContaRouteImport } from './routes/minha-conta'
@@ -37,6 +38,11 @@ import { Route as AdminContasIndexRouteImport } from './routes/admin.contas.inde
 import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
 import { Route as AdminContasIdRouteImport } from './routes/admin.contas.$id'
 
+const UnidadesRoute = UnidadesRouteImport.update({
+  id: '/unidades',
+  path: '/unidades',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SobreRoute = SobreRouteImport.update({
   id: '/sobre',
   path: '/sobre',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/minha-conta': typeof MinhaContaRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
+  '/unidades': typeof UnidadesRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
   '/admin/atendimentos': typeof AdminAtendimentosRoute
   '/admin/banners': typeof AdminBannersRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
   '/sobre': typeof SobreRoute
+  '/unidades': typeof UnidadesRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
   '/admin/atendimentos': typeof AdminAtendimentosRoute
   '/admin/banners': typeof AdminBannersRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/minha-conta': typeof MinhaContaRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
+  '/unidades': typeof UnidadesRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
   '/admin/atendimentos': typeof AdminAtendimentosRoute
   '/admin/banners': typeof AdminBannersRoute
@@ -270,6 +279,7 @@ export interface FileRouteTypes {
     | '/minha-conta'
     | '/produtos'
     | '/sobre'
+    | '/unidades'
     | '/admin/anuncios'
     | '/admin/atendimentos'
     | '/admin/banners'
@@ -296,6 +306,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/minha-conta'
     | '/sobre'
+    | '/unidades'
     | '/admin/anuncios'
     | '/admin/atendimentos'
     | '/admin/banners'
@@ -325,6 +336,7 @@ export interface FileRouteTypes {
     | '/minha-conta'
     | '/produtos'
     | '/sobre'
+    | '/unidades'
     | '/admin/anuncios'
     | '/admin/atendimentos'
     | '/admin/banners'
@@ -355,12 +367,20 @@ export interface RootRouteChildren {
   MinhaContaRoute: typeof MinhaContaRoute
   ProdutosRoute: typeof ProdutosRouteWithChildren
   SobreRoute: typeof SobreRoute
+  UnidadesRoute: typeof UnidadesRoute
   PaginasSlugRoute: typeof PaginasSlugRoute
   ApiPublicInitAdminRoute: typeof ApiPublicInitAdminRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unidades': {
+      id: '/unidades'
+      path: '/unidades'
+      fullPath: '/unidades'
+      preLoaderRoute: typeof UnidadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sobre': {
       id: '/sobre'
       path: '/sobre'
@@ -623,6 +643,7 @@ const rootRouteChildren: RootRouteChildren = {
   MinhaContaRoute: MinhaContaRoute,
   ProdutosRoute: ProdutosRouteWithChildren,
   SobreRoute: SobreRoute,
+  UnidadesRoute: UnidadesRoute,
   PaginasSlugRoute: PaginasSlugRoute,
   ApiPublicInitAdminRoute: ApiPublicInitAdminRoute,
 }
