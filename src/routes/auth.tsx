@@ -89,7 +89,7 @@ function LoginForm({ onLogin }: { onLogin: (e: string, p: string) => Promise<{ e
   );
 }
 
-type AccountKind = "cliente" | "revendedor" | "produtor";
+type AccountKind = "cliente" | "produtor";
 
 function RegisterForm() {
   const [accountKind, setAccountKind] = useState<AccountKind>("cliente");
