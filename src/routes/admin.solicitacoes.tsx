@@ -150,7 +150,7 @@ function SolicitacoesPage() {
             <CardTitle className="text-sm flex items-center gap-2"><Clock className="h-4 w-4" /> Como funciona</CardTitle>
           </CardHeader>
           <CardContent className="text-xs text-muted-foreground">
-            Ao aprovar, o tipo da conta do solicitante é atualizado automaticamente (Produtor Rural ou Revendedor) e os dados cadastrais (UF, documento, telefone) são copiados para o perfil dele.
+            Ao aprovar, o tipo da conta do solicitante é atualizado automaticamente para Produtor Rural e os dados cadastrais (UF, documento, telefone) são copiados para o perfil dele.
           </CardContent>
         </Card>
       )}
