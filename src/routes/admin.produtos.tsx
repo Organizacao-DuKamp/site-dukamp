@@ -45,7 +45,7 @@ function ProductsAdmin() {
         { name: "price", label: "Preço base (legado)", type: "number", step: "0.01", defaultValue: 0 },
         { name: "pix_price", label: "Preço PIX (legado)", type: "number", step: "0.01" },
         { name: "consumer_pix_price", label: "PIX — Consumidor", type: "number", step: "0.01" },
-        { name: "reseller_pix_price", label: "PIX — Revendedor", type: "number", step: "0.01" },
+        
         { name: "producer_pix_price", label: "PIX — Produtor Rural", type: "number", step: "0.01" },
         { name: "installments", label: "Parcelas", type: "number", defaultValue: 1 },
         { name: "stock", label: "Estoque", type: "number", defaultValue: 0 },
