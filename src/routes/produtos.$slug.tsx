@@ -10,6 +10,7 @@ import { useAuth, priceForAccount, pixPriceForAccount } from "@/lib/auth";
 import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { RichContent } from "@/components/site/RichContent";
 
 
 export const Route = createFileRoute("/produtos/$slug")({
@@ -111,7 +112,11 @@ function Page() {
           {p.description && (
             <div className="mt-6">
               <h2 className="font-semibold mb-2">Descrição</h2>
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{p.description}</p>
+              {/\<[a-z]/i.test(p.description) ? (
+                <RichContent html={p.description} className="text-muted-foreground" />
+              ) : (
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{p.description}</p>
+              )}
             </div>
           )}
         </div>
