@@ -52,7 +52,9 @@ function Dashboard() {
               {cartCount === 0 ? "Seu carrinho está vazio." : `${cartCount} item(s) no carrinho.`}
             </p>
             <Button asChild size="sm" className="mt-3 w-fit">
-              <Link to="/produtos">Ver produtos</Link>
+              <Link to={cartCount > 0 ? "/carrinho" : "/produtos"}>
+                {cartCount > 0 ? "Ver carrinho" : "Ver produtos"}
+              </Link>
             </Button>
           </div>
 
