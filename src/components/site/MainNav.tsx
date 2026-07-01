@@ -13,7 +13,7 @@ const items = [
   { label: "Suínos", to: "/produtos" as const, search: { categoria: "suinos" } },
   { label: "Aves", to: "/produtos" as const, search: { categoria: "aves" } },
   { label: "Equipe de Vendas", to: "/contato" as const },
-  { label: "Nossas Unidades", to: "/sobre" as const },
+  { label: "Nossas Unidades", to: "/unidades" as const },
 ];
 
 export function MainNav() {

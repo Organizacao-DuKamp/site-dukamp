@@ -6,7 +6,7 @@ import { useSupport } from "@/lib/support";
 
 export function Footer() {
   const { data: settings } = useSiteSettings();
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const { openChat } = useSupport();
   const nav = useNavigate();
   const siteName = settings?.site_name || "Dukamp Saúde Animal";
@@ -23,10 +23,6 @@ export function Footer() {
     e.preventDefault();
     if (!user) {
       nav({ to: "/auth" });
-      return;
-    }
-    if (isAdmin) {
-      nav({ to: "/admin/atendimentos" });
       return;
     }
     openChat();
