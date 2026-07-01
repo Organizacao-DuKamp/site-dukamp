@@ -151,7 +151,7 @@ function RegisterForm() {
       return;
     }
 
-    // If Produtor/Revendedor, create account_request (account stays as 'cliente' until approved)
+    // If Produtor Rural, create account_request (account stays as 'cliente' until approved)
     if (needsExtra && signUpData.user?.id) {
       const { error: reqErr } = await (supabase as any).from("account_requests").insert({
         user_id: signUpData.user.id,
