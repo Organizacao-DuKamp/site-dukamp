@@ -160,7 +160,7 @@ function ContaDetalhe() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Tipo de conta</CardTitle>
-          <CardDescription>Atual: <span className="font-medium">{currentType === "cliente" ? "Consumidor" : currentType === "produtor" ? "Produtor Rural" : currentType === "revendedor" ? "Revendedor" : "Admin"}</span></CardDescription>
+          <CardDescription>Atual: <span className="font-medium">{currentType === "cliente" ? "Consumidor" : currentType === "produtor" ? "Produtor Rural" : "Admin"}</span></CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-end gap-2">
           <div className="flex-1 min-w-[200px]">
@@ -168,7 +168,7 @@ function ContaDetalhe() {
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="cliente">Consumidor</SelectItem>
-                <SelectItem value="revendedor">Revendedor</SelectItem>
+                
                 <SelectItem value="produtor">Produtor Rural</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
               </SelectContent>

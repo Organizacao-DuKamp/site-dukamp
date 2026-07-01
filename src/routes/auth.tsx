@@ -89,7 +89,7 @@ function LoginForm({ onLogin }: { onLogin: (e: string, p: string) => Promise<{ e
   );
 }
 
-type AccountKind = "cliente" | "revendedor" | "produtor";
+type AccountKind = "cliente" | "produtor";
 
 function RegisterForm() {
   const [accountKind, setAccountKind] = useState<AccountKind>("cliente");
@@ -151,7 +151,7 @@ function RegisterForm() {
       return;
     }
 
-    // If Produtor/Revendedor, create account_request (account stays as 'cliente' until approved)
+    // If Produtor Rural, create account_request (account stays as 'cliente' until approved)
     if (needsExtra && signUpData.user?.id) {
       const { error: reqErr } = await (supabase as any).from("account_requests").insert({
         user_id: signUpData.user.id,
@@ -184,7 +184,7 @@ function RegisterForm() {
           <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="cliente">Consumidor</SelectItem>
-            <SelectItem value="revendedor">Revendedor</SelectItem>
+            
             <SelectItem value="produtor">Produtor Rural</SelectItem>
           </SelectContent>
         </Select>

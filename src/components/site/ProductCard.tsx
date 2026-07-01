@@ -40,7 +40,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
   const displayPrice = priceForAccount(p, accountType);
   const displayPix = pixPriceForAccount(p, accountType);
   const parcela = displayPrice / installments;
-  const tierLabel = accountType === "revendedor" ? "Revendedor" : accountType === "produtor" ? "Produtor Rural" : null;
+  const tierLabel = accountType === "produtor" ? "Produtor Rural" : null;
   const wa = whatsappLink(
     settings?.phone,
     `Olá, tenho interesse no produto: ${p.name} (cód. ${p.code}) - ${formatBRL(displayPrice)}`,

@@ -26,7 +26,7 @@ function ProductsAdmin() {
         { key: "name", label: "Nome" },
         { key: "code", label: "Código" },
         { key: "consumer_price", label: "Consumidor", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
-        { key: "reseller_price", label: "Revendedor", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
+        
         { key: "producer_price", label: "Produtor Rural", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
 
         { key: "stock", label: "Estoque" },
@@ -40,12 +40,12 @@ function ProductsAdmin() {
         { name: "category_id", label: "Categoria", type: "select", options: (cats.data ?? []).map((c) => ({ value: c.id, label: c.name })) },
         { name: "catalog_id", label: "Catálogo", type: "select", options: (catalogs.data ?? []).map((c) => ({ value: c.id, label: c.name })) },
         { name: "consumer_price", label: "Preço — Consumidor", type: "number", step: "0.01", required: true, defaultValue: 0 },
-        { name: "reseller_price", label: "Preço — Revendedor", type: "number", step: "0.01" },
+        
         { name: "producer_price", label: "Preço — Produtor Rural", type: "number", step: "0.01" },
         { name: "price", label: "Preço base (legado)", type: "number", step: "0.01", defaultValue: 0 },
         { name: "pix_price", label: "Preço PIX (legado)", type: "number", step: "0.01" },
         { name: "consumer_pix_price", label: "PIX — Consumidor", type: "number", step: "0.01" },
-        { name: "reseller_pix_price", label: "PIX — Revendedor", type: "number", step: "0.01" },
+        
         { name: "producer_pix_price", label: "PIX — Produtor Rural", type: "number", step: "0.01" },
         { name: "installments", label: "Parcelas", type: "number", defaultValue: 1 },
         { name: "stock", label: "Estoque", type: "number", defaultValue: 0 },

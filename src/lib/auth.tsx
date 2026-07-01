@@ -3,7 +3,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { PROTECTED_ADMIN_EMAIL } from "@/lib/constants";
 
-export type AccountType = "cliente" | "revendedor" | "produtor" | "admin";
+export type AccountType = "cliente" | "produtor" | "admin";
 
 type AuthCtx = {
   user: User | null;
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const p: any = profileR.data ?? {};
     const t = (p.account_type ?? "cliente") as AccountType;
     setAccountType(t);
-    if (p.approval_notified === false && (t === "revendedor" || t === "produtor")) {
+    if (p.approval_notified === false && t === "produtor") {
       setApprovalNotice(t);
     } else {
       setApprovalNotice(null);
@@ -97,20 +97,18 @@ export function useAuth() {
 }
 
 /** Resolve price field based on user account type. Falls back to consumer/legacy. */
-export function priceForAccount(p: { price?: number | null; consumer_price?: number | null; reseller_price?: number | null; producer_price?: number | null }, t: AccountType): number {
-  if (t === "revendedor" && p.reseller_price != null) return Number(p.reseller_price);
+export function priceForAccount(p: { price?: number | null; consumer_price?: number | null; producer_price?: number | null }, t: AccountType): number {
   if (t === "produtor" && p.producer_price != null) return Number(p.producer_price);
   return Number(p.consumer_price ?? p.price ?? 0);
 }
 
 /** Resolve PIX price for the user's account type. Returns null if no PIX configured for that tier. */
 export function pixPriceForAccount(
-  p: { pix_price?: number | null; consumer_pix_price?: number | null; reseller_pix_price?: number | null; producer_pix_price?: number | null },
+  p: { pix_price?: number | null; consumer_pix_price?: number | null; producer_pix_price?: number | null },
   t: AccountType,
 ): number | null {
   let v: number | null | undefined;
-  if (t === "revendedor") v = p.reseller_pix_price;
-  else if (t === "produtor") v = p.producer_pix_price;
+  if (t === "produtor") v = p.producer_pix_price;
   else v = p.consumer_pix_price ?? p.pix_price;
   return v != null ? Number(v) : null;
 }
