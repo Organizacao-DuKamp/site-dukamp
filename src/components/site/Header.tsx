@@ -150,36 +150,63 @@ export function Header() {
                   )}
                 </Button>
               </SheetTrigger>
-              <SheetContent>
+              <SheetContent className="flex flex-col">
                 <SheetHeader>
                   <SheetTitle>Carrinho ({count})</SheetTitle>
                 </SheetHeader>
-                <div className="mt-4 space-y-3 max-h-[60vh] overflow-auto">
+                <div className="mt-4 space-y-3 flex-1 overflow-auto pr-1">
                   {items.length === 0 && (
                     <p className="text-sm text-muted-foreground">Seu carrinho está vazio.</p>
                   )}
                   {items.map((i) => (
                     <div key={i.id} className="flex gap-3 border-b pb-3">
-                      <div className="h-14 w-14 rounded bg-muted shrink-0 overflow-hidden">
+                      <div className="h-16 w-16 rounded bg-muted shrink-0 overflow-hidden">
                         {i.image && <img src={i.image} alt={i.name} className="w-full h-full object-cover" />}
                       </div>
-                      <div className="flex-1 text-sm">
-                        <div className="font-medium line-clamp-1">{i.name}</div>
-                        <div className="text-muted-foreground text-xs">
-                          {i.quantity} × {formatBRL(i.price)}
+                      <div className="flex-1 min-w-0 text-sm">
+                        <div className="font-medium line-clamp-2">{i.name}</div>
+                        <div className="text-muted-foreground text-xs mt-0.5">{formatBRL(i.price)}</div>
+                        <div className="flex items-center justify-between mt-2 gap-2">
+                          <div className="inline-flex items-center border rounded-md">
+                            <button
+                              onClick={() => setQty(i.id, i.quantity - 1)}
+                              disabled={i.quantity <= 1}
+                              className="h-7 w-7 grid place-items-center disabled:opacity-40"
+                              aria-label="Diminuir"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="w-7 text-center text-xs">{i.quantity}</span>
+                            <button
+                              onClick={() => setQty(i.id, i.quantity + 1)}
+                              className="h-7 w-7 grid place-items-center"
+                              aria-label="Aumentar"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+                          <div className="font-semibold text-xs">{formatBRL(i.price * i.quantity)}</div>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm" onClick={() => remove(i.id)}>×</Button>
+                      <button
+                        onClick={() => remove(i.id)}
+                        className="text-muted-foreground hover:text-destructive self-start p-1"
+                        aria-label="Remover"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   ))}
                 </div>
                 {items.length > 0 && (
-                  <div className="mt-4 pt-4 border-t">
+                  <div className="mt-4 pt-4 border-t space-y-3">
                     <div className="flex justify-between font-semibold">
                       <span>Total</span>
                       <span>{formatBRL(total)}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">Checkout em breve.</p>
+                    <Button asChild className="w-full">
+                      <Link to="/carrinho">Ver carrinho completo</Link>
+                    </Button>
                   </div>
                 )}
               </SheetContent>
