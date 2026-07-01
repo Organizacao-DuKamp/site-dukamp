@@ -179,6 +179,48 @@ export type Database = {
         }
         Relationships: []
       }
+      import_logs: {
+        Row: {
+          activated_count: number
+          admin_id: string | null
+          created_at: string
+          created_count: number
+          deactivated_count: number
+          error_count: number
+          error_details: Json
+          filename: string
+          id: string
+          total: number
+          updated_count: number
+        }
+        Insert: {
+          activated_count?: number
+          admin_id?: string | null
+          created_at?: string
+          created_count?: number
+          deactivated_count?: number
+          error_count?: number
+          error_details?: Json
+          filename: string
+          id?: string
+          total?: number
+          updated_count?: number
+        }
+        Update: {
+          activated_count?: number
+          admin_id?: string | null
+          created_at?: string
+          created_count?: number
+          deactivated_count?: number
+          error_count?: number
+          error_details?: Json
+          filename?: string
+          id?: string
+          total?: number
+          updated_count?: number
+        }
+        Relationships: []
+      }
       institutional_ads: {
         Row: {
           active: boolean
