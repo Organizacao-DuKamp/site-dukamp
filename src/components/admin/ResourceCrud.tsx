@@ -38,6 +38,8 @@ type Props = {
   columns: ColumnDef[];
   fields: FieldDef[];
   orderBy?: { column: string; ascending?: boolean };
+  searchField?: string;
+  searchPlaceholder?: string;
 };
 
 const PAGE_SIZE = 25;
