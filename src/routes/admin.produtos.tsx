@@ -22,6 +22,8 @@ function ProductsAdmin() {
       title="Produtos"
       table="products"
       orderBy={{ column: "created_at", ascending: false }}
+      searchField="name"
+      searchPlaceholder="Pesquisar produto por nome..."
       columns={[
         { key: "name", label: "Nome" },
         { key: "code", label: "Código" },
