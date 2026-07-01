@@ -111,7 +111,7 @@ function ContasPage() {
                 <TableCell className="text-sm">{u.email}</TableCell>
                 <TableCell>
                   <Badge variant={u.account_type === "admin" ? "default" : u.account_type === "cliente" ? "secondary" : "outline"}>
-                    {u.account_type === "produtor" ? "Produtor Rural" : u.account_type === "revendedor" ? "Revendedor" : u.account_type === "admin" ? "Admin" : "Consumidor"}
+                    {u.account_type === "produtor" ? "Produtor Rural" : u.account_type === "admin" ? "Admin" : "Consumidor"}
                   </Badge>
                 </TableCell>
                 <TableCell className="hidden md:table-cell text-xs text-muted-foreground">
