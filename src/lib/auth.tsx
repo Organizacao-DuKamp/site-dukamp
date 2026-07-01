@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const p: any = profileR.data ?? {};
     const t = (p.account_type ?? "cliente") as AccountType;
     setAccountType(t);
-    if (p.approval_notified === false && (t === "revendedor" || t === "produtor")) {
+    if (p.approval_notified === false && t === "produtor") {
       setApprovalNotice(t);
     } else {
       setApprovalNotice(null);
