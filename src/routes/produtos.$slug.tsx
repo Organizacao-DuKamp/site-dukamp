@@ -109,14 +109,14 @@ function Page() {
             <div>Estoque: {p.stock}</div>
             {p.weight != null && <div>Peso: {p.weight} kg</div>}
           </div>
-          {p.description && (
-            <div className="mt-6">
-              <h2 className="font-semibold mb-2">Descrição</h2>
-              <RichContent html={p.description} className="text-muted-foreground" />
-            </div>
-          )}
         </div>
       </div>
+      {p.description && (
+        <div className="mt-10 border-t pt-6">
+          <h2 className="font-semibold mb-4 text-lg">Descrição</h2>
+          <RichContent html={p.description} className="text-muted-foreground max-w-4xl" />
+        </div>
+      )}
     </SiteLayout>
   );
 }
