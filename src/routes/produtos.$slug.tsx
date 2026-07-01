@@ -112,11 +112,7 @@ function Page() {
           {p.description && (
             <div className="mt-6">
               <h2 className="font-semibold mb-2">Descrição</h2>
-              {/\<[a-z]/i.test(p.description) ? (
-                <RichContent html={p.description} className="text-muted-foreground" />
-              ) : (
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{p.description}</p>
-              )}
+              <RichContent html={p.description} className="text-muted-foreground" />
             </div>
           )}
         </div>
