@@ -1,14 +1,36 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useSiteSettings } from "@/lib/site-settings";
+import { FOOTER_PAGES } from "@/lib/footer-pages";
+import { useAuth } from "@/lib/auth";
+import { useSupport } from "@/lib/support";
 
 export function Footer() {
   const { data: settings } = useSiteSettings();
+  const { user, isAdmin } = useAuth();
+  const { openChat } = useSupport();
+  const nav = useNavigate();
   const siteName = settings?.site_name || "Dukamp Saúde Animal";
   const tagline = settings?.tagline || "Mais de 20 anos cuidando da saúde dos animais.";
   const email = settings?.email || "contato@dukamp.com.br";
   const phone = settings?.phone || "(00) 0000-0000";
   const address = settings?.address || "";
   const logoUrl = settings?.logo_url;
+
+  const informacoes = FOOTER_PAGES.filter((p) => p.group === "informacoes");
+  const seguranca = FOOTER_PAGES.filter((p) => p.group === "seguranca");
+
+  function handleFaleConosco(e: React.MouseEvent) {
+    e.preventDefault();
+    if (!user) {
+      nav({ to: "/auth" });
+      return;
+    }
+    if (isAdmin) {
+      nav({ to: "/admin/atendimentos" });
+      return;
+    }
+    openChat();
+  }
 
   return (
     <footer className="border-t bg-card mt-12">
@@ -24,20 +46,39 @@ export function Footer() {
           </div>
           <p className="text-muted-foreground">{tagline}</p>
         </div>
-        <div>
-          <div className="font-semibold mb-3">Loja</div>
-          <ul className="space-y-2 text-muted-foreground">
-            <li><Link to="/produtos" className="hover:text-primary">Produtos</Link></li>
-            <li><Link to="/catalogos" className="hover:text-primary">Catálogos</Link></li>
-          </ul>
-        </div>
+
         <div>
           <div className="font-semibold mb-3">Institucional</div>
           <ul className="space-y-2 text-muted-foreground">
-            <li><Link to="/sobre" className="hover:text-primary">Sobre</Link></li>
-            <li><Link to="/contato" className="hover:text-primary">Contato</Link></li>
+            <li><Link to="/sobre" className="hover:text-primary">Nossas Unidades</Link></li>
+            <li><Link to="/sobre" className="hover:text-primary">Sobre Nós</Link></li>
+            <li>
+              <a href="/contato" onClick={handleFaleConosco} className="hover:text-primary cursor-pointer">
+                Fale Conosco
+              </a>
+            </li>
           </ul>
         </div>
+
+        <div>
+          <div className="font-semibold mb-3">Informações</div>
+          <ul className="space-y-2 text-muted-foreground">
+            {informacoes.map((p) => (
+              <li key={p.slug}>
+                <Link to="/paginas/$slug" params={{ slug: p.slug }} className="hover:text-primary">{p.title}</Link>
+              </li>
+            ))}
+          </ul>
+          <div className="font-semibold mt-6 mb-3">Segurança</div>
+          <ul className="space-y-2 text-muted-foreground">
+            {seguranca.map((p) => (
+              <li key={p.slug}>
+                <Link to="/paginas/$slug" params={{ slug: p.slug }} className="hover:text-primary">{p.title}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div>
           <div className="font-semibold mb-3">Contato</div>
           <ul className="space-y-2 text-muted-foreground">
