@@ -150,6 +150,7 @@ function Page() {
               stock: stockInt,
               active: shouldBeActive,
               ...dims,
+              weight: dims.peso ?? 0,
             });
             if (error) throw error;
             result.created++;
