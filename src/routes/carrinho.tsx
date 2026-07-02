@@ -179,11 +179,14 @@ function CarrinhoPage() {
                 <span>{formatBRL(total)}</span>
               </div>
             </div>
-            <Button className="w-full" onClick={finalizar}>
+            <Button className="w-full" asChild>
+              <Link to="/checkout">Finalizar compra</Link>
+            </Button>
+            <Button className="w-full" variant="outline" onClick={finalizar}>
               <MessageCircle className="h-4 w-4" /> Finalizar pelo WhatsApp
             </Button>
             <p className="text-[11px] text-muted-foreground text-center">
-              Um consultor confirmará valores de frete e forma de pagamento.
+              No checkout você calcula frete pelos Correios e paga com Pix (Mercado Pago).
             </p>
           </div>
         </aside>

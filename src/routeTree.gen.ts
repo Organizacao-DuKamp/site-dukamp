@@ -25,6 +25,7 @@ import { Route as ProdutosIndexRouteImport } from './routes/produtos.index'
 import { Route as CatalogosIndexRouteImport } from './routes/catalogos.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProdutosSlugRouteImport } from './routes/produtos.$slug'
+import { Route as PedidoIdRouteImport } from './routes/pedido.$id'
 import { Route as PaginasSlugRouteImport } from './routes/paginas.$slug'
 import { Route as CatalogosSlugRouteImport } from './routes/catalogos.$slug'
 import { Route as AdminSolicitacoesRouteImport } from './routes/admin.solicitacoes'
@@ -121,6 +122,11 @@ const ProdutosSlugRoute = ProdutosSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ProdutosRoute,
+} as any)
+const PedidoIdRoute = PedidoIdRouteImport.update({
+  id: '/pedido/$id',
+  path: '/pedido/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PaginasSlugRoute = PaginasSlugRouteImport.update({
   id: '/paginas/$slug',
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/paginas/$slug': typeof PaginasSlugRoute
+  '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/catalogos/': typeof CatalogosIndexRoute
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/paginas/$slug': typeof PaginasSlugRoute
+  '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin': typeof AdminIndexRoute
   '/catalogos': typeof CatalogosIndexRoute
@@ -295,6 +303,7 @@ export interface FileRoutesById {
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/paginas/$slug': typeof PaginasSlugRoute
+  '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/catalogos/': typeof CatalogosIndexRoute
@@ -331,6 +340,7 @@ export interface FileRouteTypes {
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/paginas/$slug'
+    | '/pedido/$id'
     | '/produtos/$slug'
     | '/admin/'
     | '/catalogos/'
@@ -362,6 +372,7 @@ export interface FileRouteTypes {
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/paginas/$slug'
+    | '/pedido/$id'
     | '/produtos/$slug'
     | '/admin'
     | '/catalogos'
@@ -396,6 +407,7 @@ export interface FileRouteTypes {
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/paginas/$slug'
+    | '/pedido/$id'
     | '/produtos/$slug'
     | '/admin/'
     | '/catalogos/'
@@ -420,6 +432,7 @@ export interface RootRouteChildren {
   SobreRoute: typeof SobreRoute
   UnidadesRoute: typeof UnidadesRoute
   PaginasSlugRoute: typeof PaginasSlugRoute
+  PedidoIdRoute: typeof PedidoIdRoute
   ApiPublicInitAdminRoute: typeof ApiPublicInitAdminRoute
   ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
 }
@@ -537,6 +550,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/produtos/$slug'
       preLoaderRoute: typeof ProdutosSlugRouteImport
       parentRoute: typeof ProdutosRoute
+    }
+    '/pedido/$id': {
+      id: '/pedido/$id'
+      path: '/pedido/$id'
+      fullPath: '/pedido/$id'
+      preLoaderRoute: typeof PedidoIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/paginas/$slug': {
       id: '/paginas/$slug'
@@ -729,6 +749,7 @@ const rootRouteChildren: RootRouteChildren = {
   SobreRoute: SobreRoute,
   UnidadesRoute: UnidadesRoute,
   PaginasSlugRoute: PaginasSlugRoute,
+  PedidoIdRoute: PedidoIdRoute,
   ApiPublicInitAdminRoute: ApiPublicInitAdminRoute,
   ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
 }
