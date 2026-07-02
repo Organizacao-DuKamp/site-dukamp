@@ -201,22 +201,29 @@ async function correiosToken() {
   const cartao = onlyDigits(cleanSecret(process.env.CORREIOS_CARTAO_POSTAGEM));
   const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
 
+  const senhaFingerprint = senha
+    ? `${senha.slice(0, 2)}***${senha.slice(-2)} (len=${senha.length})`
+    : "vazia";
+  const senhaHasWhitespace = /\s/.test(process.env.CORREIOS_SENHA || "");
+  const senhaHasQuotes = /["']/.test(process.env.CORREIOS_SENHA || "");
+  const usuarioPreview = usuario ? `${usuario.slice(0, 2)}***${usuario.slice(-2)}` : "vazio";
+
   console.log("[Correios] auth start", {
-    hasUsuario: !!usuario,
+    usuarioPreview,
     usuarioLen: usuario.length,
     usuarioDigits: onlyDigits(usuario).length,
     usuarioNormalizedEqualsRaw: usuario === rawUsuario,
-    hasSenha: !!senha,
-    senhaLen: senha.length,
-    hasCartao: !!cartao,
+    senhaFingerprint,
+    senhaHasWhitespace,
+    senhaHasQuotes,
     cartaoLen: cartao.length,
-    hasContrato: !!contrato,
     contratoLen: contrato.length,
   });
 
   validateCorreiosCredentials(usuario, senha, cartao);
 
   const basic = Buffer.from(`${usuario}:${senha}`).toString("base64");
+  console.log("[Correios] basic auth header", { basicLen: basic.length, basicPreview: `${basic.slice(0, 6)}...${basic.slice(-4)}` });
   const headers = { Authorization: `Basic ${basic}`, "Content-Type": "application/json", Accept: "application/json" };
   const attempts: Array<{ name: string; status: number; detail: string }> = [];
 
