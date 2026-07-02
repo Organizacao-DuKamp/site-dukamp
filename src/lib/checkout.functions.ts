@@ -298,94 +298,39 @@ export const calculateShipping = createServerFn({ method: "POST" })
       .in("id", ids);
     if (error) throw new Error(error.message);
 
-    // Agregar peso e dimensões (empilha por comprimento como aproximação)
-    let pesoTotal = 0;
-    let altura = 0;
-    let largura = 0;
-    let comprimento = 0;
+    const pacotes: ShippingPackage[] = [];
     for (const item of data.items) {
       const p = prods?.find((x) => x.id === item.product_id);
       if (!p) continue;
-      const w = Number(p.peso ?? 0) * item.quantity;
-      pesoTotal += w;
-      altura = Math.max(altura, Number(p.altura ?? 0));
-      largura = Math.max(largura, Number(p.largura ?? 0));
-      comprimento += Number(p.comprimento ?? 0) * item.quantity;
-    }
-    // Limites/mínimos Correios
-    if (pesoTotal <= 0) pesoTotal = 1;
-    if (altura < 2) altura = 2;
-    if (largura < 11) largura = 11;
-    if (comprimento < 16) comprimento = 16;
-    // Máximos PAC
-    altura = Math.min(altura, 105);
-    largura = Math.min(largura, 105);
-    comprimento = Math.min(comprimento, 105);
-
-    const { token } = await correiosToken();
-    const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
-
-    // Preço
-    const precoRes = await fetch("https://api.correios.com.br/preco/v1/nacional", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        idLote: "1",
-        parametrosProduto: [
-          {
-            coProduto: CORREIOS_SERVICO,
-            nuRequisicao: "1",
-            nuContrato: contrato,
-            cepOrigem: CEP_ORIGEM,
-            cepDestino: cepDest,
-            psObjeto: String(Math.ceil(pesoTotal * 1000)), // gramas
-            tpObjeto: "2",
-            comprimento: String(Math.ceil(comprimento)),
-            largura: String(Math.ceil(largura)),
-            altura: String(Math.ceil(altura)),
-            servicosAdicionais: ["001"],
-            vlDeclarado: "0",
-          },
-        ],
-      }),
-    });
-    if (!precoRes.ok) {
-      const t = await precoRes.text();
-      throw new Error(`Correios preço falhou: ${precoRes.status} ${t}`);
-    }
-    const precoJson = (await precoRes.json()) as Array<{ pcFinal?: string; txErro?: string }>;
-    const preco = precoJson?.[0];
-    if (!preco || preco.txErro) throw new Error(preco?.txErro || "Frete indisponível para este CEP");
-    const valor = Number((preco.pcFinal || "0").replace(",", "."));
-
-    // Prazo
-    const prazoRes = await fetch("https://api.correios.com.br/prazo/v1/nacional", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        idLote: "1",
-        parametrosPrazo: [
-          {
-            coProduto: CORREIOS_SERVICO,
-            nuRequisicao: "1",
-            cepOrigem: CEP_ORIGEM,
-            cepDestino: cepDest,
-            dtEvento: new Date().toISOString().slice(0, 10).split("-").reverse().join("/"),
-          },
-        ],
-      }),
-    });
-    let prazoDias = 7;
-    if (prazoRes.ok) {
-      const prazoJson = (await prazoRes.json()) as Array<{ prazoEntrega?: number }>;
-      prazoDias = Number(prazoJson?.[0]?.prazoEntrega ?? 7) || 7;
+      const pacote = {
+        pesoKg: toCorreiosWeight(p.peso),
+        alturaCm: toCorreiosDimension(p.altura, 2),
+        larguraCm: toCorreiosDimension(p.largura, 11),
+        comprimentoCm: toCorreiosDimension(p.comprimento, 16),
+      };
+      for (let q = 0; q < item.quantity; q += 1) pacotes.push(pacote);
     }
 
-    return {
-      servico: CORREIOS_SERVICO_NOME,
-      valor,
-      prazoDias,
-    };
+    if (!pacotes.length) throw new Error("Produto inválido no carrinho");
+
+    try {
+      const { token } = await correiosToken();
+      const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
+      return await calculateCorreiosRestShipping(token, cepDest, contrato, pacotes);
+    } catch (error) {
+      console.error("[Correios] API REST indisponível; usando calculador público", {
+        reason: error instanceof Error ? error.message.slice(0, 500) : String(error),
+        packages: pacotes.length,
+      });
+      try {
+        return await calculateLegacyCorreiosShipping(cepDest, pacotes);
+      } catch (legacyError) {
+        console.error("[Correios] calculador público falhou", {
+          reason: legacyError instanceof Error ? legacyError.message.slice(0, 500) : String(legacyError),
+        });
+        throw new Error("Não foi possível calcular o frete pelos Correios agora. Verifique o CEP ou tente novamente em alguns minutos.");
+      }
+    }
   });
 
 // ---------- Order + Mercado Pago Pix ----------
