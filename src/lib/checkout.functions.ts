@@ -256,19 +256,27 @@ async function correiosToken() {
     return null;
   }
 
-  const defaultToken = await tryToken("autentica", "https://api.correios.com.br/token/v1/autentica");
+  const defaultToken =
+    (await tryToken("autentica-v1", "https://api.correios.com.br/token/v1/autentica")) ||
+    (await tryToken("autentica", "https://api.correios.com.br/token/autentica"));
   if (defaultToken) return defaultToken;
 
   if (contrato) {
-    const contractToken = await tryToken("contrato", "https://api.correios.com.br/token/v1/autentica/contrato", {
-      numero: contrato,
-    });
+    const contractToken =
+      (await tryToken("contrato-v1", "https://api.correios.com.br/token/v1/autentica/contrato", {
+        numero: contrato,
+      })) ||
+      (await tryToken("contrato", "https://api.correios.com.br/token/autentica/contrato", {
+        numero: contrato,
+      }));
     if (contractToken) return contractToken;
   }
 
   const cardBody: Record<string, string> = { numero: cartao };
   if (contrato) cardBody.contrato = contrato;
-  const cardToken = await tryToken("cartaopostagem", "https://api.correios.com.br/token/v1/autentica/cartaopostagem", cardBody);
+  const cardToken =
+    (await tryToken("cartaopostagem-v1", "https://api.correios.com.br/token/v1/autentica/cartaopostagem", cardBody)) ||
+    (await tryToken("cartaopostagem", "https://api.correios.com.br/token/autentica/cartaopostagem", cardBody));
   if (cardToken) return cardToken;
 
   const details = attempts
