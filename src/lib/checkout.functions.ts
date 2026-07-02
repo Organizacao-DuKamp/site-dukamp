@@ -10,23 +10,56 @@ function onlyDigits(s: string) {
   return (s || "").replace(/\D/g, "");
 }
 
+function cleanSecret(value?: string) {
+  return (value || "").trim();
+}
+
+function normalizeCorreiosUser(value?: string) {
+  const raw = cleanSecret(value);
+  const digits = onlyDigits(raw);
+  return digits.length === 11 || digits.length === 14 ? digits : raw;
+}
+
+async function readCorreiosError(res: Response) {
+  const text = await res.text();
+  try {
+    const json = JSON.parse(text) as { msgs?: string[]; mensagem?: string; message?: string; erro?: string };
+    return json.msgs?.join("; ") || json.mensagem || json.message || json.erro || text;
+  } catch {
+    return text;
+  }
+}
+
 // ---------- Correios CWS ----------
 async function correiosToken() {
-  const usuario = process.env.CORREIOS_USUARIO!;
-  const senha = process.env.CORREIOS_SENHA!;
-  const cartao = process.env.CORREIOS_CARTAO_POSTAGEM!;
+  const usuario = normalizeCorreiosUser(process.env.CORREIOS_USUARIO);
+  const senha = cleanSecret(process.env.CORREIOS_SENHA);
+  const cartao = onlyDigits(cleanSecret(process.env.CORREIOS_CARTAO_POSTAGEM));
   if (!usuario || !senha || !cartao) throw new Error("Credenciais Correios ausentes");
   const basic = Buffer.from(`${usuario}:${senha}`).toString("base64");
-  const res = await fetch("https://api.correios.com.br/token/v1/autentica/cartaopostagem", {
+  const headers = { Authorization: `Basic ${basic}`, "Content-Type": "application/json", Accept: "application/json" };
+  const cardRes = await fetch("https://api.correios.com.br/token/v1/autentica/cartaopostagem", {
     method: "POST",
-    headers: { Authorization: `Basic ${basic}`, "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ numero: cartao }),
   });
-  if (!res.ok) {
-    const t = await res.text();
-    throw new Error(`Correios auth falhou: ${res.status} ${t}`);
+
+  if (cardRes.ok) return (await cardRes.json()) as { token: string; ambiente?: string };
+
+  const cardError = await readCorreiosError(cardRes);
+  const defaultRes = await fetch("https://api.correios.com.br/token/v1/autentica", {
+    method: "POST",
+    headers,
+  });
+
+  if (!defaultRes.ok) {
+    const defaultError = await readCorreiosError(defaultRes);
+    throw new Error(
+      `Correios auth falhou: ${defaultRes.status}. Confira CNPJ/usuário e código de acesso da API. Detalhe: ${defaultError || cardError}`,
+    );
   }
-  return (await res.json()) as { token: string; ambiente?: string };
+
+  return (await defaultRes.json()) as { token: string; ambiente?: string };
 }
 
 export const calculateShipping = createServerFn({ method: "POST" })
@@ -81,7 +114,7 @@ export const calculateShipping = createServerFn({ method: "POST" })
     comprimento = Math.min(comprimento, 105);
 
     const { token } = await correiosToken();
-    const contrato = process.env.CORREIOS_CONTRATO!;
+    const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
 
     // Preço
     const precoRes = await fetch("https://api.correios.com.br/preco/v1/nacional", {
