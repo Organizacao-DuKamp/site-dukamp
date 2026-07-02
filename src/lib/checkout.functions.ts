@@ -58,48 +58,61 @@ async function correiosToken() {
 
   const basic = Buffer.from(`${usuario}:${senha}`).toString("base64");
   const headers = { Authorization: `Basic ${basic}`, "Content-Type": "application/json", Accept: "application/json" };
+  const attempts: Array<{ name: string; status: number; detail: string }> = [];
 
-  console.log("[Correios] tentando /token/v1/autentica/cartaopostagem");
-  const cardRes = await fetch("https://api.correios.com.br/token/v1/autentica/cartaopostagem", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ numero: cartao }),
-  });
-
-  if (cardRes.ok) {
-    const json = (await cardRes.json()) as { token: string; ambiente?: string };
-    console.log("[Correios] auth OK via cartaopostagem", { ambiente: json.ambiente, tokenLen: json.token?.length });
-    return json;
-  }
-
-  const cardError = await readCorreiosError(cardRes);
-  console.error("[Correios] cartaopostagem falhou", {
-    status: cardRes.status,
-    statusText: cardRes.statusText,
-    body: cardError?.slice(0, 500),
-  });
-
-  console.log("[Correios] tentando /token/v1/autentica (fallback)");
-  const defaultRes = await fetch("https://api.correios.com.br/token/v1/autentica", {
-    method: "POST",
-    headers,
-  });
-
-  if (!defaultRes.ok) {
-    const defaultError = await readCorreiosError(defaultRes);
-    console.error("[Correios] autentica default falhou", {
-      status: defaultRes.status,
-      statusText: defaultRes.statusText,
-      body: defaultError?.slice(0, 500),
+  async function tryToken(name: string, url: string, body?: Record<string, string | number>) {
+    console.log(`[Correios] tentando ${name}`, {
+      hasBody: !!body,
+      bodyKeys: body ? Object.keys(body) : [],
     });
-    throw new Error(
-      `Correios auth falhou: ${defaultRes.status}. cartaopostagem=${cardRes.status} (${cardError?.slice(0, 200) || "sem detalhe"}). autentica=${defaultRes.status} (${defaultError?.slice(0, 200) || "sem detalhe"}).`,
-    );
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+
+    if (res.ok) {
+      const json = (await res.json()) as { token: string; ambiente?: string };
+      console.log(`[Correios] auth OK via ${name}`, { ambiente: json.ambiente, tokenLen: json.token?.length });
+      return json;
+    }
+
+    const detail = await readCorreiosError(res);
+    attempts.push({ name, status: res.status, detail });
+    console.error(`[Correios] ${name} falhou`, {
+      status: res.status,
+      statusText: res.statusText,
+      body: detail?.slice(0, 500),
+      wwwAuthenticate: res.headers.get("www-authenticate") || null,
+    });
+    return null;
   }
 
-  const json = (await defaultRes.json()) as { token: string; ambiente?: string };
-  console.log("[Correios] auth OK via autentica default", { ambiente: json.ambiente, tokenLen: json.token?.length });
-  return json;
+  const defaultToken = await tryToken("autentica", "https://api.correios.com.br/token/v1/autentica");
+  if (defaultToken) return defaultToken;
+
+  if (contrato) {
+    const contractToken = await tryToken("contrato", "https://api.correios.com.br/token/v1/autentica/contrato", {
+      numero: contrato,
+    });
+    if (contractToken) return contractToken;
+  }
+
+  const cardBody: Record<string, string> = { numero: cartao };
+  if (contrato) cardBody.contrato = contrato;
+  const cardToken = await tryToken("cartaopostagem", "https://api.correios.com.br/token/v1/autentica/cartaopostagem", cardBody);
+  if (cardToken) return cardToken;
+
+  const details = attempts
+    .map((attempt) => `${attempt.name}=${attempt.status} (${attempt.detail?.slice(0, 200) || "sem detalhe"})`)
+    .join(". ");
+  const likelyUserIssue =
+    onlyDigits(usuario).length === 14
+      ? " O usuário configurado parece ser um CNPJ (14 dígitos). Na API dos Correios, o Basic Auth normalmente exige o idCorreios/login do Meu Correios vinculado ao contrato, e a senha deve ser o código de acesso às APIs do CWS."
+      : "";
+
+  throw new Error(`Correios auth falhou: ${attempts.at(-1)?.status || 401}. ${details}.${likelyUserIssue}`);
 }
 
 export const calculateShipping = createServerFn({ method: "POST" })
