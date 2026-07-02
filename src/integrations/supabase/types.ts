@@ -260,10 +260,12 @@ export type Database = {
       products: {
         Row: {
           active: boolean
+          altura: number | null
           brand: string | null
           catalog_id: string | null
           category_id: string | null
           code: string
+          comprimento: number | null
           consumer_pix_price: number | null
           consumer_price: number | null
           created_at: string
@@ -272,7 +274,9 @@ export type Database = {
           id: string
           images: string[]
           installments: number
+          largura: number | null
           name: string
+          peso: number | null
           pix_price: number | null
           price: number
           producer_pix_price: number | null
@@ -286,10 +290,12 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          altura?: number | null
           brand?: string | null
           catalog_id?: string | null
           category_id?: string | null
           code: string
+          comprimento?: number | null
           consumer_pix_price?: number | null
           consumer_price?: number | null
           created_at?: string
@@ -298,7 +304,9 @@ export type Database = {
           id?: string
           images?: string[]
           installments?: number
+          largura?: number | null
           name: string
+          peso?: number | null
           pix_price?: number | null
           price?: number
           producer_pix_price?: number | null
@@ -312,10 +320,12 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          altura?: number | null
           brand?: string | null
           catalog_id?: string | null
           category_id?: string | null
           code?: string
+          comprimento?: number | null
           consumer_pix_price?: number | null
           consumer_price?: number | null
           created_at?: string
@@ -324,7 +334,9 @@ export type Database = {
           id?: string
           images?: string[]
           installments?: number
+          largura?: number | null
           name?: string
+          peso?: number | null
           pix_price?: number | null
           price?: number
           producer_pix_price?: number | null
