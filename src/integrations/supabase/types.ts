@@ -257,6 +257,165 @@ export type Database = {
         }
         Relationships: []
       }
+      order_items: {
+        Row: {
+          altura: number | null
+          comprimento: number | null
+          created_at: string
+          id: string
+          largura: number | null
+          name: string
+          order_id: string
+          peso: number | null
+          product_code: string | null
+          product_id: string | null
+          quantity: number
+          subtotal: number
+          unit_price: number
+        }
+        Insert: {
+          altura?: number | null
+          comprimento?: number | null
+          created_at?: string
+          id?: string
+          largura?: number | null
+          name: string
+          order_id: string
+          peso?: number | null
+          product_code?: string | null
+          product_id?: string | null
+          quantity: number
+          subtotal: number
+          unit_price: number
+        }
+        Update: {
+          altura?: number | null
+          comprimento?: number | null
+          created_at?: string
+          id?: string
+          largura?: number | null
+          name?: string
+          order_id?: string
+          peso?: number | null
+          product_code?: string | null
+          product_id?: string | null
+          quantity?: number
+          subtotal?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          bairro: string
+          cep: string
+          cidade: string
+          complemento: string | null
+          cpf_cnpj: string | null
+          created_at: string
+          customer_name: string
+          email: string
+          estado: string
+          id: string
+          mp_expires_at: string | null
+          mp_payment_id: string | null
+          mp_qr_code: string | null
+          mp_qr_code_base64: string | null
+          mp_ticket_url: string | null
+          notes: string | null
+          numero: string
+          order_number: string
+          payment_method: Database["public"]["Enums"]["payment_method"]
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          phone: string
+          rua: string
+          shipping_cost: number
+          shipping_deadline_days: number | null
+          shipping_service: string | null
+          subtotal: number
+          total: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          bairro: string
+          cep: string
+          cidade: string
+          complemento?: string | null
+          cpf_cnpj?: string | null
+          created_at?: string
+          customer_name: string
+          email: string
+          estado: string
+          id?: string
+          mp_expires_at?: string | null
+          mp_payment_id?: string | null
+          mp_qr_code?: string | null
+          mp_qr_code_base64?: string | null
+          mp_ticket_url?: string | null
+          notes?: string | null
+          numero: string
+          order_number?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          phone: string
+          rua: string
+          shipping_cost?: number
+          shipping_deadline_days?: number | null
+          shipping_service?: string | null
+          subtotal: number
+          total: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          bairro?: string
+          cep?: string
+          cidade?: string
+          complemento?: string | null
+          cpf_cnpj?: string | null
+          created_at?: string
+          customer_name?: string
+          email?: string
+          estado?: string
+          id?: string
+          mp_expires_at?: string | null
+          mp_payment_id?: string | null
+          mp_qr_code?: string | null
+          mp_qr_code_base64?: string | null
+          mp_ticket_url?: string | null
+          notes?: string | null
+          numero?: string
+          order_number?: string
+          payment_method?: Database["public"]["Enums"]["payment_method"]
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          phone?: string
+          rua?: string
+          shipping_cost?: number
+          shipping_deadline_days?: number | null
+          shipping_service?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           active: boolean
@@ -548,6 +707,14 @@ export type Database = {
       account_request_status: "pending" | "approved" | "rejected"
       account_type: "cliente" | "revendedor" | "produtor" | "admin"
       app_role: "admin" | "user"
+      payment_method: "pix" | "card"
+      payment_status:
+        | "pending"
+        | "in_process"
+        | "approved"
+        | "rejected"
+        | "cancelled"
+        | "refunded"
       requested_account_type: "revendedor" | "produtor"
       ticket_status: "open" | "in_progress" | "closed"
     }
@@ -680,6 +847,15 @@ export const Constants = {
       account_request_status: ["pending", "approved", "rejected"],
       account_type: ["cliente", "revendedor", "produtor", "admin"],
       app_role: ["admin", "user"],
+      payment_method: ["pix", "card"],
+      payment_status: [
+        "pending",
+        "in_process",
+        "approved",
+        "rejected",
+        "cancelled",
+        "refunded",
+      ],
       requested_account_type: ["revendedor", "produtor"],
       ticket_status: ["open", "in_progress", "closed"],
     },
