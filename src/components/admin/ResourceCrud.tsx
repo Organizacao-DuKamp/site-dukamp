@@ -32,6 +32,12 @@ export type ColumnDef = {
   format?: (v: any, row: any) => ReactNode;
 };
 
+export type FilterDef = {
+  column: string;
+  label: string;
+  options: { value: string; label: string }[];
+};
+
 type Props = {
   title: string;
   table: string;
@@ -40,6 +46,7 @@ type Props = {
   orderBy?: { column: string; ascending?: boolean };
   searchField?: string;
   searchPlaceholder?: string;
+  filters?: FilterDef[];
 };
 
 const PAGE_SIZE = 25;
