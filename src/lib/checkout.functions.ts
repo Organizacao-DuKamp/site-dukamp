@@ -32,6 +32,20 @@ function summarizeCorreiosAuthIssue(attempts: Array<{ name: string; status: numb
   return `${userHint} O retorno 401 em todos os endpoints significa que os Correios recusaram o Basic Auth antes de validar contrato/cartão. O problema está em CORREIOS_USUARIO ou CORREIOS_SENHA: o usuário deve ser exatamente o login/idCorreios exibido em Credenciais no CWS, e a senha deve ser o código de acesso às APIs gerado em Gestão de acesso a APIs. Se ambos estiverem corretos, esse contrato/login ainda não está habilitado/autorizado para a API REST nova dos Correios e precisa ser liberado pelo gerente/suporte tecnológico dos Correios.`;
 }
 
+function validateCorreiosCredentials(usuario: string, senha: string, cartao: string) {
+  if (!usuario || !senha || !cartao) {
+    console.error("[Correios] credenciais ausentes", { usuario: !!usuario, senha: !!senha, cartao: !!cartao });
+    throw new Error("Credenciais Correios ausentes (usuário/senha/cartão)");
+  }
+
+  if (senha.length !== 40) {
+    console.error("[Correios] senha inválida para CWS", { senhaLen: senha.length });
+    throw new Error(
+      `CORREIOS_SENHA inválida: o valor atual tem ${senha.length} caracteres. Para a API REST dos Correios, não use a senha de login do Meu Correios; use o código de acesso às APIs do CWS, que normalmente tem 40 caracteres.`,
+    );
+  }
+}
+
 async function readCorreiosError(res: Response) {
   const text = await res.text();
   try {
@@ -63,10 +77,7 @@ async function correiosToken() {
     contratoLen: contrato.length,
   });
 
-  if (!usuario || !senha || !cartao) {
-    console.error("[Correios] credenciais ausentes", { usuario: !!usuario, senha: !!senha, cartao: !!cartao });
-    throw new Error("Credenciais Correios ausentes (usuário/senha/cartão)");
-  }
+  validateCorreiosCredentials(usuario, senha, cartao);
 
   const basic = Buffer.from(`${usuario}:${senha}`).toString("base64");
   const headers = { Authorization: `Basic ${basic}`, "Content-Type": "application/json", Accept: "application/json" };
