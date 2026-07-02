@@ -138,6 +138,7 @@ function Page() {
             if (error) throw error;
             result.updated++;
           } else {
+            const dims = getDimensionsFromName(r.name);
             const { error } = await supabase.from("products").insert({
               code: r.code,
               name: r.name,
@@ -147,6 +148,7 @@ function Page() {
               price: r.preco1,
               stock: stockInt,
               active: shouldBeActive,
+              ...dims,
             });
             if (error) throw error;
             result.created++;
