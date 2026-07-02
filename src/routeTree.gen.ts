@@ -37,6 +37,7 @@ import { Route as AdminAtualizarValoresRouteImport } from './routes/admin.atuali
 import { Route as AdminAtendimentosRouteImport } from './routes/admin.atendimentos'
 import { Route as AdminAnunciosRouteImport } from './routes/admin.anuncios'
 import { Route as AdminContasIndexRouteImport } from './routes/admin.contas.index'
+import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
 import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
 import { Route as AdminContasIdRouteImport } from './routes/admin.contas.$id'
 
@@ -180,6 +181,12 @@ const AdminContasIndexRoute = AdminContasIndexRouteImport.update({
   path: '/contas/',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicMercadopagoWebhookRoute =
+  ApiPublicMercadopagoWebhookRouteImport.update({
+    id: '/api/public/mercadopago-webhook',
+    path: '/api/public/mercadopago-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicInitAdminRoute = ApiPublicInitAdminRouteImport.update({
   id: '/api/public/init-admin',
   path: '/api/public/init-admin',
@@ -221,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas/': typeof AdminContasIndexRoute
 }
 export interface FileRoutesByTo {
@@ -250,6 +258,7 @@ export interface FileRoutesByTo {
   '/produtos': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas': typeof AdminContasIndexRoute
 }
 export interface FileRoutesById {
@@ -283,6 +292,7 @@ export interface FileRoutesById {
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
+  '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas/': typeof AdminContasIndexRoute
 }
 export interface FileRouteTypes {
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/produtos/'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
+    | '/api/public/mercadopago-webhook'
     | '/admin/contas/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
+    | '/api/public/mercadopago-webhook'
     | '/admin/contas'
   id:
     | '__root__'
@@ -378,6 +390,7 @@ export interface FileRouteTypes {
     | '/produtos/'
     | '/admin/contas/$id'
     | '/api/public/init-admin'
+    | '/api/public/mercadopago-webhook'
     | '/admin/contas/'
   fileRoutesById: FileRoutesById
 }
@@ -395,6 +408,7 @@ export interface RootRouteChildren {
   UnidadesRoute: typeof UnidadesRoute
   PaginasSlugRoute: typeof PaginasSlugRoute
   ApiPublicInitAdminRoute: typeof ApiPublicInitAdminRoute
+  ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -595,6 +609,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContasIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/mercadopago-webhook': {
+      id: '/api/public/mercadopago-webhook'
+      path: '/api/public/mercadopago-webhook'
+      fullPath: '/api/public/mercadopago-webhook'
+      preLoaderRoute: typeof ApiPublicMercadopagoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/init-admin': {
       id: '/api/public/init-admin'
       path: '/api/public/init-admin'
@@ -688,6 +709,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnidadesRoute: UnidadesRoute,
   PaginasSlugRoute: PaginasSlugRoute,
   ApiPublicInitAdminRoute: ApiPublicInitAdminRoute,
+  ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
