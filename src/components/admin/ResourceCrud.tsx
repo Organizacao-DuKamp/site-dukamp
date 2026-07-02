@@ -51,21 +51,25 @@ type Props = {
 
 const PAGE_SIZE = 25;
 
-export function ResourceCrud({ title, table, columns, fields, orderBy, searchField, searchPlaceholder }: Props) {
+export function ResourceCrud({ title, table, columns, fields, orderBy, searchField, searchPlaceholder, filters }: Props) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
   const [page, setPage] = useState(1);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
+  const [filterValues, setFilterValues] = useState<Record<string, string>>({});
 
   const list = useQuery({
-    queryKey: ["admin", table, page, search],
+    queryKey: ["admin", table, page, search, filterValues],
     queryFn: async () => {
       const from = (page - 1) * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
       let q = supabase.from(table as any).select("*", { count: "exact" });
       if (searchField && search) q = q.ilike(searchField, `%${search}%`);
+      for (const [col, val] of Object.entries(filterValues)) {
+        if (val) q = q.eq(col, val);
+      }
       if (orderBy) q = q.order(orderBy.column, { ascending: orderBy.ascending ?? true });
       const { data, error, count } = await q.range(from, to);
       if (error) throw error;
