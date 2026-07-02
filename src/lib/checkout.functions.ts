@@ -84,7 +84,7 @@ async function calculateLegacyCorreiosPackage(cepDest: string, pacote: ShippingP
   url.searchParams.set("nIndicaCalculo", "3");
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
+  const timeout = setTimeout(() => controller.abort(), 25_000);
   let xml = "";
   let res: Response;
   try {
