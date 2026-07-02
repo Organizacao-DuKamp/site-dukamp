@@ -146,6 +146,8 @@ async function calculateCorreiosRestShipping(token: string, cepDest: string, con
   });
   if (!precoRes.ok) {
     const t = await precoRes.text();
+    const restrictedMessage = getCorreiosRestrictedApiMessage(t);
+    if (restrictedMessage) throw new Error(restrictedMessage);
     throw new Error(`Correios preço falhou: ${precoRes.status} ${t}`);
   }
   const precoJson = (await precoRes.json()) as Array<{ pcFinal?: string; txErro?: string }>;
@@ -181,6 +183,25 @@ async function calculateCorreiosRestShipping(token: string, cepDest: string, con
     valor: Number(valor.toFixed(2)),
     prazoDias,
   };
+}
+
+function getCorreiosRestrictedApiMessage(body: string) {
+  if (!body.includes("GTW-012") && !body.toLowerCase().includes("api restrita")) return "";
+
+  let apiCode = "34";
+  try {
+    const parsed = JSON.parse(body) as { msgs?: string[] };
+    const message = parsed.msgs?.join(" ") || body;
+    apiCode = message.match(/API:\s*(\d+)/i)?.[1] || apiCode;
+  } catch {
+    apiCode = body.match(/API:\s*(\d+)/i)?.[1] || apiCode;
+  }
+
+  return `Correios REST bloqueado: seu usuário autenticou, mas não tem permissão para a API de preços em produção (GTW-012 / API ${apiCode}). Isso não é erro de CEP, peso ou dimensão. Peça aos Correios para liberar no contrato/cartão de postagem o acesso à API REST de Preço Nacional (/preco/v1/nacional, API ${apiCode}) para o idCorreios configurado.`;
+}
+
+function isCorreiosPermissionError(message: string) {
+  return message.includes("GTW-012") || message.includes("Correios REST bloqueado") || message.toLowerCase().includes("api restrita");
 }
 
 async function readCorreiosError(res: Response) {
@@ -334,8 +355,17 @@ export const calculateShipping = createServerFn({ method: "POST" })
       const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
       return await calculateCorreiosRestShipping(token, cepDest, contrato, pacotes);
     } catch (error) {
+      const restMsg = error instanceof Error ? error.message : String(error);
+      if (isCorreiosPermissionError(restMsg)) {
+        console.error("[Correios] REST sem permissão para API de preço", {
+          reason: restMsg.slice(0, 500),
+          packages: pacotes.length,
+        });
+        throw new Error(restMsg);
+      }
+
       console.error("[Correios] API REST indisponível; usando calculador público", {
-        reason: error instanceof Error ? error.message.slice(0, 500) : String(error),
+        reason: restMsg.slice(0, 500),
         packages: pacotes.length,
       });
       try {
@@ -344,7 +374,6 @@ export const calculateShipping = createServerFn({ method: "POST" })
         console.error("[Correios] calculador público falhou", {
           reason: legacyError instanceof Error ? legacyError.message.slice(0, 500) : String(legacyError),
         });
-        const restMsg = error instanceof Error ? error.message : String(error);
         const legacyMsg = legacyError instanceof Error ? legacyError.message : String(legacyError);
         throw new Error(`Falha ao calcular frete. REST: ${restMsg} | Legado (CalcPrecoPrazo): ${legacyMsg}`);
       }
