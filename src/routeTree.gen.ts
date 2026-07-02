@@ -15,6 +15,7 @@ import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContatoRouteImport } from './routes/contato'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CatalogosRouteImport } from './routes/catalogos'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -69,6 +70,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const ContatoRoute = ContatoRouteImport.update({
   id: '/contato',
   path: '/contato',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogosRoute = CatalogosRouteImport.update({
@@ -204,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/carrinho': typeof CarrinhoRoute
   '/catalogos': typeof CatalogosRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
@@ -235,6 +242,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/carrinho': typeof CarrinhoRoute
+  '/checkout': typeof CheckoutRoute
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
@@ -268,6 +276,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/carrinho': typeof CarrinhoRoute
   '/catalogos': typeof CatalogosRouteWithChildren
+  '/checkout': typeof CheckoutRoute
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/carrinho'
     | '/catalogos'
+    | '/checkout'
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
@@ -334,6 +344,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/carrinho'
+    | '/checkout'
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
@@ -366,6 +377,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/carrinho'
     | '/catalogos'
+    | '/checkout'
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
@@ -400,6 +412,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CarrinhoRoute: typeof CarrinhoRoute
   CatalogosRoute: typeof CatalogosRouteWithChildren
+  CheckoutRoute: typeof CheckoutRoute
   ContatoRoute: typeof ContatoRoute
   DashboardRoute: typeof DashboardRoute
   MinhaContaRoute: typeof MinhaContaRoute
@@ -453,6 +466,13 @@ declare module '@tanstack/react-router' {
       path: '/contato'
       fullPath: '/contato'
       preLoaderRoute: typeof ContatoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalogos': {
@@ -701,6 +721,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CarrinhoRoute: CarrinhoRoute,
   CatalogosRoute: CatalogosRouteWithChildren,
+  CheckoutRoute: CheckoutRoute,
   ContatoRoute: ContatoRoute,
   DashboardRoute: DashboardRoute,
   MinhaContaRoute: MinhaContaRoute,
