@@ -32,21 +32,54 @@ async function readCorreiosError(res: Response) {
 
 // ---------- Correios CWS ----------
 async function correiosToken() {
+  const rawUsuario = cleanSecret(process.env.CORREIOS_USUARIO);
   const usuario = normalizeCorreiosUser(process.env.CORREIOS_USUARIO);
   const senha = cleanSecret(process.env.CORREIOS_SENHA);
   const cartao = onlyDigits(cleanSecret(process.env.CORREIOS_CARTAO_POSTAGEM));
-  if (!usuario || !senha || !cartao) throw new Error("Credenciais Correios ausentes");
+  const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
+
+  console.log("[Correios] auth start", {
+    hasUsuario: !!usuario,
+    usuarioLen: usuario.length,
+    usuarioDigits: onlyDigits(usuario).length,
+    usuarioNormalizedEqualsRaw: usuario === rawUsuario,
+    hasSenha: !!senha,
+    senhaLen: senha.length,
+    hasCartao: !!cartao,
+    cartaoLen: cartao.length,
+    hasContrato: !!contrato,
+    contratoLen: contrato.length,
+  });
+
+  if (!usuario || !senha || !cartao) {
+    console.error("[Correios] credenciais ausentes", { usuario: !!usuario, senha: !!senha, cartao: !!cartao });
+    throw new Error("Credenciais Correios ausentes (usuário/senha/cartão)");
+  }
+
   const basic = Buffer.from(`${usuario}:${senha}`).toString("base64");
   const headers = { Authorization: `Basic ${basic}`, "Content-Type": "application/json", Accept: "application/json" };
+
+  console.log("[Correios] tentando /token/v1/autentica/cartaopostagem");
   const cardRes = await fetch("https://api.correios.com.br/token/v1/autentica/cartaopostagem", {
     method: "POST",
     headers,
     body: JSON.stringify({ numero: cartao }),
   });
 
-  if (cardRes.ok) return (await cardRes.json()) as { token: string; ambiente?: string };
+  if (cardRes.ok) {
+    const json = (await cardRes.json()) as { token: string; ambiente?: string };
+    console.log("[Correios] auth OK via cartaopostagem", { ambiente: json.ambiente, tokenLen: json.token?.length });
+    return json;
+  }
 
   const cardError = await readCorreiosError(cardRes);
+  console.error("[Correios] cartaopostagem falhou", {
+    status: cardRes.status,
+    statusText: cardRes.statusText,
+    body: cardError?.slice(0, 500),
+  });
+
+  console.log("[Correios] tentando /token/v1/autentica (fallback)");
   const defaultRes = await fetch("https://api.correios.com.br/token/v1/autentica", {
     method: "POST",
     headers,
@@ -54,12 +87,19 @@ async function correiosToken() {
 
   if (!defaultRes.ok) {
     const defaultError = await readCorreiosError(defaultRes);
+    console.error("[Correios] autentica default falhou", {
+      status: defaultRes.status,
+      statusText: defaultRes.statusText,
+      body: defaultError?.slice(0, 500),
+    });
     throw new Error(
-      `Correios auth falhou: ${defaultRes.status}. Confira CNPJ/usuário e código de acesso da API. Detalhe: ${defaultError || cardError}`,
+      `Correios auth falhou: ${defaultRes.status}. cartaopostagem=${cardRes.status} (${cardError?.slice(0, 200) || "sem detalhe"}). autentica=${defaultRes.status} (${defaultError?.slice(0, 200) || "sem detalhe"}).`,
     );
   }
 
-  return (await defaultRes.json()) as { token: string; ambiente?: string };
+  const json = (await defaultRes.json()) as { token: string; ambiente?: string };
+  console.log("[Correios] auth OK via autentica default", { ambiente: json.ambiente, tokenLen: json.token?.length });
+  return json;
 }
 
 export const calculateShipping = createServerFn({ method: "POST" })
