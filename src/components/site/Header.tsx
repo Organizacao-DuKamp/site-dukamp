@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FacebookBrand, InstagramBrand, YoutubeBrand, TikTokBrand, WhatsappBrand } from "./BrandIcons";
-import fixedLogo from "@/assets/dukamp-logo-transparent.png.asset.json";
+import fixedLogo from "@/assets/dukamp-logo.png";
 
 const socials = [
   { href: "https://www.facebook.com/dukampsaudeanimal/", label: "Facebook", Icon: FacebookBrand },
@@ -54,7 +54,7 @@ export function Header() {
         <div className="flex h-16 items-center gap-4">
           <Link to="/" className="flex items-center shrink-0" aria-label="Início">
             <img
-              src={fixedLogo.url}
+              src={fixedLogo}
               alt="Dukamp Saúde Animal"
               className="h-12 sm:h-14 w-auto object-contain select-none"
               draggable={false}
