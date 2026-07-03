@@ -469,6 +469,7 @@ export const createPixOrder = createServerFn({ method: "POST" })
     const { data: order, error: oe } = await supa
       .from("orders")
       .insert({
+        user_id: authUserId,
         customer_name: data.customer_name,
         email: data.email,
         phone: data.phone,
