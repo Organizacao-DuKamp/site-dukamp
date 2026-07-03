@@ -123,7 +123,7 @@ function GeneralDashboard() {
           </div>
         </div>
         <ChartContainer
-          config={{ total: { label: "Total", color: "hsl(var(--primary))" } }}
+          config={{ total: { label: "Total", color: "var(--color-primary)" } }}
           className="h-[260px] w-full"
         >
           <AreaChart data={s?.week ?? []} margin={{ left: 8, right: 8, top: 8, bottom: 0 }}>
