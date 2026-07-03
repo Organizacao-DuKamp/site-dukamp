@@ -14,6 +14,7 @@ export const listMyOrders = createServerFn({ method: "GET" })
         "id,order_number,total,payment_status,delivery_status,delivered_at,created_at,shipping_service",
       )
       .eq("user_id", userId)
+      .in("payment_status", ["approved", "in_process"])
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
