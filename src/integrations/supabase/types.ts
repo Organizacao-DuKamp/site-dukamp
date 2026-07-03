@@ -329,6 +329,9 @@ export type Database = {
           cpf_cnpj: string | null
           created_at: string
           customer_name: string
+          delivered_at: string | null
+          delivery_notified: boolean
+          delivery_status: Database["public"]["Enums"]["delivery_status"]
           email: string
           estado: string
           id: string
@@ -360,6 +363,9 @@ export type Database = {
           cpf_cnpj?: string | null
           created_at?: string
           customer_name: string
+          delivered_at?: string | null
+          delivery_notified?: boolean
+          delivery_status?: Database["public"]["Enums"]["delivery_status"]
           email: string
           estado: string
           id?: string
@@ -391,6 +397,9 @@ export type Database = {
           cpf_cnpj?: string | null
           created_at?: string
           customer_name?: string
+          delivered_at?: string | null
+          delivery_notified?: boolean
+          delivery_status?: Database["public"]["Enums"]["delivery_status"]
           email?: string
           estado?: string
           id?: string
@@ -707,6 +716,7 @@ export type Database = {
       account_request_status: "pending" | "approved" | "rejected"
       account_type: "cliente" | "revendedor" | "produtor" | "admin"
       app_role: "admin" | "user"
+      delivery_status: "preparando" | "a_caminho" | "entregue"
       payment_method: "pix" | "card"
       payment_status:
         | "pending"
@@ -847,6 +857,7 @@ export const Constants = {
       account_request_status: ["pending", "approved", "rejected"],
       account_type: ["cliente", "revendedor", "produtor", "admin"],
       app_role: ["admin", "user"],
+      delivery_status: ["preparando", "a_caminho", "entregue"],
       payment_method: ["pix", "card"],
       payment_status: [
         "pending",
