@@ -57,7 +57,6 @@ function CheckoutPage() {
 
   function set<K extends keyof Form>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
-    if (["cep", "rua", "numero", "bairro", "cidade", "estado"].includes(k)) setShipping(null);
   }
 
   async function lookupCep(cep: string) {
@@ -92,23 +91,6 @@ function CheckoutPage() {
     return null;
   }
 
-  async function handleCalcFrete() {
-    const err = validateDelivery();
-    if (err) return toast.error(err);
-    if (!items.length) return toast.error("Carrinho vazio");
-    setLoadingFrete(true);
-    try {
-      const r = await calcFrete({
-        data: { cepDestino: form.cep, items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })) },
-      });
-      setShipping(r);
-      toast.success(`Frete ${r.servico}: ${formatBRL(r.valor)} • ${r.prazoDias} dias úteis`);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro ao calcular frete");
-    } finally {
-      setLoadingFrete(false);
-    }
-  }
 
   async function handleBuy() {
     const err = validateDelivery();
