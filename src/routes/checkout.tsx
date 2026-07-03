@@ -113,7 +113,8 @@ function CheckoutPage() {
   }
 
   async function handleBuy() {
-    if (!shipping) return toast.error("Calcule o frete primeiro");
+    const err = validateDelivery();
+    if (err) return toast.error(err);
     if (method !== "pix") return;
     setLoadingPay(true);
     try {
@@ -121,9 +122,9 @@ function CheckoutPage() {
         data: {
           ...form,
           items: items.map((i) => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price })),
-          shipping_cost: shipping.valor,
-          shipping_service: shipping.servico,
-          shipping_deadline_days: shipping.prazoDias,
+          shipping_cost: 0,
+          shipping_service: "A combinar",
+          shipping_deadline_days: 0,
         },
       });
       clear();
@@ -134,6 +135,7 @@ function CheckoutPage() {
       setLoadingPay(false);
     }
   }
+
 
   const total = subtotal + (shipping?.valor ?? 0);
 
