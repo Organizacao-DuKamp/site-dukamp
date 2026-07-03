@@ -3,7 +3,7 @@ import { useSiteSettings } from "@/lib/site-settings";
 import { FOOTER_PAGES } from "@/lib/footer-pages";
 import { useAuth } from "@/lib/auth";
 import { useSupport } from "@/lib/support";
-import fixedLogo from "@/assets/dukamp-logo-transparent.png.asset.json";
+import fixedLogo from "@/assets/dukamp-logo.png";
 
 export function Footer() {
   const { data: settings } = useSiteSettings();
@@ -32,7 +32,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-10 grid gap-8 md:grid-cols-4 text-sm">
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <img src={fixedLogo.url} alt={siteName} className="h-8 w-auto max-w-[140px] object-contain" />
+            <img src={fixedLogo} alt={siteName} className="h-8 w-auto max-w-[140px] object-contain" />
             <div className="font-bold">{siteName}</div>
           </div>
           <p className="text-muted-foreground">{tagline}</p>
