@@ -137,7 +137,7 @@ function CheckoutPage() {
   }
 
 
-  const total = subtotal + (shipping?.valor ?? 0);
+  const total = subtotal;
 
   if (items.length === 0) {
     return (
