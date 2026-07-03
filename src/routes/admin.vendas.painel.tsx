@@ -59,7 +59,7 @@ function PainelVendas() {
       <div className="border rounded-lg p-4 bg-card">
         <h2 className="font-semibold mb-4">Vendas dos últimos 7 dias</h2>
         <ChartContainer
-          config={{ total: { label: "Total", color: "hsl(var(--primary))" } }}
+          config={{ total: { label: "Total", color: "var(--color-primary)" } }}
           className="h-64 w-full"
         >
           <BarChart data={s.week}>
