@@ -104,6 +104,7 @@ function RootComponent() {
           <SupportProvider>
             <Outlet />
             <SupportWidget />
+            <DeliveryNoticeWatcher />
             <Toaster />
           </SupportProvider>
         </CartProvider>
