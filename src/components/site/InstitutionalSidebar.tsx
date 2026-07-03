@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { QuotesWidget } from "./QuotesWidget";
 
 export function InstitutionalSidebar() {
   const { data } = useQuery({
@@ -17,6 +18,7 @@ export function InstitutionalSidebar() {
 
   return (
     <aside className="space-y-4">
+      <QuotesWidget />
       <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium px-1">
         Institucional
       </div>
