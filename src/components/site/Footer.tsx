@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useSiteSettings } from "@/lib/site-settings";
-import { createFileRoute } from "@tanstack/react-router"; -- wait, I must not add this.
 import { FOOTER_PAGES } from "@/lib/footer-pages";
 import { useAuth } from "@/lib/auth";
 import { useSupport } from "@/lib/support";
