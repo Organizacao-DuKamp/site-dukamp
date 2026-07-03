@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth";
 import {
   LayoutDashboard, Package, Tag, FolderTree, Image as ImageIcon,
   Megaphone, Users, Settings, LogOut, ExternalLink, MessageSquare, Menu, ClipboardList, FileText, RefreshCw, Navigation,
-  ShoppingBag, ChevronDown, BarChart3, History, ListOrdered,
+  ShoppingBag, ChevronDown, BarChart3, History, ListOrdered, Boxes,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -21,8 +21,16 @@ type NavEntry = NavLeaf | NavGroup;
 
 const NAV: NavEntry[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { to: "/admin/produtos", label: "Produtos", icon: Package },
-  { to: "/admin/atualizar-valores", label: "Atualizar Valores", icon: RefreshCw },
+  {
+    label: "Estoque", icon: Boxes, basePath: "/admin/estoque",
+    children: [
+      { to: "/admin/estoque", label: "Painel", icon: BarChart3 },
+      { to: "/admin/produtos", label: "Produtos", icon: Package },
+      { to: "/admin/atualizar-valores", label: "Atualizar Valores", icon: RefreshCw },
+      { to: "/admin/catalogos", label: "Catálogos", icon: FolderTree },
+      { to: "/admin/categorias", label: "Categorias", icon: Tag },
+    ],
+  },
   {
     label: "Vendas", icon: ShoppingBag, basePath: "/admin/vendas",
     children: [
@@ -31,8 +39,6 @@ const NAV: NavEntry[] = [
       { to: "/admin/vendas/painel", label: "Painel", icon: BarChart3 },
     ],
   },
-  { to: "/admin/catalogos", label: "Catálogos", icon: FolderTree },
-  { to: "/admin/categorias", label: "Categorias", icon: Tag },
   { to: "/admin/banners", label: "Banners", icon: ImageIcon },
   { to: "/admin/anuncios", label: "Anúncios", icon: Megaphone },
   { to: "/admin/atendimentos", label: "Atendimentos", icon: MessageSquare },
@@ -61,7 +67,9 @@ function SidebarContent({ pathname, onNavigate, signOut, isMaster }: { pathname:
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
         {items.map((n) => {
           if (isGroup(n)) {
-            const groupActive = pathname.startsWith(n.basePath);
+            const groupActive =
+              pathname.startsWith(n.basePath) ||
+              n.children.some((c) => pathname === c.to || pathname.startsWith(c.to + "/"));
             return (
               <details key={n.label} open={groupActive} className="group">
                 <summary className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm cursor-pointer list-none ${groupActive ? "bg-accent" : "hover:bg-accent"}`}>

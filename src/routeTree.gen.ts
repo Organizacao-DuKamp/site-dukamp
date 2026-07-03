@@ -33,6 +33,7 @@ import { Route as AdminSolicitacoesRouteImport } from './routes/admin.solicitaco
 import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
 import { Route as AdminNavbarRouteImport } from './routes/admin.navbar'
 import { Route as AdminFooterRouteImport } from './routes/admin.footer'
+import { Route as AdminEstoqueRouteImport } from './routes/admin.estoque'
 import { Route as AdminConfiguracoesRouteImport } from './routes/admin.configuracoes'
 import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
 import { Route as AdminCatalogosRouteImport } from './routes/admin.catalogos'
@@ -168,6 +169,11 @@ const AdminFooterRoute = AdminFooterRouteImport.update({
   path: '/footer',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminEstoqueRoute = AdminEstoqueRouteImport.update({
+  id: '/estoque',
+  path: '/estoque',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/estoque': typeof AdminEstoqueRoute
   '/admin/footer': typeof AdminFooterRoute
   '/admin/navbar': typeof AdminNavbarRoute
   '/admin/produtos': typeof AdminProdutosRoute
@@ -298,6 +305,7 @@ export interface FileRoutesByTo {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/estoque': typeof AdminEstoqueRoute
   '/admin/footer': typeof AdminFooterRoute
   '/admin/navbar': typeof AdminNavbarRoute
   '/admin/produtos': typeof AdminProdutosRoute
@@ -339,6 +347,7 @@ export interface FileRoutesById {
   '/admin/catalogos': typeof AdminCatalogosRoute
   '/admin/categorias': typeof AdminCategoriasRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
+  '/admin/estoque': typeof AdminEstoqueRoute
   '/admin/footer': typeof AdminFooterRoute
   '/admin/navbar': typeof AdminNavbarRoute
   '/admin/produtos': typeof AdminProdutosRoute
@@ -381,6 +390,7 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
+    | '/admin/estoque'
     | '/admin/footer'
     | '/admin/navbar'
     | '/admin/produtos'
@@ -418,6 +428,7 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
+    | '/admin/estoque'
     | '/admin/footer'
     | '/admin/navbar'
     | '/admin/produtos'
@@ -458,6 +469,7 @@ export interface FileRouteTypes {
     | '/admin/catalogos'
     | '/admin/categorias'
     | '/admin/configuracoes'
+    | '/admin/estoque'
     | '/admin/footer'
     | '/admin/navbar'
     | '/admin/produtos'
@@ -668,6 +680,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFooterRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/estoque': {
+      id: '/admin/estoque'
+      path: '/estoque'
+      fullPath: '/admin/estoque'
+      preLoaderRoute: typeof AdminEstoqueRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/configuracoes': {
       id: '/admin/configuracoes'
       path: '/configuracoes'
@@ -777,6 +796,7 @@ interface AdminRouteChildren {
   AdminCatalogosRoute: typeof AdminCatalogosRoute
   AdminCategoriasRoute: typeof AdminCategoriasRoute
   AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
+  AdminEstoqueRoute: typeof AdminEstoqueRoute
   AdminFooterRoute: typeof AdminFooterRoute
   AdminNavbarRoute: typeof AdminNavbarRoute
   AdminProdutosRoute: typeof AdminProdutosRoute
@@ -797,6 +817,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogosRoute: AdminCatalogosRoute,
   AdminCategoriasRoute: AdminCategoriasRoute,
   AdminConfiguracoesRoute: AdminConfiguracoesRoute,
+  AdminEstoqueRoute: AdminEstoqueRoute,
   AdminFooterRoute: AdminFooterRoute,
   AdminNavbarRoute: AdminNavbarRoute,
   AdminProdutosRoute: AdminProdutosRoute,
