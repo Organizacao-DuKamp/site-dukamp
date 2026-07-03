@@ -18,6 +18,19 @@ function onlyDigits(s: string) {
   return (s || "").replace(/\D/g, "");
 }
 
+function translateMpError(msg: string): string {
+  const m = (msg || "").toLowerCase();
+  if (!m) return "Não foi possível gerar o pagamento. Tente novamente em instantes.";
+  if (m.includes("identification")) return "CPF/CNPJ inválido. Verifique o número informado (somente dígitos: 11 para CPF, 14 para CNPJ).";
+  if (m.includes("email")) return "E-mail inválido para pagamento. Confira o endereço informado.";
+  if (m.includes("amount") || m.includes("transaction_amount")) return "Valor do pedido inválido para pagamento.";
+  if (m.includes("payer")) return "Dados do pagador inválidos. Revise nome, e-mail e CPF/CNPJ.";
+  if (m.includes("date_of_expiration") || m.includes("expiration")) return "Erro ao definir o prazo do Pix. Tente novamente.";
+  if (m.includes("unauthorized") || m.includes("invalid access token")) return "Falha na integração de pagamento. Contate o suporte.";
+  return "Não foi possível gerar o pagamento. Verifique seus dados e tente novamente.";
+}
+
+
 function cleanSecret(value?: string) {
   return (value || "").trim();
 }
