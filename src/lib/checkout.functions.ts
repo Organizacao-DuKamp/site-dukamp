@@ -505,6 +505,9 @@ export const createPixOrder = createServerFn({ method: "POST" })
     const [firstName, ...rest] = data.customer_name.trim().split(/\s+/);
     const lastName = rest.join(" ") || firstName;
     const cpf = onlyDigits(data.cpf_cnpj);
+    if (cpf.length !== 11 && cpf.length !== 14) {
+      throw new Error("CPF/CNPJ inválido: informe 11 dígitos (CPF) ou 14 dígitos (CNPJ)");
+    }
     const idType = cpf.length === 14 ? "CNPJ" : "CPF";
 
     const notifBase = process.env.PUBLIC_APP_URL || "https://dukamp.lovable.app";
