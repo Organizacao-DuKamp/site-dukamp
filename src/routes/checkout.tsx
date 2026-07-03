@@ -2,13 +2,13 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useServerFn } from "@tanstack/react-start";
-import { calculateShipping, createPixOrder } from "@/lib/checkout.functions";
+import { createPixOrder } from "@/lib/checkout.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Truck, CreditCard, QrCode, Lock } from "lucide-react";
+import { Loader2, CreditCard, QrCode, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
   ssr: false,
@@ -48,18 +48,15 @@ function CheckoutPage() {
   const { items, total: subtotal, clear } = useCart();
   const nav = useNavigate();
   const [form, setForm] = useState<Form>(emptyForm);
-  const [shipping, setShipping] = useState<{ valor: number; prazoDias: number; servico: string } | null>(null);
   const [loadingCep, setLoadingCep] = useState(false);
-  const [loadingFrete, setLoadingFrete] = useState(false);
   const [loadingPay, setLoadingPay] = useState(false);
   const [method, setMethod] = useState<"pix" | "card">("pix");
 
-  const calcFrete = useServerFn(calculateShipping);
   const createOrder = useServerFn(createPixOrder);
+
 
   function set<K extends keyof Form>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
-    if (["cep", "rua", "numero", "bairro", "cidade", "estado"].includes(k)) setShipping(null);
   }
 
   async function lookupCep(cep: string) {
@@ -94,26 +91,10 @@ function CheckoutPage() {
     return null;
   }
 
-  async function handleCalcFrete() {
-    const err = validateDelivery();
-    if (err) return toast.error(err);
-    if (!items.length) return toast.error("Carrinho vazio");
-    setLoadingFrete(true);
-    try {
-      const r = await calcFrete({
-        data: { cepDestino: form.cep, items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })) },
-      });
-      setShipping(r);
-      toast.success(`Frete ${r.servico}: ${formatBRL(r.valor)} • ${r.prazoDias} dias úteis`);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Erro ao calcular frete");
-    } finally {
-      setLoadingFrete(false);
-    }
-  }
 
   async function handleBuy() {
-    if (!shipping) return toast.error("Calcule o frete primeiro");
+    const err = validateDelivery();
+    if (err) return toast.error(err);
     if (method !== "pix") return;
     setLoadingPay(true);
     try {
@@ -121,9 +102,9 @@ function CheckoutPage() {
         data: {
           ...form,
           items: items.map((i) => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price })),
-          shipping_cost: shipping.valor,
-          shipping_service: shipping.servico,
-          shipping_deadline_days: shipping.prazoDias,
+          shipping_cost: 0,
+          shipping_service: "A combinar",
+          shipping_deadline_days: 0,
         },
       });
       clear();
@@ -135,7 +116,8 @@ function CheckoutPage() {
     }
   }
 
-  const total = subtotal + (shipping?.valor ?? 0);
+
+  const total = subtotal;
 
   if (items.length === 0) {
     return (
@@ -194,54 +176,47 @@ function CheckoutPage() {
               <Field label="Cidade *"><Input value={form.cidade} onChange={(e) => set("cidade", e.target.value)} /></Field>
               <Field label="UF *"><Input maxLength={2} value={form.estado} onChange={(e) => set("estado", e.target.value.toUpperCase())} /></Field>
             </div>
-            <Button onClick={handleCalcFrete} disabled={loadingFrete} variant="outline">
-              {loadingFrete ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
-              Calcular frete
-            </Button>
-            {shipping && (
-              <div className="text-sm bg-muted rounded p-3">
-                <strong>{shipping.servico}</strong> — {formatBRL(shipping.valor)} • entrega em {shipping.prazoDias} dias úteis
-              </div>
-            )}
+            <p className="text-xs text-muted-foreground">
+              O frete será combinado separadamente após a confirmação do pedido.
+            </p>
           </section>
 
           {/* Pagamento */}
-          {shipping && (
-            <section className="border rounded-lg p-4 bg-card space-y-3">
-              <h2 className="font-semibold">3. Forma de pagamento</h2>
-              <div className="grid sm:grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setMethod("pix")}
-                  className={`border rounded-lg p-3 text-left flex items-center gap-3 ${method === "pix" ? "border-primary ring-2 ring-primary/30" : ""}`}
-                >
-                  <QrCode className="h-6 w-6 text-primary" />
-                  <div>
-                    <div className="font-medium">Pix</div>
-                    <div className="text-xs text-muted-foreground">Aprovação imediata</div>
-                  </div>
-                </button>
-                <div className="border rounded-lg p-3 flex items-center gap-3 opacity-60 cursor-not-allowed">
-                  <CreditCard className="h-6 w-6" />
-                  <div>
-                    <div className="font-medium">Cartão de crédito</div>
-                    <div className="text-xs text-muted-foreground">Em breve — indisponível no momento</div>
-                  </div>
+          <section className="border rounded-lg p-4 bg-card space-y-3">
+            <h2 className="font-semibold">3. Forma de pagamento</h2>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setMethod("pix")}
+                className={`border rounded-lg p-3 text-left flex items-center gap-3 ${method === "pix" ? "border-primary ring-2 ring-primary/30" : ""}`}
+              >
+                <QrCode className="h-6 w-6 text-primary" />
+                <div>
+                  <div className="font-medium">Pix</div>
+                  <div className="text-xs text-muted-foreground">Aprovação imediata</div>
+                </div>
+              </button>
+              <div className="border rounded-lg p-3 flex items-center gap-3 opacity-60 cursor-not-allowed">
+                <CreditCard className="h-6 w-6" />
+                <div>
+                  <div className="font-medium">Cartão de crédito</div>
+                  <div className="text-xs text-muted-foreground">Em breve — indisponível no momento</div>
                 </div>
               </div>
-              <Button onClick={handleBuy} disabled={loadingPay || method !== "pix"} className="w-full">
-                {loadingPay ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
-                Comprar — {formatBRL(total)}
-              </Button>
-            </section>
-          )}
+            </div>
+            <Button onClick={handleBuy} disabled={loadingPay || method !== "pix"} className="w-full">
+              {loadingPay ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
+              Comprar — {formatBRL(total)}
+            </Button>
+          </section>
+
         </div>
 
         <aside>
           <div className="border rounded-lg p-4 bg-card sticky top-4 space-y-2 text-sm">
             <h2 className="font-semibold">Resumo</h2>
             <Row label="Subtotal" value={formatBRL(subtotal)} />
-            <Row label="Frete" value={shipping ? formatBRL(shipping.valor) : "A calcular"} />
+            <Row label="Frete" value="A combinar" />
             <div className="border-t pt-2 flex justify-between font-bold text-base">
               <span>Total</span><span>{formatBRL(total)}</span>
             </div>
