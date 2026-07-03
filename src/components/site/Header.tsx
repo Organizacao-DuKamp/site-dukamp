@@ -56,7 +56,7 @@ export function Header() {
             <img
               src={fixedLogo.url}
               alt="Dukamp Saúde Animal"
-              className="h-11 sm:h-12 w-auto object-contain select-none"
+              className="h-12 sm:h-14 w-auto object-contain select-none"
               draggable={false}
             />
           </Link>
