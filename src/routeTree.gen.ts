@@ -43,6 +43,7 @@ import { Route as AdminAnunciosRouteImport } from './routes/admin.anuncios'
 import { Route as AdminContasIndexRouteImport } from './routes/admin.contas.index'
 import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
 import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
+import { Route as AdminVendasPedidosRouteImport } from './routes/admin.vendas.pedidos'
 import { Route as AdminContasIdRouteImport } from './routes/admin.contas.$id'
 
 const UnidadesRoute = UnidadesRouteImport.update({
@@ -216,6 +217,11 @@ const ApiPublicInitAdminRoute = ApiPublicInitAdminRouteImport.update({
   path: '/api/public/init-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminVendasPedidosRoute = AdminVendasPedidosRouteImport.update({
+  id: '/vendas/pedidos',
+  path: '/vendas/pedidos',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminContasIdRoute = AdminContasIdRouteImport.update({
   id: '/contas/$id',
   path: '/contas/$id',
@@ -255,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/catalogos/': typeof CatalogosIndexRoute
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
+  '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas/': typeof AdminContasIndexRoute
@@ -289,6 +296,7 @@ export interface FileRoutesByTo {
   '/catalogos': typeof CatalogosIndexRoute
   '/produtos': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
+  '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas': typeof AdminContasIndexRoute
@@ -327,6 +335,7 @@ export interface FileRoutesById {
   '/catalogos/': typeof CatalogosIndexRoute
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
+  '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas/': typeof AdminContasIndexRoute
@@ -366,6 +375,7 @@ export interface FileRouteTypes {
     | '/catalogos/'
     | '/produtos/'
     | '/admin/contas/$id'
+    | '/admin/vendas/pedidos'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
     | '/admin/contas/'
@@ -400,6 +410,7 @@ export interface FileRouteTypes {
     | '/catalogos'
     | '/produtos'
     | '/admin/contas/$id'
+    | '/admin/vendas/pedidos'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
     | '/admin/contas'
@@ -437,6 +448,7 @@ export interface FileRouteTypes {
     | '/catalogos/'
     | '/produtos/'
     | '/admin/contas/$id'
+    | '/admin/vendas/pedidos'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
     | '/admin/contas/'
@@ -702,6 +714,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicInitAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/vendas/pedidos': {
+      id: '/admin/vendas/pedidos'
+      path: '/vendas/pedidos'
+      fullPath: '/admin/vendas/pedidos'
+      preLoaderRoute: typeof AdminVendasPedidosRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/contas/$id': {
       id: '/admin/contas/$id'
       path: '/contas/$id'
@@ -726,6 +745,7 @@ interface AdminRouteChildren {
   AdminSolicitacoesRoute: typeof AdminSolicitacoesRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminContasIdRoute: typeof AdminContasIdRoute
+  AdminVendasPedidosRoute: typeof AdminVendasPedidosRoute
   AdminContasIndexRoute: typeof AdminContasIndexRoute
 }
 
@@ -743,6 +763,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSolicitacoesRoute: AdminSolicitacoesRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminContasIdRoute: AdminContasIdRoute,
+  AdminVendasPedidosRoute: AdminVendasPedidosRoute,
   AdminContasIndexRoute: AdminContasIndexRoute,
 }
 
