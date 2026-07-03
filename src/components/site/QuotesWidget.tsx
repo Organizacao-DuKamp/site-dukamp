@@ -1,33 +1,90 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { TrendingUp } from "lucide-react";
+import { Activity, ArrowDownRight, ArrowUpRight, Beef, DollarSign, Minus, RefreshCw, Ship } from "lucide-react";
 import { getMarketQuotes, type QuoteItem } from "@/lib/quotes.functions";
 
-function formatPrice(item: QuoteItem) {
-  if (!item.available || item.price == null) return "indisponível no momento";
+const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  usd: DollarSign,
+  boi_china: Ship,
+  boi_gordo: Beef,
+  vaca_gorda: Beef,
+  novilha: Beef,
+};
+
+function fmtBRL(n: number | null | undefined, max = 4) {
+  if (n == null) return "—";
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
     minimumFractionDigits: 2,
-    maximumFractionDigits: 4,
-  }).format(item.price);
+    maximumFractionDigits: max,
+  }).format(n);
 }
 
-function formatUpdated(iso: string | null) {
+function fmtRelative(iso: string | null) {
   if (!iso) return "—";
   const d = new Date(iso.replace(" ", "T"));
   if (Number.isNaN(d.getTime())) return "—";
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(d);
+  const diff = (Date.now() - d.getTime()) / 1000;
+  if (diff < 60) return "agora";
+  if (diff < 3600) return `há ${Math.floor(diff / 60)} min`;
+  if (diff < 86400) return `há ${Math.floor(diff / 3600)} h`;
+  const days = Math.floor(diff / 86400);
+  if (days < 7) return `há ${days} d`;
+  return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit" }).format(d);
+}
+
+function Sparkline({ points, up }: { points: number[]; up: boolean | null }) {
+  if (points.length < 2) {
+    return <div className="h-6 w-14 rounded bg-muted/40" aria-hidden />;
+  }
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const range = max - min || 1;
+  const w = 56;
+  const h = 22;
+  const step = w / (points.length - 1);
+  const d = points
+    .map((p, i) => {
+      const x = i * step;
+      const y = h - ((p - min) / range) * h;
+      return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+  const stroke = up == null ? "hsl(var(--muted-foreground))" : up ? "hsl(142 71% 45%)" : "hsl(0 72% 51%)";
+  return (
+    <svg width={w} height={h} className="shrink-0" aria-hidden>
+      <path d={d} fill="none" stroke={stroke} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ChangeBadge({ item }: { item: QuoteItem }) {
+  if (!item.available || item.change == null || item.changePct == null) {
+    return (
+      <span className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium bg-muted text-muted-foreground">
+        <Minus className="h-2.5 w-2.5" />
+        estável
+      </span>
+    );
+  }
+  const up = item.change > 0;
+  const cls = up
+    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+    : "bg-red-500/10 text-red-600 dark:text-red-400";
+  const Icon = up ? ArrowUpRight : ArrowDownRight;
+  return (
+    <span className={`inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-semibold ${cls}`}>
+      <Icon className="h-2.5 w-2.5" />
+      {up ? "+" : ""}
+      {item.changePct.toFixed(2)}%
+    </span>
+  );
 }
 
 export function QuotesWidget() {
   const fetchQuotes = useServerFn(getMarketQuotes);
-  const { data, isLoading, isError, refetch, isFetching } = useQuery({
+  const { data, isLoading, isError, refetch, isFetching, dataUpdatedAt } = useQuery({
     queryKey: ["market-quotes"],
     queryFn: () => fetchQuotes(),
     staleTime: 5 * 60_000,
@@ -35,66 +92,125 @@ export function QuotesWidget() {
     refetchOnWindowFocus: false,
   });
 
+  const availableCount = data?.items.filter((i) => i.available).length ?? 0;
+
   return (
-    <div className="rounded-lg border bg-card overflow-hidden">
-      <div className="flex items-center gap-2 px-3 py-2 border-b bg-muted/40">
-        <TrendingUp className="h-4 w-4 text-primary" />
-        <div className="font-semibold text-sm">Cotações do Mercado</div>
+    <div className="rounded-xl border bg-gradient-to-b from-card to-card/50 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="relative px-4 py-3 border-b bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary">
+              <Activity className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <div className="font-semibold text-sm leading-tight truncate">Cotações do Mercado</div>
+              <div className="text-[10px] text-muted-foreground">
+                {isLoading ? "Carregando…" : `${availableCount}/${data?.items.length ?? 0} indicadores ao vivo`}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            aria-label="Atualizar cotações"
+            className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition disabled:opacity-50"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
+          </button>
+        </div>
       </div>
 
-      <div className="p-3">
+      {/* Body */}
+      <div className="p-2">
         {isLoading ? (
-          <ul className="space-y-2">
+          <ul className="space-y-1.5">
             {Array.from({ length: 5 }).map((_, i) => (
-              <li key={i} className="flex items-center justify-between gap-2">
-                <div className="h-3 w-24 rounded bg-muted animate-pulse" />
-                <div className="h-3 w-16 rounded bg-muted animate-pulse" />
+              <li key={i} className="flex items-center justify-between gap-2 p-2 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-md bg-muted animate-pulse" />
+                  <div className="space-y-1">
+                    <div className="h-3 w-20 rounded bg-muted animate-pulse" />
+                    <div className="h-2 w-14 rounded bg-muted animate-pulse" />
+                  </div>
+                </div>
+                <div className="h-4 w-16 rounded bg-muted animate-pulse" />
               </li>
             ))}
           </ul>
         ) : isError || !data ? (
-          <div className="text-xs text-muted-foreground">
+          <div className="p-3 text-xs text-muted-foreground">
             Não foi possível carregar as cotações.{" "}
             <button onClick={() => refetch()} className="text-primary hover:underline">
               Tentar novamente
             </button>
           </div>
-        ) : data.items.length === 0 ? (
-          <div className="text-xs text-muted-foreground">Nenhum indicador disponível.</div>
         ) : (
-          <ul className="space-y-2">
-            {data.items.map((item) => (
-              <li key={item.key} className="flex items-start justify-between gap-2 text-xs">
-                <div className="min-w-0">
-                  <div className="font-medium text-foreground">{item.name}</div>
-                  <div className="text-[10px] text-muted-foreground">
-                    {item.unit}
-                    {item.region ? ` · ${item.region}` : ""} · {formatUpdated(item.updatedAt)}
-                  </div>
-                </div>
-                <div
-                  className={
-                    "text-right font-semibold shrink-0 " +
-                    (item.available ? "text-foreground" : "text-muted-foreground italic font-normal")
-                  }
+          <ul className="space-y-1">
+            {data.items.map((item) => {
+              const Icon = ICONS[item.key] ?? Activity;
+              const history = data.history[item.key] ?? [];
+              const up = item.change == null ? null : item.change > 0;
+              return (
+                <li
+                  key={item.key}
+                  className="group flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-muted/50 transition"
                 >
-                  {formatPrice(item)}
-                </div>
-              </li>
-            ))}
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div
+                      className={`grid h-8 w-8 shrink-0 place-items-center rounded-md ${
+                        item.available ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-semibold text-foreground truncate">{item.name}</span>
+                        <span className="text-[9px] text-muted-foreground shrink-0">{item.unit}</span>
+                      </div>
+                      <div className="text-[10px] text-muted-foreground truncate">
+                        {item.region ?? item.source} · {fmtRelative(item.updatedAt)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Sparkline points={history} up={up} />
+                    <div className="text-right">
+                      <div
+                        className={`text-sm font-bold tabular-nums leading-tight ${
+                          item.available ? "text-foreground" : "text-muted-foreground/60 italic font-normal text-[11px]"
+                        }`}
+                      >
+                        {item.available ? fmtBRL(item.price) : "indisponível"}
+                      </div>
+                      <div className="mt-0.5">
+                        <ChangeBadge item={item} />
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
+      </div>
 
-        <div className="mt-3 pt-2 border-t flex items-center justify-between text-[10px] text-muted-foreground">
-          <span>Fonte: AwesomeAPI / CEPEA</span>
-          <button
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="hover:text-primary disabled:opacity-50"
-          >
-            {isFetching ? "atualizando…" : "atualizar"}
-          </button>
-        </div>
+      {/* Footer */}
+      <div className="px-3 py-2 border-t bg-muted/30 flex items-center justify-between text-[10px] text-muted-foreground">
+        <span className="inline-flex items-center gap-1">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className={`absolute inline-flex h-full w-full rounded-full ${isFetching ? "bg-amber-400 animate-ping" : "bg-emerald-500"} opacity-75`} />
+            <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${isFetching ? "bg-amber-500" : "bg-emerald-500"}`} />
+          </span>
+          {isFetching ? "atualizando…" : "ao vivo"}
+        </span>
+        <span>
+          {dataUpdatedAt
+            ? `atualizado ${new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date(dataUpdatedAt))}`
+            : "—"}
+        </span>
       </div>
     </div>
   );

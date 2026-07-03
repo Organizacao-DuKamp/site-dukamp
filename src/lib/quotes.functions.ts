@@ -5,8 +5,12 @@ export type QuoteItem = {
   name: string;
   unit: string;
   price: number | null;
+  previousPrice: number | null;
+  change: number | null; // absolute
+  changePct: number | null; // %
   updatedAt: string | null;
   source: string;
+  sourceUrl: string;
   available: boolean;
   region?: string;
 };
@@ -37,25 +41,16 @@ async function fetchText(url: string, timeoutMs = 8000): Promise<string | null> 
 }
 
 // ---------- Dólar (melhorcambio.com) ----------
-async function fetchDolar(): Promise<QuoteItem> {
-  const base: QuoteItem = {
-    key: "usd",
-    name: "Dólar",
-    unit: "R$/US$",
-    price: null,
-    updatedAt: null,
-    source: "melhorcambio.com",
-    available: false,
-  };
+async function fetchDolar(): Promise<Partial<QuoteItem>> {
   const html = await fetchText("https://www.melhorcambio.com/dolar-hoje");
-  if (!html) return base;
+  if (!html) return {};
   const m = html.match(/id=["']comercial["'][^>]*value=["']([\d.,]+)["']/i);
   const price = m ? Number(m[1]) : null;
-  if (!Number.isFinite(price as number)) return base;
-  return { ...base, price: price as number, updatedAt: new Date().toISOString(), available: true };
+  if (!Number.isFinite(price as number)) return {};
+  return { price: price as number, updatedAt: new Date().toISOString(), available: true };
 }
 
-// ---------- Noticias Agricolas (Boi Gordo, Vaca Gorda, Novilha) ----------
+// ---------- Noticias Agricolas ----------
 type NaRow = { region: string; price: number };
 
 function findFirstRowAfter(html: string, headerNeedle: string): NaRow | null {
@@ -73,73 +68,40 @@ function findFirstRowAfter(html: string, headerNeedle: string): NaRow | null {
     if (price != null) rows.push({ region: m[1].trim(), price });
   }
   if (!rows.length) return null;
-  // Prefer São Paulo row if present, otherwise first row
   const sp = rows.find((r) => /s(ão|ao)\s*paulo|^sp\b/i.test(r.region));
   return sp ?? rows[0];
 }
 
-async function fetchNoticiasAgricolas(): Promise<{
-  boiGordo: QuoteItem;
-  vacaGorda: QuoteItem;
-  novilha: QuoteItem;
-}> {
-  const src = "noticiasagricolas.com.br";
-  const now = new Date().toISOString();
-  const mk = (key: string, name: string): QuoteItem => ({
-    key,
-    name,
-    unit: "R$/@",
-    price: null,
-    updatedAt: null,
-    source: src,
-    available: false,
-  });
-  const out = {
-    boiGordo: mk("boi_gordo", "Boi Gordo"),
-    vacaGorda: mk("vaca_gorda", "Vaca Gorda"),
-    novilha: mk("novilha", "Novilha"),
-  };
+async function fetchNoticiasAgricolas() {
   const html = await fetchText("https://www.noticiasagricolas.com.br/cotacoes/boi");
+  const now = new Date().toISOString();
+  const out: Record<string, Partial<QuoteItem>> = {
+    boi_gordo: {},
+    vaca_gorda: {},
+    novilha: {},
+  };
   if (!html) return out;
-
   const bg = findFirstRowAfter(html, "Boi Gordo - (R$/@ - à vista)");
-  if (bg) out.boiGordo = { ...out.boiGordo, price: bg.price, region: bg.region, updatedAt: now, available: true };
-
+  if (bg) out.boi_gordo = { price: bg.price, region: bg.region, updatedAt: now, available: true };
   const vg = findFirstRowAfter(html, "Vaca Gorda (R$/@ - à vista)");
-  if (vg) out.vacaGorda = { ...out.vacaGorda, price: vg.price, region: vg.region, updatedAt: now, available: true };
-
+  if (vg) out.vaca_gorda = { price: vg.price, region: vg.region, updatedAt: now, available: true };
   const nv = findFirstRowAfter(html, "Indicador da Novilha");
-  if (nv) out.novilha = { ...out.novilha, price: nv.price, region: nv.region, updatedAt: now, available: true };
-
+  if (nv) out.novilha = { price: nv.price, region: nv.region, updatedAt: now, available: true };
   return out;
 }
 
-// ---------- Scot Consultoria (Boi China) ----------
-async function fetchBoiChina(): Promise<QuoteItem> {
-  const base: QuoteItem = {
-    key: "boi_china",
-    name: "Boi China",
-    unit: "R$/@",
-    price: null,
-    updatedAt: null,
-    source: "scotconsultoria.com.br",
-    available: false,
-  };
+// ---------- Scot (Boi China) ----------
+async function fetchBoiChina(): Promise<Partial<QuoteItem>> {
   const html = await fetchText("https://www.scotconsultoria.com.br/cotacoes/boi-gordo/");
-  if (!html) return base;
-
-  // Extract date from the "Boi China a Prazo (R$/@) - dd/mm/yyyy" header
+  if (!html) return {};
   const hdr = html.match(/Boi China a Prazo\s*\(R\$\/@\)\s*-\s*(\d{2}\/\d{2}\/\d{4})/);
   const dateStr = hdr?.[1] ?? null;
-
   const i = html.indexOf("Boi China a Prazo");
-  if (i < 0) return base;
+  if (i < 0) return {};
   const tbodyStart = html.indexOf("<tbody>", i);
   const tbodyEnd = html.indexOf("</tbody>", tbodyStart);
-  if (tbodyStart < 0 || tbodyEnd < 0) return base;
+  if (tbodyStart < 0 || tbodyEnd < 0) return {};
   const block = html.slice(tbodyStart, tbodyEnd);
-
-  // Row: <td>São Paulo ...</td><td>338,00</td><td>332,50</td>
   const rowRe = /<td[^>]*>\s*([^<]+?)\s*<\/td>\s*<td[^>]*>\s*([\d.,]+)\s*<\/td>/g;
   const rows: NaRow[] = [];
   let m: RegExpExecArray | null;
@@ -147,25 +109,82 @@ async function fetchBoiChina(): Promise<QuoteItem> {
     const price = parseBrNumber(m[2]);
     if (price != null) rows.push({ region: m[1].trim(), price });
   }
-  if (!rows.length) return base;
+  if (!rows.length) return {};
   const sp = rows.find((r) => /s(ão|ao)\s*paulo/i.test(r.region)) ?? rows[0];
-
   let iso: string | null = new Date().toISOString();
   if (dateStr) {
     const [d, mo, y] = dateStr.split("/");
     const dt = new Date(`${y}-${mo}-${d}T12:00:00Z`);
     if (!Number.isNaN(dt.getTime())) iso = dt.toISOString();
   }
-
-  return { ...base, price: sp.price, region: sp.region, updatedAt: iso, available: true };
+  return { price: sp.price, region: sp.region, updatedAt: iso, available: true };
 }
 
-export const getMarketQuotes = createServerFn({ method: "GET" }).handler(async () => {
+// Module-level history for change tracking + micro sparkline
+type HistPoint = { price: number; at: string };
+const HISTORY: Record<string, HistPoint[]> = {};
+const MAX_HIST = 12;
+
+function pushHistory(key: string, price: number, at: string) {
+  const arr = (HISTORY[key] ??= []);
+  const last = arr[arr.length - 1];
+  if (!last || last.price !== price) arr.push({ price, at });
+  if (arr.length > MAX_HIST) arr.splice(0, arr.length - MAX_HIST);
+}
+
+const BASE: Record<string, Omit<QuoteItem, "price" | "previousPrice" | "change" | "changePct" | "updatedAt" | "available" | "region">> = {
+  usd: { key: "usd", name: "Dólar Comercial", unit: "R$/US$", source: "melhorcambio", sourceUrl: "https://www.melhorcambio.com/dolar-hoje" },
+  boi_china: { key: "boi_china", name: "Boi China", unit: "R$/@", source: "Scot Consultoria", sourceUrl: "https://www.scotconsultoria.com.br/cotacoes/boi-gordo/" },
+  boi_gordo: { key: "boi_gordo", name: "Boi Gordo", unit: "R$/@", source: "Notícias Agrícolas", sourceUrl: "https://www.noticiasagricolas.com.br/cotacoes/boi" },
+  vaca_gorda: { key: "vaca_gorda", name: "Vaca Gorda", unit: "R$/@", source: "Notícias Agrícolas", sourceUrl: "https://www.noticiasagricolas.com.br/cotacoes/boi" },
+  novilha: { key: "novilha", name: "Novilha", unit: "R$/@", source: "Notícias Agrícolas", sourceUrl: "https://www.noticiasagricolas.com.br/cotacoes/boi" },
+};
+
+function build(key: string, patch: Partial<QuoteItem>): QuoteItem {
+  const base = BASE[key];
+  const item: QuoteItem = {
+    ...base,
+    price: null,
+    previousPrice: null,
+    change: null,
+    changePct: null,
+    updatedAt: null,
+    available: false,
+    ...patch,
+  };
+  if (item.available && item.price != null) {
+    const hist = HISTORY[key] ?? [];
+    const prev = hist.length ? hist[hist.length - 1].price : null;
+    if (prev != null && prev !== item.price) {
+      item.previousPrice = prev;
+      item.change = item.price - prev;
+      item.changePct = (item.change / prev) * 100;
+    }
+    pushHistory(key, item.price, item.updatedAt ?? new Date().toISOString());
+  }
+  return item;
+}
+
+export type MarketQuotes = {
+  items: QuoteItem[];
+  history: Record<string, number[]>;
+  fetchedAt: string;
+};
+
+export const getMarketQuotes = createServerFn({ method: "GET" }).handler(async (): Promise<MarketQuotes> => {
   const [dolar, na, boiChina] = await Promise.all([
     fetchDolar(),
     fetchNoticiasAgricolas(),
     fetchBoiChina(),
   ]);
-  const items: QuoteItem[] = [dolar, boiChina, na.boiGordo, na.vacaGorda, na.novilha];
-  return { items, fetchedAt: new Date().toISOString() };
+  const items: QuoteItem[] = [
+    build("usd", dolar),
+    build("boi_china", boiChina),
+    build("boi_gordo", na.boi_gordo),
+    build("vaca_gorda", na.vaca_gorda),
+    build("novilha", na.novilha),
+  ];
+  const history: Record<string, number[]> = {};
+  for (const it of items) history[it.key] = (HISTORY[it.key] ?? []).map((h) => h.price);
+  return { items, history, fetchedAt: new Date().toISOString() };
 });
