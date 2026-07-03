@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnidadesRouteImport } from './routes/unidades'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ProdutosRouteImport } from './routes/produtos'
+import { Route as MinhasComprasRouteImport } from './routes/minhas-compras'
 import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContatoRouteImport } from './routes/contato'
@@ -57,6 +58,11 @@ const SobreRoute = SobreRouteImport.update({
 const ProdutosRoute = ProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MinhasComprasRoute = MinhasComprasRouteImport.update({
+  id: '/minhas-compras',
+  path: '/minhas-compras',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MinhaContaRoute = MinhaContaRouteImport.update({
@@ -226,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
+  '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
   '/unidades': typeof UnidadesRoute
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
+  '/minhas-compras': typeof MinhasComprasRoute
   '/sobre': typeof SobreRoute
   '/unidades': typeof UnidadesRoute
   '/admin/anuncios': typeof AdminAnunciosRoute
@@ -296,6 +304,7 @@ export interface FileRoutesById {
   '/contato': typeof ContatoRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
+  '/minhas-compras': typeof MinhasComprasRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
   '/unidades': typeof UnidadesRoute
@@ -334,6 +343,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
+    | '/minhas-compras'
     | '/produtos'
     | '/sobre'
     | '/unidades'
@@ -368,6 +378,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
+    | '/minhas-compras'
     | '/sobre'
     | '/unidades'
     | '/admin/anuncios'
@@ -403,6 +414,7 @@ export interface FileRouteTypes {
     | '/contato'
     | '/dashboard'
     | '/minha-conta'
+    | '/minhas-compras'
     | '/produtos'
     | '/sobre'
     | '/unidades'
@@ -440,6 +452,7 @@ export interface RootRouteChildren {
   ContatoRoute: typeof ContatoRoute
   DashboardRoute: typeof DashboardRoute
   MinhaContaRoute: typeof MinhaContaRoute
+  MinhasComprasRoute: typeof MinhasComprasRoute
   ProdutosRoute: typeof ProdutosRouteWithChildren
   SobreRoute: typeof SobreRoute
   UnidadesRoute: typeof UnidadesRoute
@@ -470,6 +483,13 @@ declare module '@tanstack/react-router' {
       path: '/produtos'
       fullPath: '/produtos'
       preLoaderRoute: typeof ProdutosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/minhas-compras': {
+      id: '/minhas-compras'
+      path: '/minhas-compras'
+      fullPath: '/minhas-compras'
+      preLoaderRoute: typeof MinhasComprasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/minha-conta': {
@@ -766,6 +786,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContatoRoute: ContatoRoute,
   DashboardRoute: DashboardRoute,
   MinhaContaRoute: MinhaContaRoute,
+  MinhasComprasRoute: MinhasComprasRoute,
   ProdutosRoute: ProdutosRouteWithChildren,
   SobreRoute: SobreRoute,
   UnidadesRoute: UnidadesRoute,
