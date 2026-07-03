@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FacebookBrand, InstagramBrand, YoutubeBrand, TikTokBrand, WhatsappBrand } from "./BrandIcons";
+import dukampLogo from "@/assets/dukamp-logo.png.asset.json";
 
 const socials = [
   { href: "https://www.facebook.com/dukampsaudeanimal/", label: "Facebook", Icon: FacebookBrand },
@@ -53,19 +54,12 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center gap-4">
           <Link to="/" className="flex items-center shrink-0" aria-label="Início">
-            {settings?.logo_url ? (
-              <img
-                src={settings.logo_url}
-                alt={settings?.site_name ?? "Logo"}
-                width={5568}
-                height={2152}
-                className="h-12 sm:h-14 w-auto max-w-[260px] sm:max-w-[340px] object-contain"
-              />
-            ) : (
-              <div className="h-12 sm:h-14 w-[180px] sm:w-[240px] rounded-md border border-dashed border-muted-foreground/40 grid place-items-center text-[10px] uppercase tracking-wider text-muted-foreground">
-                Defina a logo no painel
-              </div>
-            )}
+            <img
+              src={settings?.logo_url || dukampLogo.url}
+              alt="Dukamp Saúde Animal"
+              className="h-12 sm:h-14 w-auto object-contain select-none"
+              draggable={false}
+            />
           </Link>
 
           <form onSubmit={onSearch} className="flex-1 max-w-xl hidden md:flex">
