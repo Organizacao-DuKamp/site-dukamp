@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { useSupport } from "@/lib/support";
-import { useSiteSettings } from "@/lib/site-settings";
 import {
   Sheet,
   SheetContent,
@@ -23,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FacebookBrand, InstagramBrand, YoutubeBrand, TikTokBrand, WhatsappBrand } from "./BrandIcons";
-import dukampLogo from "@/assets/dukamp-logo.png.asset.json";
+import fixedLogo from "@/assets/dukamp-logo-transparent.png.asset.json";
 
 const socials = [
   { href: "https://www.facebook.com/dukampsaudeanimal/", label: "Facebook", Icon: FacebookBrand },
@@ -38,7 +37,7 @@ export function Header() {
   const { count, items, total, remove, setQty } = useCart();
   const { user, isAdmin, accountType, signOut } = useAuth();
   const { ticket, openChat } = useSupport();
-  const { data: settings } = useSiteSettings();
+  
   const [q, setQ] = useState("");
   const navigate = useNavigate();
 
@@ -55,7 +54,7 @@ export function Header() {
         <div className="flex h-16 items-center gap-4">
           <Link to="/" className="flex items-center shrink-0" aria-label="Início">
             <img
-              src={settings?.logo_url || dukampLogo.url}
+              src={fixedLogo.url}
               alt="Dukamp Saúde Animal"
               className="h-12 sm:h-14 w-auto object-contain select-none"
               draggable={false}
