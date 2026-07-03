@@ -15,6 +15,7 @@ import { CartProvider } from "../lib/cart";
 import { AuthProvider } from "../lib/auth";
 import { SupportProvider } from "../lib/support";
 import { SupportWidget } from "../components/support/ChatLauncher";
+import { DeliveryNoticeWatcher } from "../components/site/DeliveryNoticeWatcher";
 import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
