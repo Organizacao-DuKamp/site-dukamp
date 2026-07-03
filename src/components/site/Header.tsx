@@ -37,7 +37,7 @@ export function Header() {
   const { count, items, total, remove, setQty } = useCart();
   const { user, isAdmin, accountType, signOut } = useAuth();
   const { ticket, openChat } = useSupport();
-  const { data: settings } = useSiteSettings();
+  
   const [q, setQ] = useState("");
   const navigate = useNavigate();
 
