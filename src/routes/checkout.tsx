@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Truck, CreditCard, QrCode, Lock } from "lucide-react";
+import { Loader2, CreditCard, QrCode, Lock } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
   ssr: false,
