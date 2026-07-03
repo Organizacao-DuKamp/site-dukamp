@@ -44,6 +44,7 @@ import { Route as AdminContasIndexRouteImport } from './routes/admin.contas.inde
 import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
 import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
 import { Route as AdminVendasPedidosRouteImport } from './routes/admin.vendas.pedidos'
+import { Route as AdminVendasPainelRouteImport } from './routes/admin.vendas.painel'
 import { Route as AdminVendasHistoricoRouteImport } from './routes/admin.vendas.historico'
 import { Route as AdminContasIdRouteImport } from './routes/admin.contas.$id'
 
@@ -223,6 +224,11 @@ const AdminVendasPedidosRoute = AdminVendasPedidosRouteImport.update({
   path: '/vendas/pedidos',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminVendasPainelRoute = AdminVendasPainelRouteImport.update({
+  id: '/vendas/painel',
+  path: '/vendas/painel',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminVendasHistoricoRoute = AdminVendasHistoricoRouteImport.update({
   id: '/vendas/historico',
   path: '/vendas/historico',
@@ -268,6 +274,7 @@ export interface FileRoutesByFullPath {
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
+  '/admin/vendas/painel': typeof AdminVendasPainelRoute
   '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
@@ -304,6 +311,7 @@ export interface FileRoutesByTo {
   '/produtos': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
+  '/admin/vendas/painel': typeof AdminVendasPainelRoute
   '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
@@ -344,6 +352,7 @@ export interface FileRoutesById {
   '/produtos/': typeof ProdutosIndexRoute
   '/admin/contas/$id': typeof AdminContasIdRoute
   '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
+  '/admin/vendas/painel': typeof AdminVendasPainelRoute
   '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
@@ -385,6 +394,7 @@ export interface FileRouteTypes {
     | '/produtos/'
     | '/admin/contas/$id'
     | '/admin/vendas/historico'
+    | '/admin/vendas/painel'
     | '/admin/vendas/pedidos'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
@@ -421,6 +431,7 @@ export interface FileRouteTypes {
     | '/produtos'
     | '/admin/contas/$id'
     | '/admin/vendas/historico'
+    | '/admin/vendas/painel'
     | '/admin/vendas/pedidos'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
@@ -460,6 +471,7 @@ export interface FileRouteTypes {
     | '/produtos/'
     | '/admin/contas/$id'
     | '/admin/vendas/historico'
+    | '/admin/vendas/painel'
     | '/admin/vendas/pedidos'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
@@ -733,6 +745,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminVendasPedidosRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/vendas/painel': {
+      id: '/admin/vendas/painel'
+      path: '/vendas/painel'
+      fullPath: '/admin/vendas/painel'
+      preLoaderRoute: typeof AdminVendasPainelRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/vendas/historico': {
       id: '/admin/vendas/historico'
       path: '/vendas/historico'
@@ -765,6 +784,7 @@ interface AdminRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminContasIdRoute: typeof AdminContasIdRoute
   AdminVendasHistoricoRoute: typeof AdminVendasHistoricoRoute
+  AdminVendasPainelRoute: typeof AdminVendasPainelRoute
   AdminVendasPedidosRoute: typeof AdminVendasPedidosRoute
   AdminContasIndexRoute: typeof AdminContasIndexRoute
 }
@@ -784,6 +804,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminContasIdRoute: AdminContasIdRoute,
   AdminVendasHistoricoRoute: AdminVendasHistoricoRoute,
+  AdminVendasPainelRoute: AdminVendasPainelRoute,
   AdminVendasPedidosRoute: AdminVendasPedidosRoute,
   AdminContasIndexRoute: AdminContasIndexRoute,
 }
