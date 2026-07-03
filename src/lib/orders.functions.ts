@@ -91,6 +91,9 @@ export const adminListOrders = createServerFn({ method: "GET" })
       .limit(500);
     if (data.onlyOpen) {
       q = q.eq("payment_status", "approved").neq("delivery_status", "entregue");
+    } else {
+      // Só mostra pedidos com pagamento confirmado (esconde pendentes/qr abertos)
+      q = q.in("payment_status", ["approved", "in_process", "rejected", "cancelled", "refunded"]);
     }
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
