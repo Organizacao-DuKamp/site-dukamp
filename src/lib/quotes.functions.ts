@@ -188,3 +188,88 @@ export const getMarketQuotes = createServerFn({ method: "GET" }).handler(async (
   for (const it of items) history[it.key] = (HISTORY[it.key] ?? []).map((h) => h.price);
   return { items, history, fetchedAt: new Date().toISOString() };
 });
+
+// ---------- Per-state quotes ----------
+function findAllRowsAfter(html: string, headerNeedle: string): NaRow[] {
+  const i = html.indexOf(headerNeedle);
+  if (i < 0) return [];
+  const tbodyStart = html.indexOf("<tbody>", i);
+  const tbodyEnd = html.indexOf("</tbody>", tbodyStart);
+  if (tbodyStart < 0 || tbodyEnd < 0) return [];
+  const block = html.slice(tbodyStart, tbodyEnd);
+  const rowRe = /<tr[^>]*>\s*<td[^>]*>([^<]+)<\/td>\s*<td[^>]*>([\d.,]+)<\/td>/g;
+  const rows: NaRow[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = rowRe.exec(block))) {
+    const price = parseBrNumber(m[2]);
+    if (price != null) rows.push({ region: m[1].trim(), price });
+  }
+  return rows;
+}
+
+export type IndicatorRegions = {
+  key: string;
+  name: string;
+  unit: string;
+  source: string;
+  sourceUrl: string;
+  rows: { region: string; price: number }[];
+};
+
+export type QuotesByState = {
+  indicators: IndicatorRegions[];
+  states: string[];
+  fetchedAt: string;
+};
+
+export const getMarketQuotesByState = createServerFn({ method: "GET" }).handler(async (): Promise<QuotesByState> => {
+  const [naHtml, scotHtml] = await Promise.all([
+    fetchText("https://www.noticiasagricolas.com.br/cotacoes/boi"),
+    fetchText("https://www.scotconsultoria.com.br/cotacoes/boi-gordo/"),
+  ]);
+
+  const indicators: IndicatorRegions[] = [];
+
+  if (naHtml) {
+    indicators.push({
+      ...BASE.boi_gordo,
+      rows: findAllRowsAfter(naHtml, "Boi Gordo - (R$/@ - à vista)"),
+    });
+    indicators.push({
+      ...BASE.vaca_gorda,
+      rows: findAllRowsAfter(naHtml, "Vaca Gorda (R$/@ - à vista)"),
+    });
+    indicators.push({
+      ...BASE.novilha,
+      rows: findAllRowsAfter(naHtml, "Indicador da Novilha"),
+    });
+  }
+
+  if (scotHtml) {
+    const i = scotHtml.indexOf("Boi China a Prazo");
+    if (i >= 0) {
+      const tbodyStart = scotHtml.indexOf("<tbody>", i);
+      const tbodyEnd = scotHtml.indexOf("</tbody>", tbodyStart);
+      const rows: NaRow[] = [];
+      if (tbodyStart >= 0 && tbodyEnd >= 0) {
+        const block = scotHtml.slice(tbodyStart, tbodyEnd);
+        const re = /<td[^>]*>\s*([^<]+?)\s*<\/td>\s*<td[^>]*>\s*([\d.,]+)\s*<\/td>/g;
+        let m: RegExpExecArray | null;
+        while ((m = re.exec(block))) {
+          const price = parseBrNumber(m[2]);
+          if (price != null) rows.push({ region: m[1].trim(), price });
+        }
+      }
+      indicators.push({ ...BASE.boi_china, rows });
+    }
+  }
+
+  const stateSet = new Set<string>();
+  for (const ind of indicators) for (const r of ind.rows) stateSet.add(r.region);
+
+  return {
+    indicators,
+    states: Array.from(stateSet).sort((a, b) => a.localeCompare(b, "pt-BR")),
+    fetchedAt: new Date().toISOString(),
+  };
+});
