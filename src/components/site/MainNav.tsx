@@ -37,7 +37,7 @@ function DesktopItem({ item }: { item: NavItem }) {
         </Link>
         {/* Mega panel */}
         <div
-          className="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute left-1/2 -translate-x-1/2 top-full z-50 pt-1
+          className="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute left-0 top-full z-50 pt-1
                      translate-y-1 group-hover:translate-y-0 transition-all duration-200 ease-out"
         >
           <div className="rounded-b-md bg-white text-foreground shadow-xl border border-black/10 p-3
