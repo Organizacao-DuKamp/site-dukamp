@@ -99,42 +99,43 @@ export function QuotesWidget() {
   return (
     <div className="rounded-xl border bg-gradient-to-b from-card to-card/50 shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="relative px-4 py-3 border-b bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+      <div className="relative px-3 py-2 border-b bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary">
-              <Activity className="h-4 w-4" />
+            <div className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-primary/15 text-primary">
+              <Activity className="h-3 w-3" />
             </div>
             <div className="min-w-0">
-              <div className="font-semibold text-sm leading-tight truncate">Cotações do Mercado</div>
-              <div className="text-[10px] text-muted-foreground">
-                {isLoading ? "Carregando…" : `${availableCount}/${data?.items.length ?? 0} indicadores ao vivo`}
+              <div className="font-semibold text-xs leading-tight truncate">Cotações do Mercado</div>
+              <div className="text-[9px] text-muted-foreground leading-tight">
+                {isLoading ? "Carregando…" : `${availableCount}/${data?.items.length ?? 0} ao vivo`}
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             <button
               onClick={toggle}
               aria-label="Expandir painel de cotações"
               title="Expandir painel de cotações"
-              className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition"
+              className="grid h-6 w-6 place-items-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition"
             >
-              <Maximize2 className="h-3.5 w-3.5" />
+              <Maximize2 className="h-3 w-3" />
             </button>
             <button
               onClick={() => refetch()}
               disabled={isFetching}
               aria-label="Atualizar cotações"
-              className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition disabled:opacity-50"
+              className="grid h-6 w-6 place-items-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition disabled:opacity-50"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-3 w-3 ${isFetching ? "animate-spin" : ""}`} />
             </button>
           </div>
         </div>
       </div>
 
       {/* Body */}
-      <div className="p-2 max-h-[120px] overflow-y-auto">
+      <div className="p-1.5 max-h-[100px] overflow-y-auto">
+
 
         {isLoading ? (
           <ul className="space-y-1.5">
