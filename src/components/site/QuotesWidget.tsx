@@ -111,14 +111,24 @@ export function QuotesWidget() {
               </div>
             </div>
           </div>
-          <button
-            onClick={() => refetch()}
-            disabled={isFetching}
-            aria-label="Atualizar cotações"
-            className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition disabled:opacity-50"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
-          </button>
+          <div className="flex items-center gap-1">
+            <Link
+              to="/cotacoes"
+              aria-label="Abrir painel de cotações"
+              title="Painel de cotações por estado"
+              className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition"
+            >
+              <BarChart3 className="h-3.5 w-3.5" />
+            </Link>
+            <button
+              onClick={() => refetch()}
+              disabled={isFetching}
+              aria-label="Atualizar cotações"
+              className="grid h-7 w-7 place-items-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition disabled:opacity-50"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
+            </button>
+          </div>
         </div>
       </div>
 
