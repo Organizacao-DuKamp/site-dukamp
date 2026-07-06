@@ -85,12 +85,35 @@ function CheckoutPage() {
     }
   }
 
+  async function handleCalcFrete() {
+    const cep = form.cep.replace(/\D/g, "");
+    if (cep.length !== 8) return toast.error("Informe um CEP válido");
+    if (items.length === 0) return;
+    setLoadingFrete(true);
+    try {
+      const r = await calcFrete({
+        data: {
+          cepDestino: cep,
+          items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })),
+        },
+      });
+      setFrete(r);
+      toast.success(`Frete ${r.servico}: ${formatBRL(r.valor)} em até ${r.prazoDias} dia(s)`);
+    } catch (e) {
+      setFrete(null);
+      toast.error(e instanceof Error ? e.message : "Erro ao calcular frete");
+    } finally {
+      setLoadingFrete(false);
+    }
+  }
+
   function validateDelivery(): string | null {
     for (const k of ["customer_name", "email", "phone", "cpf_cnpj", "cep", "rua", "numero", "bairro", "cidade", "estado"] as const) {
       if (!form[k]?.trim()) return `Preencha ${k.replace("_", " ")}`;
     }
     if (!/^\S+@\S+\.\S+$/.test(form.email)) return "E-mail inválido";
     if (form.estado.length !== 2) return "UF deve ter 2 letras";
+    if (!frete) return "Calcule o frete antes de finalizar";
     return null;
   }
 
@@ -105,9 +128,9 @@ function CheckoutPage() {
         data: {
           ...form,
           items: items.map((i) => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price })),
-          shipping_cost: 0,
-          shipping_service: "A combinar",
-          shipping_deadline_days: 0,
+          shipping_cost: frete?.valor ?? 0,
+          shipping_service: frete?.servico ?? "A combinar",
+          shipping_deadline_days: frete?.prazoDias ?? 0,
         },
       });
       clear();
@@ -120,7 +143,7 @@ function CheckoutPage() {
   }
 
 
-  const total = subtotal;
+  const total = subtotal + (frete?.valor ?? 0);
 
   if (items.length === 0) {
     return (
