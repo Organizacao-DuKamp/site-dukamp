@@ -108,11 +108,13 @@ function CheckoutPage() {
     }
   }
 
-  async function handleCalcFrete() {
-    const cep = form.cep.replace(/\D/g, "");
-    if (cep.length !== 8) return toast.error("Informe um CEP válido (8 números)");
+  async function handleCalcFreteFor(rawCep: string) {
+    const cep = rawCep.replace(/\D/g, "");
+    if (cep.length !== 8) {
+      toast.error("Informe um CEP válido (8 números)");
+      return;
+    }
     if (items.length === 0) return;
-    if (!form.rua) await lookupCep(cep);
     setLoadingFrete(true);
     try {
       const r = await calcFrete({
@@ -129,6 +131,12 @@ function CheckoutPage() {
     } finally {
       setLoadingFrete(false);
     }
+  }
+
+  async function handleCalcFrete() {
+    const cep = form.cep.replace(/\D/g, "");
+    if (!form.rua && cep.length === 8) await lookupCep(cep);
+    await handleCalcFreteFor(cep);
   }
 
   function validateDelivery(): string | null {
