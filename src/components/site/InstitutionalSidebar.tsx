@@ -22,7 +22,7 @@ export function InstitutionalSidebar() {
 
   if (expanded) {
     return (
-      <aside>
+      <aside className="animate-quotes-panel-in">
         <QuotesPanel />
       </aside>
     );

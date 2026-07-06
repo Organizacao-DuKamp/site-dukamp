@@ -11,13 +11,15 @@ function LayoutInner({ children }: { children: ReactNode }) {
   return (
     <div className="container mx-auto px-4 py-6 flex-1 w-full">
       <div
-        className={
+        className={`layout-grid grid gap-6 ${
           expanded
-            ? "grid gap-6 lg:grid-cols-[minmax(0,20rem)_1fr]"
-            : "grid gap-6 lg:grid-cols-[1fr_20rem]"
-        }
+            ? "lg:grid-cols-[minmax(0,20rem)_1fr]"
+            : "lg:grid-cols-[1fr_20rem]"
+        }`}
       >
-        <main className="min-w-0 order-1">{children}</main>
+        <main data-quotes-expanded={expanded} className="min-w-0 order-1">
+          {children}
+        </main>
         <div className="hidden lg:block order-2 min-w-0">
           <InstitutionalSidebar />
         </div>
