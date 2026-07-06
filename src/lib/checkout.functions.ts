@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const CEP_ORIGEM = "15150104";
-// PAC contrato (código padrão do MVP). Pode ser trocado por SEDEX (03220) etc.
-const CORREIOS_SERVICO = "03298";
+const CEP_ORIGEM = (process.env.CORREIOS_CEP_ORIGEM || "15150104").replace(/\D/g, "");
+// Código do produto Correios. 03220 = SEDEX contrato; pode ser sobrescrito por env.
+const CORREIOS_COD_PRODUTO = (process.env.CORREIOS_COD_PRODUTO || "03220").trim();
 const CORREIOS_SERVICO_PUBLICO = "04510";
-const CORREIOS_SERVICO_NOME = "PAC";
+const CORREIOS_SERVICO_NOME = CORREIOS_COD_PRODUTO === "03298" ? "PAC" : "SEDEX";
 
 type ShippingPackage = {
   pesoKg: number;
