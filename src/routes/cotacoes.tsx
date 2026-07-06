@@ -128,7 +128,7 @@ function IndicatorCard({
                       fill={
                         avg != null && r.price >= avg
                           ? "hsl(142 71% 45%)"
-                          : "hsl(var(--primary))"
+                          : "hsl(0 72% 51%)"
                       }
                     />
                   ))}
