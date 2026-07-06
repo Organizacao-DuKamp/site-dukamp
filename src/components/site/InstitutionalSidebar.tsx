@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { QuotesWidget } from "./QuotesWidget";
+import { QuotesPanel } from "./QuotesPanel";
+import { useQuotesPanel } from "@/lib/quotes-panel";
 
 export function InstitutionalSidebar() {
+  const { expanded } = useQuotesPanel();
   const { data } = useQuery({
     queryKey: ["institutional_ads"],
     queryFn: async () => {
@@ -14,7 +17,16 @@ export function InstitutionalSidebar() {
       if (error) throw error;
       return data;
     },
+    enabled: !expanded,
   });
+
+  if (expanded) {
+    return (
+      <aside>
+        <QuotesPanel />
+      </aside>
+    );
+  }
 
   return (
     <aside className="space-y-4">
