@@ -134,7 +134,8 @@ export function QuotesWidget() {
       </div>
 
       {/* Body */}
-      <div className="p-2">
+      <div className="p-2 max-h-[280px] overflow-y-auto">
+
         {isLoading ? (
           <ul className="space-y-1.5">
             {Array.from({ length: 5 }).map((_, i) => (
