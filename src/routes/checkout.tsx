@@ -252,7 +252,8 @@ function CheckoutPage() {
           <div className="border rounded-lg p-4 bg-card sticky top-4 space-y-2 text-sm">
             <h2 className="font-semibold">Resumo</h2>
             <Row label="Subtotal" value={formatBRL(subtotal)} />
-            <Row label="Frete" value="A combinar" />
+            <Row label="Frete" value={frete ? `${frete.servico} — ${formatBRL(frete.valor)}` : "A calcular"} />
+            {frete && <Row label="Prazo" value={`até ${frete.prazoDias} dia(s)`} /> }
             <div className="border-t pt-2 flex justify-between font-bold text-base">
               <span>Total</span><span>{formatBRL(total)}</span>
             </div>
