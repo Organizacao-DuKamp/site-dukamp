@@ -116,9 +116,27 @@
 }
 .animate-quotes-panel-in { animation: quotes-panel-in 350ms cubic-bezier(0.4, 0, 0.2, 1) both; }
 
-/* When quotes panel is expanded, force product grids on the left to 1 column */
-main[data-quotes-expanded="true"] .grid.grid-cols-2 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-main[data-quotes-expanded="true"] .grid.sm\:grid-cols-3,
-main[data-quotes-expanded="true"] .grid.lg\:grid-cols-4,
-main[data-quotes-expanded="true"] .grid.xl\:grid-cols-5 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+/* Product grids respond to the actual main-column width so they shrink
+   gradually as the quotes panel expands, instead of snapping. */
+main[data-quotes-expanded] { container-type: inline-size; container-name: mainCol; }
+
+@container mainCol (max-width: 1100px) {
+  main[data-quotes-expanded] .grid.xl\:grid-cols-5 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@container mainCol (max-width: 880px) {
+  main[data-quotes-expanded] .grid.lg\:grid-cols-4,
+  main[data-quotes-expanded] .grid.xl\:grid-cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@container mainCol (max-width: 620px) {
+  main[data-quotes-expanded] .grid.sm\:grid-cols-3,
+  main[data-quotes-expanded] .grid.lg\:grid-cols-4,
+  main[data-quotes-expanded] .grid.xl\:grid-cols-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container mainCol (max-width: 360px) {
+  main[data-quotes-expanded] .grid.grid-cols-2,
+  main[data-quotes-expanded] .grid.sm\:grid-cols-3,
+  main[data-quotes-expanded] .grid.lg\:grid-cols-4,
+  main[data-quotes-expanded] .grid.xl\:grid-cols-5 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+}
+
 
