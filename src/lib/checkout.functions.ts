@@ -64,9 +64,17 @@ function summarizeCorreiosAuthIssue(attempts: Array<{ name: string; status: numb
 }
 
 function validateCorreiosCredentials(usuario: string, senha: string, cartao: string) {
-  if (!usuario || !senha || !cartao) {
-    console.error("[Correios] credenciais ausentes", { usuario: !!usuario, senha: !!senha, cartao: !!cartao });
-    throw new Error("Credenciais Correios ausentes (usuário/senha/cartão)");
+  const missing: string[] = [];
+  if (!usuario) missing.push("CORREIOS_USUARIO");
+  if (!senha) missing.push("CORREIOS_SENHA");
+  if (!cartao) missing.push("CORREIOS_CARTAO_POSTAGEM");
+  if (missing.length) {
+    console.error("[Correios] credenciais ausentes", { missing });
+    throw new Error(
+      `Credenciais Correios ausentes neste ambiente: ${missing.join(", ")}. ` +
+        `Adicione esses secrets (e/ou CORREIOS_TOKEN) no ambiente atual do Lovable Cloud — ` +
+        `secrets salvos em Produção não são compartilhados com o Preview.`,
+    );
   }
 }
 
