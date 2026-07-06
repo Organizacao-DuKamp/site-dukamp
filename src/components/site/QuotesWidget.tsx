@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Activity, ArrowDownRight, ArrowUpRight, Beef, DollarSign, Minus, RefreshCw, Ship } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Activity, ArrowDownRight, ArrowUpRight, BarChart3, Beef, DollarSign, Minus, RefreshCw, Ship } from "lucide-react";
 import { getMarketQuotes, type QuoteItem } from "@/lib/quotes.functions";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {

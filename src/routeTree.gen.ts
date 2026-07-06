@@ -15,6 +15,7 @@ import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as MinhasComprasRouteImport } from './routes/minhas-compras'
 import { Route as MinhaContaRouteImport } from './routes/minha-conta'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CotacoesRouteImport } from './routes/cotacoes'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CatalogosRouteImport } from './routes/catalogos'
@@ -77,6 +78,11 @@ const MinhaContaRoute = MinhaContaRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CotacoesRoute = CotacoesRouteImport.update({
+  id: '/cotacoes',
+  path: '/cotacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContatoRoute = ContatoRouteImport.update({
@@ -254,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/catalogos': typeof CatalogosRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/contato': typeof ContatoRoute
+  '/cotacoes': typeof CotacoesRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
   '/minhas-compras': typeof MinhasComprasRoute
@@ -293,6 +300,7 @@ export interface FileRoutesByTo {
   '/carrinho': typeof CarrinhoRoute
   '/checkout': typeof CheckoutRoute
   '/contato': typeof ContatoRoute
+  '/cotacoes': typeof CotacoesRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
   '/minhas-compras': typeof MinhasComprasRoute
@@ -334,6 +342,7 @@ export interface FileRoutesById {
   '/catalogos': typeof CatalogosRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/contato': typeof ContatoRoute
+  '/cotacoes': typeof CotacoesRoute
   '/dashboard': typeof DashboardRoute
   '/minha-conta': typeof MinhaContaRoute
   '/minhas-compras': typeof MinhasComprasRoute
@@ -377,6 +386,7 @@ export interface FileRouteTypes {
     | '/catalogos'
     | '/checkout'
     | '/contato'
+    | '/cotacoes'
     | '/dashboard'
     | '/minha-conta'
     | '/minhas-compras'
@@ -416,6 +426,7 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/checkout'
     | '/contato'
+    | '/cotacoes'
     | '/dashboard'
     | '/minha-conta'
     | '/minhas-compras'
@@ -456,6 +467,7 @@ export interface FileRouteTypes {
     | '/catalogos'
     | '/checkout'
     | '/contato'
+    | '/cotacoes'
     | '/dashboard'
     | '/minha-conta'
     | '/minhas-compras'
@@ -498,6 +510,7 @@ export interface RootRouteChildren {
   CatalogosRoute: typeof CatalogosRouteWithChildren
   CheckoutRoute: typeof CheckoutRoute
   ContatoRoute: typeof ContatoRoute
+  CotacoesRoute: typeof CotacoesRoute
   DashboardRoute: typeof DashboardRoute
   MinhaContaRoute: typeof MinhaContaRoute
   MinhasComprasRoute: typeof MinhasComprasRoute
@@ -552,6 +565,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cotacoes': {
+      id: '/cotacoes'
+      path: '/cotacoes'
+      fullPath: '/cotacoes'
+      preLoaderRoute: typeof CotacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contato': {
@@ -868,6 +888,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogosRoute: CatalogosRouteWithChildren,
   CheckoutRoute: CheckoutRoute,
   ContatoRoute: ContatoRoute,
+  CotacoesRoute: CotacoesRoute,
   DashboardRoute: DashboardRoute,
   MinhaContaRoute: MinhaContaRoute,
   MinhasComprasRoute: MinhasComprasRoute,
