@@ -134,7 +134,7 @@ export function QuotesWidget() {
       </div>
 
       {/* Body */}
-      <div className="p-2 max-h-[180px] overflow-y-auto">
+      <div className="p-2 max-h-[120px] overflow-y-auto">
 
         {isLoading ? (
           <ul className="space-y-1.5">
