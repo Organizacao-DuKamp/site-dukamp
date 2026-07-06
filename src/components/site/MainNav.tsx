@@ -10,13 +10,13 @@ import { useAuth } from "@/lib/auth";
 
 function useCategories() {
   return useQuery({
-    queryKey: ["categories", "nav"],
+    queryKey: ["catalogs", "nav"],
     queryFn: async () => {
       const { data } = await supabase
-        .from("categories")
+        .from("catalogs")
         .select("id,name,slug")
         .eq("active", true)
-        .order("sort_order");
+        .order("name");
       return data ?? [];
     },
   });

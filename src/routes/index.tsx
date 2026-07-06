@@ -35,13 +35,13 @@ function Home() {
     },
   });
   const categories = useQuery({
-    queryKey: ["categories", "active"],
+    queryKey: ["catalogs", "active"],
     queryFn: async () => {
       const { data } = await supabase
-        .from("categories")
+        .from("catalogs")
         .select("*")
         .eq("active", true)
-        .order("sort_order");
+        .order("name");
       return data ?? [];
     },
   });
@@ -74,7 +74,7 @@ function Home() {
       </section>
 
       {categories.data?.map((cat) => {
-        const prods = (allProducts.data ?? []).filter((p) => p.category_id === cat.id).slice(0, 8);
+        const prods = (allProducts.data ?? []).filter((p) => p.catalog_id === cat.id).slice(0, 8);
         if (prods.length === 0) return null;
         return (
           <section key={cat.id} className="mt-10">
