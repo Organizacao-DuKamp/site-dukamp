@@ -136,65 +136,62 @@ async function calculateLegacyCorreiosShipping(cepDest: string, pacotes: Shippin
   };
 }
 
-async function calculateCorreiosRestShipping(token: string, cepDest: string, contrato: string, pacotes: ShippingPackage[]) {
-  const parametrosProduto = pacotes.map((pacote, index) => ({
-    coProduto: CORREIOS_SERVICO,
-    nuRequisicao: String(index + 1),
-    nuContrato: contrato || undefined,
-    cepOrigem: CEP_ORIGEM,
-    cepDestino: cepDest,
-    psObjeto: String(Math.ceil(pacote.pesoKg * 1000)),
-    tpObjeto: "2",
-    comprimento: String(pacote.comprimentoCm),
-    largura: String(pacote.larguraCm),
-    altura: String(pacote.alturaCm),
-    servicosAdicionais: ["001"],
-    vlDeclarado: "0",
-  }));
+async function calculateCorreiosRestShipping(token: string, cepDest: string, _contrato: string, pacotes: ShippingPackage[]) {
+  const cod = CORREIOS_COD_PRODUTO;
+  const headers = { Authorization: `Bearer ${token}`, accept: "application/json" };
 
-  const precoRes = await fetch("https://api.correios.com.br/preco/v1/nacional", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ idLote: "1", parametrosProduto }),
-  });
-  if (!precoRes.ok) {
-    const t = await precoRes.text();
-    const restrictedMessage = getCorreiosRestrictedApiMessage(t);
-    if (restrictedMessage) throw new Error(restrictedMessage);
-    throw new Error(`Correios preço falhou: ${precoRes.status} ${t}`);
-  }
-  const precoJson = (await precoRes.json()) as Array<{ pcFinal?: string; txErro?: string }>;
   let valor = 0;
-  for (const preco of precoJson || []) {
-    if (!preco || preco.txErro) throw new Error(preco?.txErro || "Frete indisponível para este CEP");
-    valor += Number((preco.pcFinal || "0").replace(",", "."));
-  }
+  let prazoDias = 0;
+  let dataMaxima: string | undefined;
 
-  const prazoRes = await fetch("https://api.correios.com.br/prazo/v1/nacional", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      idLote: "1",
-      parametrosPrazo: pacotes.map((_, index) => ({
-        coProduto: CORREIOS_SERVICO,
-        nuRequisicao: String(index + 1),
-        cepOrigem: CEP_ORIGEM,
-        cepDestino: cepDest,
-        dtEvento: new Date().toISOString().slice(0, 10).split("-").reverse().join("/"),
-      })),
-    }),
-  });
+  for (const pacote of pacotes) {
+    // ----- PREÇO: GET /preco/v1/nacional/{coProduto}
+    const precoUrl = new URL(`https://api.correios.com.br/preco/v1/nacional/${cod}`);
+    precoUrl.searchParams.set("cepOrigem", CEP_ORIGEM);
+    precoUrl.searchParams.set("cepDestino", cepDest);
+    precoUrl.searchParams.set("psObjeto", String(Math.max(1, Math.ceil(pacote.pesoKg * 1000))));
+    precoUrl.searchParams.set("tpObjeto", "2");
+    precoUrl.searchParams.set("comprimento", String(pacote.comprimentoCm));
+    precoUrl.searchParams.set("largura", String(pacote.larguraCm));
+    precoUrl.searchParams.set("altura", String(pacote.alturaCm));
 
-  let prazoDias = 7;
-  if (prazoRes.ok) {
-    const prazoJson = (await prazoRes.json()) as Array<{ prazoEntrega?: number }>;
-    prazoDias = Math.max(...(prazoJson || []).map((item) => Number(item?.prazoEntrega ?? 7)).filter(Number.isFinite), 7);
+    const precoRes = await fetch(precoUrl.toString(), { headers });
+    if (!precoRes.ok) {
+      const detail = await readCorreiosError(precoRes);
+      const restricted = getCorreiosRestrictedApiMessage(detail);
+      if (restricted) throw new Error(restricted);
+      if (precoRes.status === 401 || precoRes.status === 403) {
+        throw new Error(`Correios: token inválido ou sem permissão (HTTP ${precoRes.status}). Verifique CORREIOS_TOKEN.`);
+      }
+      if (precoRes.status === 404) {
+        throw new Error(`Correios: produto ${cod} ou CEP não encontrado (HTTP 404). ${detail.slice(0, 200)}`);
+      }
+      throw new Error(`Correios preço falhou: ${precoRes.status} ${detail.slice(0, 200)}`);
+    }
+    const precoJson = (await precoRes.json()) as { pcFinal?: string; txErro?: string };
+    if (precoJson.txErro) throw new Error(precoJson.txErro);
+    const parsed = Number(String(precoJson.pcFinal || "0").replace(".", "").replace(",", "."));
+    if (!Number.isFinite(parsed) || parsed <= 0) throw new Error("Correios não retornou valor de frete (pcFinal)");
+    valor += parsed;
+
+    // ----- PRAZO: GET /prazo/v1/nacional/{coProduto}
+    const prazoUrl = new URL(`https://api.correios.com.br/prazo/v1/nacional/${cod}`);
+    prazoUrl.searchParams.set("cepOrigem", CEP_ORIGEM);
+    prazoUrl.searchParams.set("cepDestino", cepDest);
+    const prazoRes = await fetch(prazoUrl.toString(), { headers });
+    if (prazoRes.ok) {
+      const prazoJson = (await prazoRes.json()) as { prazoEntrega?: number; dataMaxima?: string };
+      const p = Number(prazoJson.prazoEntrega ?? 0);
+      if (Number.isFinite(p) && p > 0) prazoDias = Math.max(prazoDias, p);
+      if (prazoJson.dataMaxima) dataMaxima = prazoJson.dataMaxima;
+    }
   }
 
   return {
     servico: CORREIOS_SERVICO_NOME,
     valor: Number(valor.toFixed(2)),
-    prazoDias,
+    prazoDias: prazoDias || 7,
+    dataMaxima,
   };
 }
 
