@@ -50,9 +50,12 @@ function CheckoutPage() {
   const [form, setForm] = useState<Form>(emptyForm);
   const [loadingCep, setLoadingCep] = useState(false);
   const [loadingPay, setLoadingPay] = useState(false);
+  const [loadingFrete, setLoadingFrete] = useState(false);
   const [method, setMethod] = useState<"pix" | "card">("pix");
+  const [frete, setFrete] = useState<{ valor: number; prazoDias: number; servico: string; dataMaxima?: string } | null>(null);
 
   const createOrder = useServerFn(createPixOrder);
+  const calcFrete = useServerFn(calculateShipping);
 
 
   function set<K extends keyof Form>(k: K, v: string) {
