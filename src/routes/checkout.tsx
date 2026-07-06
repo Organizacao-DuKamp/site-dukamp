@@ -202,9 +202,19 @@ function CheckoutPage() {
               <Field label="Cidade *"><Input value={form.cidade} onChange={(e) => set("cidade", e.target.value)} /></Field>
               <Field label="UF *"><Input maxLength={2} value={form.estado} onChange={(e) => set("estado", e.target.value.toUpperCase())} /></Field>
             </div>
-            <p className="text-xs text-muted-foreground">
-              O frete será combinado separadamente após a confirmação do pedido.
-            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-2 border-t">
+              <Button type="button" variant="outline" onClick={handleCalcFrete} disabled={loadingFrete || form.cep.replace(/\D/g, "").length !== 8}>
+                {loadingFrete ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
+                Calcular frete
+              </Button>
+              {frete ? (
+                <div className="text-sm">
+                  <span className="font-medium">{frete.servico}:</span> {formatBRL(frete.valor)} — entrega em até {frete.prazoDias} dia(s){frete.dataMaxima ? ` (até ${frete.dataMaxima})` : ""}
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground">Informe o CEP e clique em Calcular frete.</span>
+              )}
+            </div>
           </section>
 
           {/* Pagamento */}
