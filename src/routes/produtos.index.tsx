@@ -22,8 +22,8 @@ function Page() {
   const { q, categoria, page = 1 } = Route.useSearch();
   const navigate = useNavigate({ from: "/produtos/" });
   const cats = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => (await supabase.from("categories").select("*").order("sort_order")).data ?? [],
+    queryKey: ["catalogs"],
+    queryFn: async () => (await supabase.from("catalogs").select("*").eq("active", true).order("name")).data ?? [],
   });
   const catId = cats.data?.find((c) => c.slug === categoria)?.id;
   const prods = useQuery({
@@ -32,7 +32,7 @@ function Page() {
       const from = (page - 1) * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
       let qy = supabase.from("products").select("*", { count: "exact" }).eq("active", true).gt("stock", 0);
-      if (catId) qy = qy.eq("category_id", catId);
+      if (catId) qy = qy.eq("catalog_id", catId);
       if (q) qy = qy.ilike("name", `%${q}%`);
       const { data, count } = await qy.order("created_at", { ascending: false }).range(from, to);
       return { rows: data ?? [], count: count ?? 0 };
