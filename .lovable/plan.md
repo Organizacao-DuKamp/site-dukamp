@@ -1,54 +1,41 @@
-# Correção do frete dos Correios
+## Situação atual
 
-## Diagnóstico
+Comparando `PROD_WEB.txt` (98 produtos) com a tabela `products` (51 produtos):
 
-Os logs do servidor mostram que a autenticação Basic Auth está sendo rejeitada em **todos** os endpoints (`autentica`, `contrato`, `cartaopostagem`) com `401 Unauthorized` e header `WWW-Authenticate: Basic realm="Realm"`. Isso significa que os Correios recusam as credenciais **antes** de olhar contrato ou cartão.
+- **Todos os 51 produtos já têm `code` preenchido**.
+- **Nenhum dos 9 códigos com preço vazio no banco existe no PROD_WEB.txt** — ou seja, casamento por código não resolve. É preciso casar por nome (fuzzy), como você mencionou.
+- Só faz sentido atualizar esses 9 produtos (os demais já têm `consumer_price` e `producer_price`).
 
-Comparando as tentativas registradas nos logs:
+## Produtos do banco com preço vazio e possíveis matches no arquivo
 
-- Tentativa anterior: `senhaLen: 40` → mesmo assim 401 (o código CWS anterior não estava correto/liberado).
-- Tentativa mais recente: `senhaLen: 11` → 401 imediato.
+| # | Produto no banco (code) | Match sugerido no PROD_WEB (code) | Consumidor | Produtor | Confiança |
+|---|---|---|---|---|---|
+| 1 | DUKAMP 87/S 30KG (005430) | *sem match* (arquivo só tem 40/60/65/80/S) | — | — | nenhum |
+| 2 | DUKAMP CONCENTRADO CONFINAMENTO CGI-15/380 30KG (020687) | DUKAMP CONCENTRADO CONFINAMENTO GI-15/380 (020567) | 112,16 | 115,32 | alta |
+| 3 | DUKAMP PROTEICO SECA ENGORDA GOLD 30KG (067150) | *sem match direto* (arquivo tem ENGORDA / ADITIVADO / PREMIUM, nenhum "GOLD") | — | — | nenhum |
+| 4 | DUKAMP RACAO BABY ELITE 30KG (004920) | DUKAMP RACAO BABY 30KG (001643) — só "BABY", não "BABY ELITE" | 63,52 | 61,44 | baixa |
+| 5 | DUKAMP RACAO CONFINAMENTO 18 PREMIUM 30KG (072564) | DUKAMP RACAO CONFINAMENTO PREMIUM 30 KGS (074187) | 53,90 | 53,90 | média |
+| 6 | DUKAMP RACAO TOTAL M ENERGETICA 2% 30KG (077118) | DUKAMP RACAO DIETA TOTAL M ENERGETICA 2 % (077119) | 55,90 | 55,90 | alta |
+| 7 | RACAO DUKAVALLUS EGUA PELETIZADA 30KG (050652) | *sem match* (arquivo só tem DUKAVALLUS-14) | — | — | nenhum |
+| 8 | RACAO DUKAVALLUS POTRO PELETIZADA 30KG (007234) | *sem match* | — | — | nenhum |
+| 9 | RACAO PROTEINADA DUKAVALLUS 30KG (052590) | *sem match* | — | — | nenhum |
 
-O código de acesso às APIs do CWS dos Correios tem **40 caracteres**. Uma senha de 11 caracteres é a senha comum do "Meu Correios" — essa API REST não aceita ela. Ou seja, o valor atual em `CORREIOS_SENHA` está no formato errado.
+## Restrições que vou respeitar
 
-O `CORREIOS_USUARIO` tem 10 caracteres (idCorreios), que é o formato esperado, então esse está OK.
+- Não criar nem deletar produtos.
+- Não sobrescrever preços já preenchidos (`consumer_price`/`producer_price` diferente de 0 e NULL).
+- Não alterar `code` (todos já existem).
 
-Também verifiquei:
-- CEP é normalizado (`onlyDigits`) antes das chamadas ✅
-- CEP de origem definido (`15150104`) ✅
-- Dimensões dos produtos são agregadas com mínimos/máximos dos Correios ✅
-- Endpoints REST (`api.correios.com.br/token/v1/...` e `/preco/v1/nacional`) estão corretos ✅
-- Nenhuma chave é exposta no frontend ✅
-- O código já bloqueia agora quando `senhaLen ≠ 40` com mensagem clara
+## O que vou fazer após aprovação
 
-Portanto o problema **não está no código**. Está no valor da variável de ambiente `CORREIOS_SENHA`.
+1. **Aplicar automaticamente** os matches de confiança **alta** (linhas 2 e 6): atualizar `consumer_price` e `producer_price` (só onde estão em 0/NULL).
+2. **Aguardar sua confirmação** para os matches ambíguos (linhas 4 e 5) — provavelmente são produtos distintos e não devem ser preenchidos com preços de outro item.
+3. **Deixar como estão** os produtos sem match no arquivo (linhas 1, 3, 7, 8, 9).
 
-## O que precisa ser feito (sem código)
+## Perguntas para você
 
-Substituir `CORREIOS_SENHA` pelo **Código de Acesso às APIs do CWS** correto (40 caracteres).
+- **Linha 4** (BABY ELITE ↔ BABY): aplicar mesmo assim? Provavelmente **não**, "ELITE" costuma ser produto premium com preço diferente.
+- **Linha 5** (CONFINAMENTO 18 PREMIUM ↔ CONFINAMENTO PREMIUM): aplicar? O "18" pode indicar teor proteico distinto.
+- **Linhas 1, 3, 7, 8, 9**: quer que eu deixe em 0 mesmo, ou você tem outro arquivo/fonte com esses preços?
 
-### Como obter esse código
-
-1. Entrar em https://cws.correios.com.br/ com o mesmo login/idCorreios usado em `CORREIOS_USUARIO`.
-2. Menu **Meus Serviços → API dos Correios → Gestão de acesso a APIs** (também chamado "Gerar código de acesso").
-3. Clicar em **Gerar novo código de acesso** (ou copiar o vigente).
-4. Copiar o valor completo — deve ter ~40 caracteres alfanuméricos.
-
-> Importante: esse código é vinculado ao contrato/cartão de postagem. Se o CWS mostrar aviso de "sem serviços habilitados para API REST", o gerente comercial dos Correios precisa liberar seu contrato para a API REST — isso é feito por eles, não tem como resolver no código.
-
-### Aplicação
-
-Assim que você tiver o código, me diga **"pode abrir o formulário para atualizar CORREIOS_SENHA"** que eu abro o campo seguro para você colar (não gasta crédito significativo).
-
-## Estimativa de custo
-
-Nenhuma alteração de código é necessária — apenas atualização de um secret via formulário seguro. Muito abaixo do limite de 3 créditos.
-
-## Arquivos alterados
-
-Nenhum.
-
-## Setup manual pendente
-
-- Atualizar `CORREIOS_SENHA` com o Código de Acesso às APIs do CWS (40 caracteres).
-- Se após atualizar continuar dando 401, confirmar com o gerente dos Correios que o contrato/idCorreios está habilitado para a API REST nova.
+Ao aprovar, entro em modo build, aplico as atualizações confirmadas via SQL `UPDATE` na tabela `products` e reporto quantas linhas foram tocadas.
