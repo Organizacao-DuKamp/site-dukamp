@@ -121,15 +121,11 @@ function IndicatorCard({
                   labelStyle={{ fontSize: 12 }}
                   contentStyle={{ fontSize: 12 }}
                 />
-                <Bar dataKey="price" radius={[0, 4, 4, 0]} label={{ position: "right", fontSize: 11, formatter: (v: number) => fmtBRL(v) }}>
+                <Bar dataKey="price" fill="#dc2626" radius={[0, 4, 4, 0]} label={{ position: "right", fontSize: 11, formatter: (v: number) => fmtBRL(v) }}>
                   {rows.map((r) => (
                     <Cell
                       key={r.region}
-                      fill={
-                        avg != null && r.price >= avg
-                          ? "hsl(142 71% 45%)"
-                          : "hsl(0 72% 51%)"
-                      }
+                      fill={avg != null && r.price >= avg ? "#16a34a" : "#dc2626"}
                     />
                   ))}
                 </Bar>
