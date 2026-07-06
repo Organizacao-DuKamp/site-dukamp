@@ -35,13 +35,13 @@ function Home() {
     },
   });
   const categories = useQuery({
-    queryKey: ["categories", "active"],
+    queryKey: ["catalogs", "active"],
     queryFn: async () => {
       const { data } = await supabase
-        .from("categories")
+        .from("catalogs")
         .select("*")
         .eq("active", true)
-        .order("sort_order");
+        .order("name");
       return data ?? [];
     },
   });
