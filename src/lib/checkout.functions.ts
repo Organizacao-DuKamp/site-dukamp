@@ -18,6 +18,16 @@ function onlyDigits(s: string) {
   return (s || "").replace(/\D/g, "");
 }
 
+async function getServerSupabase() {
+  const { createClient } = await import("@supabase/supabase-js");
+  const url = process.env.SUPABASE_URL;
+  // Prefer service role (produção). Fallback para publishable key no preview local,
+  // onde a service role não é exposta pelo Lovable Cloud.
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) throw new Error("Supabase não configurado no servidor");
+  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+}
+
 function translateMpError(msg: string): string {
   const m = (msg || "").toLowerCase();
   if (!m) return "Não foi possível gerar o pagamento. Tente novamente em instantes.";
