@@ -31,33 +31,33 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
         aria-hidden
       />
 
-      {/* Curva amarela canto inferior direito */}
+      {/* Curva amarela grande no canto inferior direito */}
       <div
-        className="pointer-events-none absolute -right-16 -bottom-16 h-56 w-56 rounded-full bg-[#f6c515] md:h-72 md:w-72"
+        className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-[#f6c515] md:h-80 md:w-80"
         aria-hidden
       />
-      {/* Curva vermelha canto superior direito */}
+      {/* Curva vermelha menor no canto superior direito */}
       <div
-        className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full bg-[#d81f26] md:h-60 md:w-60"
+        className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#d81f26] md:h-52 md:w-52"
         aria-hidden
       />
 
-      <div className="relative grid gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,340px)_minmax(0,1fr)] md:items-center md:gap-8 md:p-8">
-        {/* Foto com arcos vermelho + amarelo */}
-        <div className="relative mx-auto md:mx-0 w-full max-w-[320px]">
+      <div className="relative grid gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,320px)_minmax(0,1fr)] md:items-center md:gap-10 md:p-8">
+        {/* Foto com arcos vermelho + amarelo à direita */}
+        <div className="relative mx-auto md:mx-0 w-full max-w-[300px]">
           <div className="relative">
-            {/* Arco amarelo (mais externo, à direita) */}
+            {/* Arco amarelo (externo) */}
             <div
-              className="absolute -right-4 -top-3 -bottom-3 w-8 rounded-r-full bg-[#f6c515] md:-right-6 md:w-10"
+              className="absolute -right-6 -top-4 -bottom-4 w-10 rounded-r-[999px] bg-[#f6c515] md:-right-8 md:w-12"
               aria-hidden
             />
-            {/* Arco vermelho (interno, mais grosso) */}
+            {/* Arco vermelho (interno, sobreposto ao amarelo pela esquerda) */}
             <div
-              className="absolute -right-1.5 -top-1.5 -bottom-1.5 w-8 rounded-r-full bg-[#d81f26] md:w-10"
+              className="absolute -right-2 -top-2 -bottom-2 w-10 rounded-r-[999px] bg-[#d81f26] md:w-12"
               aria-hidden
             />
             {/* Foto */}
-            <div className="relative overflow-hidden rounded-2xl bg-muted aspect-[4/3] shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl bg-muted aspect-[4/3] shadow-lg ring-1 ring-black/5">
               {photo ? (
                 <img
                   src={optimizedImage(photo, { width: 700, quality: 85 })}
