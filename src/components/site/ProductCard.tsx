@@ -66,7 +66,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
         <span className="sr-only">Ver detalhes de {p.name}</span>
       </Link>
       <div className="aspect-square bg-white overflow-hidden">
-        <img src={image} alt={p.name} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform" />
+        <img src={image} alt={p.name} loading="lazy" decoding="async" className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform" />
       </div>
       <div className="p-3 flex-1 flex flex-col">
         {p.brand && <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.brand}</div>}
