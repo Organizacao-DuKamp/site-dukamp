@@ -152,3 +152,111 @@ export function ImageListUpload({
     </div>
   );
 }
+
+export function MediaListUpload({
+  value,
+  onChange,
+  folder,
+}: {
+  value: string[];
+  onChange: (v: string[]) => void;
+  folder?: string;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function handle(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setBusy(true);
+    try {
+      const urls: string[] = [];
+      for (const f of Array.from(files)) urls.push(await uploadOne(f, folder));
+      onChange([...(value ?? []), ...urls]);
+    } catch (e: any) {
+      toast.error(e.message ?? "Erro ao enviar arquivo");
+    } finally {
+      setBusy(false);
+      if (ref.current) ref.current.value = "";
+    }
+  }
+
+  function removeAt(i: number) {
+    const next = [...(value ?? [])];
+    next.splice(i, 1);
+    onChange(next);
+  }
+
+  function move(i: number, dir: -1 | 1) {
+    const next = [...(value ?? [])];
+    const j = i + dir;
+    if (j < 0 || j >= next.length) return;
+    [next[i], next[j]] = [next[j], next[i]];
+    onChange(next);
+  }
+
+  return (
+    <div className="space-y-2">
+      {value?.length ? (
+        <div className="flex flex-wrap gap-2">
+          {value.map((url, i) => {
+            const video = isVideoUrl(url);
+            return (
+              <div key={i} className="relative group">
+                {video ? (
+                  <div className="h-24 w-24 rounded border bg-black/80 grid place-items-center overflow-hidden">
+                    <video src={url} className="h-full w-full object-cover" muted preload="metadata" />
+                    <Play className="absolute h-6 w-6 text-white/90 drop-shadow" />
+                  </div>
+                ) : (
+                  <img src={url} alt="" className="h-24 w-24 object-cover rounded border" />
+                )}
+                <button
+                  type="button"
+                  onClick={() => removeAt(i)}
+                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
+                  aria-label="Remover"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+                <div className="absolute bottom-1 left-1 right-1 flex justify-between opacity-0 group-hover:opacity-100 transition">
+                  <button
+                    type="button"
+                    onClick={() => move(i, -1)}
+                    className="text-[10px] bg-black/60 text-white rounded px-1"
+                  >
+                    ◀
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => move(i, 1)}
+                    className="text-[10px] bg-black/60 text-white rounded px-1"
+                  >
+                    ▶
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+      <div>
+        <input
+          ref={ref}
+          type="file"
+          accept="image/*,video/mp4,video/webm,video/quicktime"
+          multiple
+          className="hidden"
+          onChange={(e) => handle(e.target.files)}
+        />
+        <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => ref.current?.click()}>
+          {busy ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
+          Adicionar imagens/vídeos
+        </Button>
+        <p className="text-xs text-muted-foreground mt-1">
+          Se enviar mais de um arquivo, eles alternam a cada 6 segundos.
+        </p>
+      </div>
+    </div>
+  );
+}
+
