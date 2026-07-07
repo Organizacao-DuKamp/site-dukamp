@@ -25,10 +25,10 @@ import { FacebookBrand, InstagramBrand, YoutubeBrand, TikTokBrand, WhatsappBrand
 import fixedLogo from "@/assets/dukamp-logo.png";
 
 const socials = [
-  { href: "https://www.facebook.com/dukampsaudeanimal/", label: "Facebook", Icon: FacebookBrand },
+  { href: "https://www.facebook.com/AgromonteRioPreto21", label: "Facebook", Icon: FacebookBrand },
   { href: "https://www.instagram.com/dukampsaudeanimal/", label: "Instagram", Icon: InstagramBrand },
   { href: "https://www.youtube.com/c/DUKAMP?reload=9", label: "YouTube", Icon: YoutubeBrand },
-  { href: "https://www.tiktok.com/@dukamp", label: "TikTok", Icon: TikTokBrand },
+  { href: "https://www.tiktok.com/@dukampsaudeanimaloficial", label: "TikTok", Icon: TikTokBrand },
 ];
 
 const WHATSAPP_URL = "https://wa.me/551732753106?text=" + encodeURIComponent("Olá, gostaria de mais informações.");
