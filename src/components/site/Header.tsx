@@ -21,17 +21,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FacebookBrand, InstagramBrand, YoutubeBrand, TikTokBrand, WhatsappBrand } from "./BrandIcons";
+import { FacebookBrand, InstagramBrand, YoutubeBrand, TikTokBrand } from "./BrandIcons";
 import fixedLogo from "@/assets/dukamp-logo.png";
 
 const socials = [
-  { href: "https://www.facebook.com/dukampsaudeanimal/", label: "Facebook", Icon: FacebookBrand },
+  { href: "https://www.facebook.com/AgromonteRioPreto21", label: "Facebook", Icon: FacebookBrand },
   { href: "https://www.instagram.com/dukampsaudeanimal/", label: "Instagram", Icon: InstagramBrand },
   { href: "https://www.youtube.com/c/DUKAMP?reload=9", label: "YouTube", Icon: YoutubeBrand },
-  { href: "https://www.tiktok.com/@dukamp", label: "TikTok", Icon: TikTokBrand },
+  { href: "https://www.tiktok.com/@dukampsaudeanimaloficial", label: "TikTok", Icon: TikTokBrand },
 ];
 
-const WHATSAPP_URL = "https://wa.me/551732753106?text=" + encodeURIComponent("Olá, gostaria de mais informações.");
+
 
 export function Header() {
   const { count, items, total, remove, setQty } = useCart();
@@ -46,7 +46,7 @@ export function Header() {
     if (q.trim()) navigate({ to: "/produtos", search: { q: q.trim() } as any });
   }
 
-  const wa = WHATSAPP_URL;
+
 
   return (
     <header className="border-b bg-card sticky top-0 z-40">
@@ -210,15 +210,6 @@ export function Header() {
                   <Icon className="h-5 w-5" />
                 </a>
               ))}
-              <a
-                href={wa}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="WhatsApp"
-                className="h-8 w-8 grid place-items-center rounded hover:bg-accent"
-              >
-                <WhatsappBrand className="h-5 w-5" />
-              </a>
             </div>
           </div>
         </div>
