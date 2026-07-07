@@ -65,7 +65,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
       >
         <span className="sr-only">Ver detalhes de {p.name}</span>
       </Link>
-      <div className="aspect-square bg-white overflow-hidden">
+      <div className="aspect-[5/4] bg-white overflow-hidden">
         <img src={image} alt={p.name} loading="lazy" decoding="async" className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform" />
       </div>
       <div className="p-3 flex-1 flex flex-col">
@@ -73,7 +73,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
         <div className="font-medium text-sm line-clamp-2 mt-1 min-h-[2.5rem] group-hover:text-primary">
           {p.name}
         </div>
-        <div className="mt-3 space-y-0.5">
+        <div className="mt-2 space-y-0.5">
           {tierLabel && <div className="text-[10px] uppercase tracking-wider text-primary font-semibold">Preço {tierLabel}</div>}
           <div className="text-xl font-bold text-foreground">{formatBRL(displayPrice)}</div>
           {displayPix != null && (
@@ -88,7 +88,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
         <div className="mt-auto pt-3 space-y-2">
           <Button
             size="sm"
-            className="relative z-20 w-full"
+            className="relative z-20 w-full h-10 text-base font-semibold"
             disabled={p.stock <= 0}
             onClick={(e) => {
               stopNav(e);
@@ -96,16 +96,18 @@ export function ProductCard({ p }: { p: ProductLite }) {
               toast.success("Adicionado ao carrinho");
             }}
           >
-            <ShoppingCart className="h-4 w-4 mr-1" /> {p.stock > 0 ? "Comprar" : "Indisponível"}
+            <ShoppingCart className="h-4 w-4 mr-1.5" /> {p.stock > 0 ? "Comprar" : "Indisponível"}
           </Button>
           <a
             href={wa}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="relative z-20 w-full inline-flex items-center justify-center gap-1 rounded-md bg-[#25D366] hover:bg-[#1ebe57] text-white text-sm font-medium h-9 px-3 transition-colors"
+            aria-label="Comprar pelo WhatsApp"
+            className="relative z-20 w-full inline-flex items-center justify-center gap-2 rounded-md bg-[#25D366] hover:bg-[#1ebe57] text-white text-sm font-semibold h-10 px-3 shadow-sm hover:shadow-md ring-1 ring-black/5 transition-all"
           >
-            <WhatsAppIcon className="h-4 w-4" /> Comprar pelo WhatsApp
+            <WhatsAppIcon className="h-4 w-4 shrink-0" />
+            <span>WhatsApp</span>
           </a>
         </div>
       </div>
