@@ -14,12 +14,12 @@ import {
 } from "@/components/ui/table";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { ImageUpload, ImageListUpload } from "./ImageUpload";
+import { ImageUpload, ImageListUpload, MediaListUpload } from "./ImageUpload";
 
 export type FieldDef = {
   name: string;
   label: string;
-  type?: "text" | "textarea" | "number" | "boolean" | "select" | "image" | "imageList";
+  type?: "text" | "textarea" | "number" | "boolean" | "select" | "image" | "imageList" | "mediaList";
   options?: { value: string; label: string }[];
   required?: boolean;
   defaultValue?: any;
