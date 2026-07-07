@@ -39,6 +39,7 @@ const NAV: NavEntry[] = [
       { to: "/admin/vendas/painel", label: "Painel", icon: BarChart3 },
     ],
   },
+  { to: "/admin/equipe-vendas", label: "Equipe de Vendas", icon: UserSquare2 },
   { to: "/admin/banners", label: "Banners", icon: ImageIcon },
   { to: "/admin/anuncios", label: "Anúncios", icon: Megaphone },
   { to: "/admin/atendimentos", label: "Atendimentos", icon: MessageSquare },
