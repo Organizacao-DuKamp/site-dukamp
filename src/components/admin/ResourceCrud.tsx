@@ -14,12 +14,12 @@ import {
 } from "@/components/ui/table";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { ImageUpload, ImageListUpload } from "./ImageUpload";
+import { ImageUpload, ImageListUpload, MediaListUpload } from "./ImageUpload";
 
 export type FieldDef = {
   name: string;
   label: string;
-  type?: "text" | "textarea" | "number" | "boolean" | "select" | "image" | "imageList";
+  type?: "text" | "textarea" | "number" | "boolean" | "select" | "image" | "imageList" | "mediaList";
   options?: { value: string; label: string }[];
   required?: boolean;
   defaultValue?: any;
@@ -227,7 +227,7 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
   const [values, setValues] = useState<any>(() => {
     const v: any = {};
     fields.forEach((f) => {
-      if (f.type === "imageList") {
+      if (f.type === "imageList" || f.type === "mediaList") {
         v[f.name] = Array.isArray(initial?.[f.name]) ? initial[f.name] : (f.defaultValue ?? []);
       } else {
         v[f.name] = initial?.[f.name] ?? f.defaultValue ?? (f.type === "boolean" ? false : f.type === "number" ? 0 : "");
@@ -246,7 +246,7 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
     fields.forEach((f) => {
       let v = values[f.name];
       if (f.type === "number") v = v === "" || v == null ? null : Number(v);
-      if (f.type === "imageList") { out[f.name] = Array.isArray(v) ? v : []; return; }
+      if (f.type === "imageList" || f.type === "mediaList") { out[f.name] = Array.isArray(v) ? v : []; return; }
       if (f.type === "select" && v === "") v = null;
       if (v === "") v = null;
       out[f.name] = v;
@@ -258,7 +258,7 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
     <form onSubmit={submit} className="space-y-3">
       <div className="grid sm:grid-cols-2 gap-3">
         {fields.map((f) => (
-          <div key={f.name} className={f.type === "textarea" || f.type === "image" || f.type === "imageList" ? "sm:col-span-2" : ""}>
+          <div key={f.name} className={f.type === "textarea" || f.type === "image" || f.type === "imageList" || f.type === "mediaList" ? "sm:col-span-2" : ""}>
             <Label>{f.label}</Label>
             {f.type === "textarea" ? (
               <Textarea value={values[f.name] ?? ""} onChange={(e) => handleChange(f.name, e.target.value)} rows={4} />
@@ -277,6 +277,8 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
               <ImageUpload value={values[f.name] ?? ""} onChange={(v) => handleChange(f.name, v)} />
             ) : f.type === "imageList" ? (
               <ImageListUpload value={Array.isArray(values[f.name]) ? values[f.name] : []} onChange={(v) => handleChange(f.name, v)} />
+            ) : f.type === "mediaList" ? (
+              <MediaListUpload value={Array.isArray(values[f.name]) ? values[f.name] : []} onChange={(v) => handleChange(f.name, v)} />
             ) : (
               <Input
                 type={f.type === "number" ? "number" : "text"}
