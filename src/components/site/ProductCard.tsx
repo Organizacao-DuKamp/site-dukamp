@@ -36,7 +36,8 @@ export function ProductCard({ p }: { p: ProductLite }) {
   const { add } = useCart();
   const { data: settings } = useSiteSettings();
   const { accountType } = useAuth();
-  const image = p.images?.[0] || "/placeholder.svg";
+  const rawImage = p.images?.[0] || "/placeholder.svg";
+  const image = optimizedImage(rawImage, { width: 400, quality: 75 });
   const installments = Math.max(1, Number(p.installments ?? 1));
   const displayPrice = priceForAccount(p, accountType);
   const displayPix = pixPriceForAccount(p, accountType);
