@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { useSellerBySlug } from "@/lib/sellers";
+import { useSellerBySlug, useActiveSellers } from "@/lib/sellers";
 import { SellerProfileBanner } from "@/components/sellers/SellerProfileBanner";
+import { SellerCard } from "@/components/sellers/SellerCard";
 import { Loader2, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/equipe-de-vendas/$slug")({
@@ -18,6 +19,9 @@ export const Route = createFileRoute("/equipe-de-vendas/$slug")({
 function SellerDetailPage() {
   const { slug } = Route.useParams();
   const { data: seller, isLoading } = useSellerBySlug(slug);
+  const { data: allSellers } = useActiveSellers();
+
+  const others = (allSellers ?? []).filter((s) => s.slug !== slug);
 
   return (
     <SiteLayout>
@@ -35,7 +39,35 @@ function SellerDetailPage() {
       ) : !seller ? (
         <div className="text-center py-16 text-muted-foreground">Vendedor não encontrado.</div>
       ) : (
-        <SellerProfileBanner seller={seller} />
+        <>
+          <SellerProfileBanner seller={seller} />
+
+          {others.length > 0 && (
+            <section className="mt-12">
+              <div className="flex items-end justify-between gap-4 mb-5">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-foreground">
+                    Outros vendedores
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Escolha outro representante Dukamp
+                  </p>
+                </div>
+                <Link
+                  to="/equipe-de-vendas"
+                  className="text-sm font-semibold text-[#d81f26] hover:underline shrink-0"
+                >
+                  Ver todos →
+                </Link>
+              </div>
+              <div className="grid gap-5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+                {others.map((s) => (
+                  <SellerCard key={s.id} seller={s} />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
       )}
     </SiteLayout>
   );
