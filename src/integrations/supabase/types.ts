@@ -586,6 +586,7 @@ export type Database = {
           active: boolean
           banner_url: string | null
           created_at: string
+          cutout_url: string | null
           display_order: number
           id: string
           name: string
@@ -601,6 +602,7 @@ export type Database = {
           active?: boolean
           banner_url?: string | null
           created_at?: string
+          cutout_url?: string | null
           display_order?: number
           id?: string
           name: string
@@ -616,6 +618,7 @@ export type Database = {
           active?: boolean
           banner_url?: string | null
           created_at?: string
+          cutout_url?: string | null
           display_order?: number
           id?: string
           name?: string

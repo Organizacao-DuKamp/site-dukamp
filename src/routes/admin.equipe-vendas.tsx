@@ -50,6 +50,7 @@ function AdminSellersPage() {
         phone: values.phone || null,
         whatsapp: values.whatsapp || null,
         photo_url: values.photo_url || null,
+        cutout_url: (values as any).cutout_url || null,
         banner_url: values.banner_url || null,
         active: values.active ?? true,
         display_order: values.display_order ?? 0,
@@ -269,6 +270,7 @@ function SellerForm({
     phone: initial?.phone ?? "",
     whatsapp: initial?.whatsapp ?? "",
     photo_url: initial?.photo_url ?? "",
+    cutout_url: initial?.cutout_url ?? "",
     banner_url: initial?.banner_url ?? "",
     active: initial?.active ?? true,
     display_order: initial?.display_order ?? 0,
@@ -305,12 +307,26 @@ function SellerForm({
           <Input value={values.whatsapp ?? ""} onChange={(e) => set("whatsapp", e.target.value)} placeholder="16994118921" />
         </div>
         <div className="sm:col-span-2">
-          <Label>Foto (recomendado PNG com fundo transparente ou já recortada)</Label>
+          <Label>Foto COM fundo (usada nos cards e listagem)</Label>
           <ImageUpload
             value={values.photo_url ?? ""}
             onChange={(v) => set("photo_url", v)}
             folder="sellers"
           />
+          <p className="text-xs text-muted-foreground mt-1">
+            Foto normal do vendedor, com fundo. Ex: retrato profissional.
+          </p>
+        </div>
+        <div className="sm:col-span-2">
+          <Label>Foto SEM fundo (usada no banner do perfil)</Label>
+          <ImageUpload
+            value={(values as any).cutout_url ?? ""}
+            onChange={(v) => set("cutout_url" as any, v)}
+            folder="sellers/cutouts"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            PNG transparente do vendedor recortado. Aparece sobreposto na plantação, em corpo inteiro.
+          </p>
         </div>
         <div className="sm:col-span-2">
           <Label>Banner personalizado (opcional)</Label>
@@ -320,7 +336,7 @@ function SellerForm({
             folder="sellers/banners"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Se definido, será usado como fundo do banner. Caso contrário, o layout padrão vermelho/amarelo Dukamp é aplicado.
+            Substitui a imagem padrão de plantação como fundo do banner. Deixe vazio para usar a plantação.
           </p>
         </div>
         <div>

@@ -10,6 +10,7 @@ export type Seller = {
   phone: string | null;
   whatsapp: string | null;
   photo_url: string | null;
+  cutout_url: string | null;
   banner_url: string | null;
   active: boolean;
   display_order: number;
