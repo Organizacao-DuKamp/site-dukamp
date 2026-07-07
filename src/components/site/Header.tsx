@@ -31,7 +31,7 @@ const socials = [
   { href: "https://www.tiktok.com/@dukampsaudeanimaloficial", label: "TikTok", Icon: TikTokBrand },
 ];
 
-const WHATSAPP_URL = "https://wa.me/551732753106?text=" + encodeURIComponent("Olá, gostaria de mais informações.");
+
 
 export function Header() {
   const { count, items, total, remove, setQty } = useCart();
