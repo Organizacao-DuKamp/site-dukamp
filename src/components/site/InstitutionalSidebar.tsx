@@ -39,7 +39,7 @@ export function InstitutionalSidebar() {
           <div className="rounded-lg border bg-card overflow-hidden hover:shadow-md transition-shadow">
             {ad.image_url && (
               <div className="aspect-[4/3] bg-muted overflow-hidden">
-                <img src={ad.image_url} alt={ad.title} className="w-full h-full object-cover" />
+                <img src={ad.image_url} alt={ad.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
             )}
             <div className="p-3">

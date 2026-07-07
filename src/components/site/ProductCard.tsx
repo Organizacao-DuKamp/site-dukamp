@@ -4,6 +4,7 @@ import { ShoppingCart } from "lucide-react";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useSiteSettings, whatsappLink } from "@/lib/site-settings";
 import { useAuth, priceForAccount, pixPriceForAccount } from "@/lib/auth";
+import { optimizedImage } from "@/lib/image-url";
 import { toast } from "sonner";
 
 export type ProductLite = {
@@ -35,7 +36,8 @@ export function ProductCard({ p }: { p: ProductLite }) {
   const { add } = useCart();
   const { data: settings } = useSiteSettings();
   const { accountType } = useAuth();
-  const image = p.images?.[0] || "/placeholder.svg";
+  const rawImage = p.images?.[0] || "/placeholder.svg";
+  const image = optimizedImage(rawImage, { width: 400, quality: 75 });
   const installments = Math.max(1, Number(p.installments ?? 1));
   const displayPrice = priceForAccount(p, accountType);
   const displayPix = pixPriceForAccount(p, accountType);
@@ -64,7 +66,7 @@ export function ProductCard({ p }: { p: ProductLite }) {
         <span className="sr-only">Ver detalhes de {p.name}</span>
       </Link>
       <div className="aspect-square bg-white overflow-hidden">
-        <img src={image} alt={p.name} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform" />
+        <img src={image} alt={p.name} loading="lazy" decoding="async" className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform" />
       </div>
       <div className="p-3 flex-1 flex flex-col">
         {p.brand && <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.brand}</div>}

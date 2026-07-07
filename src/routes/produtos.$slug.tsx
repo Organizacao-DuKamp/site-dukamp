@@ -82,7 +82,7 @@ function Page() {
                     activeImg === i ? "ring-2 ring-primary" : "hover:border-primary/60",
                   )}
                 >
-                  <img src={src} alt={`thumb ${i + 1}`} className="w-full h-full object-contain p-1" />
+                  <img src={src} alt={`thumb ${i + 1}`} loading="lazy" decoding="async" className="w-full h-full object-contain p-1" />
                 </button>
               ))}
             </div>
