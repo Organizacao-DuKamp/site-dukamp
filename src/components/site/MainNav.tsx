@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { InstitutionalSidebar } from "./InstitutionalSidebar";
+import { NavbarQuoteTicker } from "./NavbarQuoteTicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavItems, type NavItem } from "@/lib/navbar-settings";
 import { useAuth } from "@/lib/auth";
@@ -99,9 +100,14 @@ export function MainNav() {
     <nav className="bg-[#0f4d2a] text-white border-b border-black/10">
       <div className="container mx-auto px-2">
         {/* Desktop */}
-        <ul className="hidden lg:flex items-center gap-1 whitespace-nowrap text-sm font-medium">
-          {items.map((it) => <DesktopItem key={it.key} item={it} />)}
-        </ul>
+        <div className="hidden lg:flex items-center justify-between gap-4">
+          <ul className="flex items-center gap-1 whitespace-nowrap text-sm font-medium">
+            {items.map((it) => <DesktopItem key={it.key} item={it} />)}
+          </ul>
+          <div className="shrink-0">
+            <NavbarQuoteTicker />
+          </div>
+        </div>
 
         {/* Mobile */}
         <div className="lg:hidden flex items-center justify-between py-2">
