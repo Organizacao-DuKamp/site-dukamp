@@ -307,36 +307,36 @@ function SellerForm({
           <Input value={values.whatsapp ?? ""} onChange={(e) => set("whatsapp", e.target.value)} placeholder="16994118921" />
         </div>
         <div className="sm:col-span-2">
-          <Label>Foto COM fundo (usada nos cards e listagem)</Label>
+          <Label>Foto do vendedor</Label>
           <ImageUpload
             value={values.photo_url ?? ""}
             onChange={(v) => set("photo_url", v)}
             folder="sellers"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Foto normal do vendedor, com fundo. Ex: retrato profissional.
+            Aparece dentro da moldura vermelha/amarela no banner. Ideal: retrato horizontal (4:3) com bom enquadramento do rosto.
           </p>
         </div>
         <div className="sm:col-span-2">
-          <Label>Foto SEM fundo (usada no banner do perfil)</Label>
+          <Label>Foto alternativa sem fundo (opcional)</Label>
           <ImageUpload
             value={(values as any).cutout_url ?? ""}
             onChange={(v) => set("cutout_url" as any, v)}
             folder="sellers/cutouts"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            PNG transparente do vendedor recortado. Aparece sobreposto na plantação, em corpo inteiro.
+            PNG transparente — usada como fallback caso a foto principal não esteja definida.
           </p>
         </div>
         <div className="sm:col-span-2">
-          <Label>Banner personalizado (opcional)</Label>
+          <Label>Banner de fundo (opcional)</Label>
           <ImageUpload
             value={values.banner_url ?? ""}
             onChange={(v) => set("banner_url", v)}
             folder="sellers/banners"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Substitui a imagem padrão de plantação como fundo do banner. Deixe vazio para usar a plantação.
+            Substitui a imagem padrão de pasto (usada em cinza como marca d'água atrás do texto).
           </p>
         </div>
         <div>
