@@ -45,13 +45,28 @@ function Home() {
       return data ?? [];
     },
   });
+  const catIds = (categories.data ?? []).map((c) => c.id).sort().join(",");
   const allProducts = useQuery({
-    queryKey: ["products", "all-by-cat"],
+    enabled: !!categories.data && categories.data.length > 0,
+    queryKey: ["products", "by-cat", catIds],
     queryFn: async () => {
-      const { data } = await supabase.from("products").select("*").eq("active", true).gt("stock", 0).limit(100);
-      return data ?? [];
+      const ids = (categories.data ?? []).map((c) => c.id);
+      const results = await Promise.all(
+        ids.map((id) =>
+          supabase
+            .from("products")
+            .select("*")
+            .eq("active", true)
+            .gt("stock", 0)
+            .eq("catalog_id", id)
+            .order("created_at", { ascending: false })
+            .limit(8),
+        ),
+      );
+      return results.flatMap((r) => r.data ?? []);
     },
   });
+
 
   return (
     <SiteLayout>
