@@ -50,6 +50,7 @@ function AdminSellersPage() {
         phone: values.phone || null,
         whatsapp: values.whatsapp || null,
         photo_url: values.photo_url || null,
+        cutout_url: (values as any).cutout_url || null,
         banner_url: values.banner_url || null,
         active: values.active ?? true,
         display_order: values.display_order ?? 0,
