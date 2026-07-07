@@ -277,6 +277,8 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
               <ImageUpload value={values[f.name] ?? ""} onChange={(v) => handleChange(f.name, v)} />
             ) : f.type === "imageList" ? (
               <ImageListUpload value={Array.isArray(values[f.name]) ? values[f.name] : []} onChange={(v) => handleChange(f.name, v)} />
+            ) : f.type === "mediaList" ? (
+              <MediaListUpload value={Array.isArray(values[f.name]) ? values[f.name] : []} onChange={(v) => handleChange(f.name, v)} />
             ) : (
               <Input
                 type={f.type === "number" ? "number" : "text"}
