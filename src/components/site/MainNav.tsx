@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { InstitutionalSidebar } from "./InstitutionalSidebar";
+import { NavbarQuoteTicker } from "./NavbarQuoteTicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavItems, type NavItem } from "@/lib/navbar-settings";
 import { useAuth } from "@/lib/auth";
