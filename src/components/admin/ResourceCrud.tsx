@@ -246,7 +246,7 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
     fields.forEach((f) => {
       let v = values[f.name];
       if (f.type === "number") v = v === "" || v == null ? null : Number(v);
-      if (f.type === "imageList") { out[f.name] = Array.isArray(v) ? v : []; return; }
+      if (f.type === "imageList" || f.type === "mediaList") { out[f.name] = Array.isArray(v) ? v : []; return; }
       if (f.type === "select" && v === "") v = null;
       if (v === "") v = null;
       out[f.name] = v;
