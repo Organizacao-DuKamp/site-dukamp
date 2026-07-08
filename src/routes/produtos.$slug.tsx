@@ -11,6 +11,7 @@ import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { RichContent } from "@/components/site/RichContent";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 
 
 export const Route = createFileRoute("/produtos/$slug")({
@@ -57,7 +58,19 @@ function Page() {
                 {images.map((src, i) => (
                   <CarouselItem key={i}>
                     <div className="aspect-square rounded-lg bg-white border overflow-hidden">
-                      <img src={src} alt={`${p.name} ${i + 1}`} className="w-full h-full object-contain p-4" />
+                      <OptimizedImage
+                        src={src}
+                        alt={`${p.name} ${i + 1}`}
+                        width={800}
+                        height={800}
+                        quality={80}
+                        srcsetWidths={[400, 600, 800, 1000]}
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        priority={i === 0}
+                        fit="contain"
+                        wrapperClassName="w-full h-full bg-white"
+                        className="p-4"
+                      />
                     </div>
                   </CarouselItem>
                 ))}
@@ -67,7 +80,19 @@ function Page() {
             </Carousel>
           ) : (
             <div className="aspect-square rounded-lg bg-white border overflow-hidden">
-              <img src={images[0]} alt={p.name} className="w-full h-full object-contain p-4" />
+              <OptimizedImage
+                src={images[0]}
+                alt={p.name}
+                width={800}
+                height={800}
+                quality={80}
+                srcsetWidths={[400, 600, 800, 1000]}
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+                fit="contain"
+                wrapperClassName="w-full h-full bg-white"
+                className="p-4"
+              />
             </div>
           )}
           {images.length > 1 && (
@@ -82,7 +107,17 @@ function Page() {
                     activeImg === i ? "ring-2 ring-primary" : "hover:border-primary/60",
                   )}
                 >
-                  <img src={src} alt={`thumb ${i + 1}`} loading="lazy" decoding="async" className="w-full h-full object-contain p-1" />
+                  <OptimizedImage
+                    src={src}
+                    alt={`thumb ${i + 1}`}
+                    width={120}
+                    height={120}
+                    quality={65}
+                    sizes="120px"
+                    fit="contain"
+                    wrapperClassName="w-full h-full bg-white"
+                    className="p-1"
+                  />
                 </button>
               ))}
             </div>

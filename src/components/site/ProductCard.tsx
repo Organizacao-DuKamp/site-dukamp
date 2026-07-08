@@ -4,7 +4,8 @@ import { ShoppingCart } from "lucide-react";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useSiteSettings, whatsappLink } from "@/lib/site-settings";
 import { useAuth, priceForAccount, pixPriceForAccount } from "@/lib/auth";
-import { optimizedImage, optimizedSrcset } from "@/lib/image-url";
+import { optimizedImage } from "@/lib/image-url";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { toast } from "sonner";
 
 export type ProductLite = {
@@ -38,7 +39,6 @@ export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: bool
   const { accountType } = useAuth();
   const rawImage = p.images?.[0] || "/placeholder.svg";
   const image = optimizedImage(rawImage, { width: 320, quality: 65 });
-  const srcSet = optimizedSrcset(rawImage, [160, 240, 320, 480], 65);
 
   const installments = Math.max(1, Number(p.installments ?? 1));
   const displayPrice = priceForAccount(p, accountType);
@@ -68,17 +68,18 @@ export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: bool
         <span className="sr-only">Ver detalhes de {p.name}</span>
       </Link>
       <div className="aspect-[5/4] bg-white overflow-hidden">
-        <img
-          src={image}
-          srcSet={srcSet}
-          sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, (max-width: 1280px) 22vw, 18vw"
+        <OptimizedImage
+          src={rawImage}
           alt={p.name}
           width={320}
           height={256}
-          loading={eager ? "eager" : "lazy"}
-          fetchPriority={eager ? "high" : "auto"}
-          decoding="async"
-          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform"
+          quality={65}
+          srcsetWidths={[160, 240, 320, 480]}
+          sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, (max-width: 1280px) 22vw, 18vw"
+          priority={eager}
+          fit="contain"
+          wrapperClassName="w-full h-full bg-white"
+          className="p-2 group-hover:scale-105 transition-transform"
         />
       </div>
 
