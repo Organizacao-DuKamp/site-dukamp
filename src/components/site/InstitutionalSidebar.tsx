@@ -49,7 +49,7 @@ function AdaptiveMedia({ url }: { url: string }) {
         />
       ) : (
         <img
-          src={url}
+          src={optimizedImage(url, { width: 400, quality: 70 })}
           alt=""
           loading="lazy"
           decoding="async"
@@ -59,6 +59,7 @@ function AdaptiveMedia({ url }: { url: string }) {
             if (im.naturalWidth && im.naturalHeight) setRatio(im.naturalWidth / im.naturalHeight);
           }}
         />
+
       )}
     </div>
   );
