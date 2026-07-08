@@ -42,16 +42,16 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
             aria-hidden
           />
 
-          {/* Curva amarela decorativa - canto inferior esquerdo */}
+          {/* Curvas decorativas ATRÁS da pessoa (canto superior esq. — dão contexto) */}
           <div
-            className="pointer-events-none absolute -left-16 -bottom-16 h-56 w-56 rounded-full bg-[#f6c515]/90 md:h-72 md:w-72"
+            className="pointer-events-none absolute -left-24 -top-20 h-52 w-52 rounded-full bg-[#f6c515]/80 md:h-64 md:w-64"
             aria-hidden
           />
-          {/* Curva vermelha decorativa - sobre a amarela */}
           <div
-            className="pointer-events-none absolute -left-10 -bottom-24 h-48 w-48 rounded-full bg-[#d81f26] md:h-64 md:w-64"
+            className="pointer-events-none absolute -left-16 -top-28 h-40 w-40 rounded-full bg-[#d81f26]/90 md:h-52 md:w-52"
             aria-hidden
           />
+
 
           {/* Pessoa recortada (sem fundo) por cima de tudo */}
           <div className="relative z-10 h-full flex items-end justify-center pt-6 md:pt-8">
@@ -102,7 +102,25 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
               </div>
             )}
           </div>
+
+          {/* ===== FAIXAS CURVAS NA FRENTE DA PESSOA (efeito de integração) ===== */}
+          {/* Faixa AMARELA (mais externa/baixa) — cobre parte inferior/lateral da foto */}
+          <div
+            className="pointer-events-none absolute z-20 -left-24 -bottom-28 h-64 w-[130%] rounded-[50%] bg-[#f6c515] shadow-[0_-8px_20px_rgba(0,0,0,0.15)] md:h-80 md:-bottom-36"
+            aria-hidden
+          />
+          {/* Faixa VERMELHA (por cima da amarela, mordendo mais a pessoa) */}
+          <div
+            className="pointer-events-none absolute z-30 -left-20 -bottom-16 h-52 w-[125%] rounded-[50%] bg-[#d81f26] shadow-[0_-10px_24px_rgba(0,0,0,0.2)] md:h-64 md:-bottom-20"
+            aria-hidden
+          />
+          {/* Traço amarelo fino cortando a base — reforça a curva da referência */}
+          <div
+            className="pointer-events-none absolute z-40 -left-16 bottom-2 h-3 w-[120%] rotate-[-6deg] rounded-full bg-[#f6c515] md:h-4 md:bottom-6"
+            aria-hidden
+          />
         </div>
+
 
         {/* ---------- LADO DIREITO: informações ---------- */}
         <div className="relative bg-white p-6 sm:p-8 md:p-10 flex flex-col justify-center">
