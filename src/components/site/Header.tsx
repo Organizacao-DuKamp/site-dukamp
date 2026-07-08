@@ -56,9 +56,14 @@ export function Header() {
             <img
               src={fixedLogo}
               alt="Dukamp Saúde Animal"
+              width={168}
+              height={56}
+              fetchPriority="high"
+              decoding="async"
               className="h-12 sm:h-14 w-auto object-contain select-none"
               draggable={false}
             />
+
           </Link>
 
           <form onSubmit={onSearch} className="flex-1 max-w-xl hidden md:flex">
