@@ -62,12 +62,12 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
               <Star className="h-3.5 w-3.5 fill-white" /> DESTAQUE
             </span>
 
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black leading-tight text-foreground">
+            <h1 className="text-lg sm:text-2xl md:text-4xl font-black leading-tight text-foreground break-words">
               {seller.name}
             </h1>
 
             {seller.role && (
-              <p className="text-base sm:text-lg font-semibold text-[#d81f26]">
+              <p className="text-sm sm:text-base md:text-lg font-semibold text-[#d81f26]">
                 {seller.role}
               </p>
             )}
