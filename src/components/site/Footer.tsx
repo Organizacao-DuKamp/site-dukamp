@@ -3,7 +3,7 @@ import { useSiteSettings } from "@/lib/site-settings";
 import { FOOTER_PAGES } from "@/lib/footer-pages";
 import { useAuth } from "@/lib/auth";
 import { useSupport } from "@/lib/support";
-import fixedLogo from "@/assets/dukamp-logo.png";
+import fixedLogo from "@/assets/dukamp-logo.webp";
 
 export function Footer() {
   const { data: settings } = useSiteSettings();
