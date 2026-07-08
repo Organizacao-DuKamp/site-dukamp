@@ -72,15 +72,15 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
               </p>
             )}
 
-            <div className="space-y-1.5 pt-1 text-sm sm:text-base text-foreground/90">
+            <div className="space-y-1.5 pt-1 text-xs sm:text-sm md:text-base text-foreground/90">
               {seller.region && (
-                <p className="flex items-center justify-center gap-2 md:justify-start">
+                <p className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 shrink-0 text-[#d81f26]" />
-                  <span>{seller.region}</span>
+                  <span className="break-words">{seller.region}</span>
                 </p>
               )}
               {phoneDisplay && (
-                <p className="flex items-center justify-center gap-2 md:justify-start">
+                <p className="flex items-center gap-2">
                   <Phone className="h-4 w-4 shrink-0 text-[#d81f26]" />
                   <a
                     href={telHref(seller.phone ?? seller.whatsapp)}
