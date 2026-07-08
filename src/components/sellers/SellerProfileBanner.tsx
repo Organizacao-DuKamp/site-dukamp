@@ -15,9 +15,9 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-border bg-white shadow-xl">
-      <div className="grid md:grid-cols-2 md:min-h-[360px]">
+      <div className="grid grid-cols-2 min-h-[220px] md:min-h-[360px]">
         {/* ============ ESQUERDA — arte pronta enviada pelo admin ============ */}
-        <div className="relative min-h-[240px] md:min-h-full bg-muted">
+        <div className="relative min-h-full bg-muted">
           {hasHero ? (
             <img
               src={optimizedImage(heroImage, { width: 1200, quality: 90 })}
