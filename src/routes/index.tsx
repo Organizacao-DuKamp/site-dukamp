@@ -92,36 +92,73 @@ function Home() {
         </div>
       </section>
 
-      {categories.data?.map((cat, catIdx) => {
-        const prods = (allProducts.data ?? []).filter((p) => p.catalog_id === cat.id).slice(0, 8);
-        if (prods.length === 0) return null;
-        const content = (
-          <section key={cat.id} className="mt-10">
+      {(() => {
+        type CatSec = { cat: { id: string; name: string; slug: string }; prods: any[] };
+        const sections: CatSec[] = (categories.data ?? [])
+          .map((cat) => ({
+            cat,
+            prods: (allProducts.data ?? []).filter((p) => p.catalog_id === cat.id).slice(0, 8),
+          }))
+          .filter((s) => s.prods.length > 0);
+
+        // Pack consecutive "small" categories (<=2 items) into side-by-side pairs
+        const rows: CatSec[][] = [];
+        for (let i = 0; i < sections.length; i++) {
+          const cur = sections[i];
+          const nxt = sections[i + 1];
+          if (cur.prods.length <= 2 && nxt && nxt.prods.length <= 2) {
+            rows.push([cur, nxt]);
+            i++;
+          } else {
+            rows.push([cur]);
+          }
+        }
+
+        const renderSection = (s: CatSec, paired: boolean) => (
+          <section className="h-full">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3">
-                {cat.name}
+                {s.cat.name}
               </h2>
               <Button asChild variant="ghost" size="sm">
-                <Link to="/produtos" search={{ categoria: cat.slug } as any}>
+                <Link to="/produtos" search={{ categoria: s.cat.slug } as any}>
                   Ver todos <ChevronRight className="h-4 w-4" />
                 </Link>
               </Button>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {prods.map((p) => (
+            <div
+              className={
+                paired
+                  ? "grid grid-cols-2 gap-3"
+                  : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
+              }
+            >
+              {s.prods.map((p) => (
                 <ProductCard key={p.id} p={p as any} />
               ))}
             </div>
           </section>
         );
-        // First category renders immediately; the rest mount as the user scrolls near them
-        if (catIdx === 0) return content;
-        return (
-          <LazyMount key={cat.id} minHeight={480}>
-            {content}
-          </LazyMount>
-        );
-      })}
+
+        return rows.map((row, rowIdx) => {
+          const key = row.map((s) => s.cat.id).join("+");
+          const content =
+            row.length === 2 ? (
+              <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-8 lg:divide-x lg:divide-border">
+                <div className="lg:pr-8">{renderSection(row[0], true)}</div>
+                <div className="lg:pl-8">{renderSection(row[1], true)}</div>
+              </div>
+            ) : (
+              <div className="mt-10">{renderSection(row[0], false)}</div>
+            );
+          if (rowIdx === 0) return <div key={key}>{content}</div>;
+          return (
+            <LazyMount key={key} minHeight={480}>
+              {content}
+            </LazyMount>
+          );
+        });
+      })()}
     </SiteLayout>
   );
 }
