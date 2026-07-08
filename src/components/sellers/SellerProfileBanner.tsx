@@ -56,12 +56,46 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
           {/* Pessoa recortada (sem fundo) por cima de tudo */}
           <div className="relative z-10 h-full flex items-end justify-center pt-6 md:pt-8">
             {cutout ? (
-              <img
-                src={optimizedImage(cutout, { width: 800, quality: 90 })}
-                alt={seller.name}
-                className="max-h-[260px] md:max-h-[340px] w-auto object-contain drop-shadow-[0_18px_18px_rgba(0,0,0,0.35)]"
-                decoding="async"
-              />
+              <div className="relative flex items-end justify-center">
+                {/* Halo suave atrás da pessoa — ajuda a integrar ao fundo */}
+                <div
+                  className="pointer-events-none absolute left-1/2 bottom-4 -translate-x-1/2 h-[70%] w-[85%] rounded-[50%] bg-white/25 blur-3xl"
+                  aria-hidden
+                />
+                {/* Sombra elíptica no chão — dá contato com o pasto */}
+                <div
+                  className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-1 h-6 w-[70%] rounded-[50%] bg-black/40 blur-xl"
+                  aria-hidden
+                />
+                <img
+                  src={optimizedImage(cutout, { width: 900, quality: 92 })}
+                  alt={seller.name}
+                  decoding="async"
+                  className="relative max-h-[280px] md:max-h-[360px] w-auto object-contain object-bottom"
+                  style={{
+                    // Suaviza bordas e derrete a base da pessoa no pasto
+                    WebkitMaskImage:
+                      "linear-gradient(to bottom, #000 0%, #000 88%, rgba(0,0,0,0.55) 96%, rgba(0,0,0,0) 100%)",
+                    maskImage:
+                      "linear-gradient(to bottom, #000 0%, #000 88%, rgba(0,0,0,0.55) 96%, rgba(0,0,0,0) 100%)",
+                    filter:
+                      "drop-shadow(0 22px 14px rgba(0,0,0,0.35)) drop-shadow(0 4px 2px rgba(0,0,0,0.15))",
+                  }}
+                />
+                {/* Camada quente sutil sobre a pessoa — casa a luz do campo */}
+                <div
+                  className="pointer-events-none absolute inset-0 mix-blend-soft-light"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(255,214,140,0.35) 0%, rgba(255,180,90,0.10) 60%, rgba(120,70,20,0.25) 100%)",
+                    WebkitMaskImage:
+                      "linear-gradient(to bottom, #000 0%, #000 88%, rgba(0,0,0,0) 100%)",
+                    maskImage:
+                      "linear-gradient(to bottom, #000 0%, #000 88%, rgba(0,0,0,0) 100%)",
+                  }}
+                  aria-hidden
+                />
+              </div>
             ) : (
               <div className="mb-6 grid h-40 w-40 place-items-center rounded-full bg-white/80 text-[#d81f26] shadow-lg md:h-56 md:w-56">
                 <UserRound className="h-24 w-24 md:h-32 md:w-32" strokeWidth={1.5} />
