@@ -107,20 +107,27 @@ function Home() {
           })
           .filter((s) => s.prods.length > 0);
 
-        // Greedy pack sections into rows of capacity 5 (matches xl grid).
+        // Bin-pack sections into rows summing to exactly 5 when possible
+        // (best-fit: pick the largest remaining section that fits the row).
+        const remaining = [...sections];
         const rows: CatSec[][] = [];
-        let cur: CatSec[] = [];
-        let used = 0;
-        for (const s of sections) {
-          if (used + s.n > 5) {
-            if (cur.length) rows.push(cur);
-            cur = [];
-            used = 0;
+        while (remaining.length) {
+          const row: CatSec[] = [];
+          let cap = 5;
+          while (cap > 0) {
+            let bestIdx = -1;
+            for (let j = 0; j < remaining.length; j++) {
+              if (remaining[j].n <= cap) {
+                if (bestIdx === -1 || remaining[j].n > remaining[bestIdx].n) bestIdx = j;
+              }
+            }
+            if (bestIdx === -1) break;
+            const picked = remaining.splice(bestIdx, 1)[0];
+            row.push(picked);
+            cap -= picked.n;
           }
-          cur.push(s);
-          used += s.n;
+          rows.push(row);
         }
-        if (cur.length) rows.push(cur);
 
         // Static class maps so Tailwind JIT picks them up.
         const spanCls: Record<CatSec["n"], string> = {
@@ -141,12 +148,11 @@ function Home() {
         return rows.map((row, rowIdx) => {
           const key = row.map((s) => s.cat.id).join("+");
           const content = (
-            <div className="mt-10 flex flex-col gap-6 xl:flex-row xl:gap-6">
+            <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-5 xl:gap-6">
               {row.map((s, i) => (
                 <section
                   key={s.cat.id}
-                  style={{ flexGrow: s.n, flexBasis: 0 }}
-                  className={`min-w-0 ${
+                  className={`min-w-0 ${spanCls[s.n]} ${
                     row.length > 1 && i > 0
                       ? "xl:border-l xl:border-border xl:pl-6"
                       : ""
