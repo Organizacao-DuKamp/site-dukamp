@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FacebookBrand, InstagramBrand, YoutubeBrand, TikTokBrand } from "./BrandIcons";
-import fixedLogo from "@/assets/dukamp-logo.png";
+import fixedLogo from "@/assets/dukamp-logo.webp";
 
 const socials = [
   { href: "https://www.facebook.com/AgromonteRioPreto21", label: "Facebook", Icon: FacebookBrand },
@@ -56,9 +56,14 @@ export function Header() {
             <img
               src={fixedLogo}
               alt="Dukamp Saúde Animal"
+              width={168}
+              height={56}
+              fetchPriority="high"
+              decoding="async"
               className="h-12 sm:h-14 w-auto object-contain select-none"
               draggable={false}
             />
+
           </Link>
 
           <form onSubmit={onSearch} className="flex-1 max-w-xl hidden md:flex">

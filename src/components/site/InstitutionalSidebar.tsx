@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { isVideoUrl } from "@/components/admin/ImageUpload";
+import { optimizedImage } from "@/lib/image-url";
+
 
 type Ad = {
   id: string;
@@ -47,7 +49,7 @@ function AdaptiveMedia({ url }: { url: string }) {
         />
       ) : (
         <img
-          src={url}
+          src={optimizedImage(url, { width: 400, quality: 70 })}
           alt=""
           loading="lazy"
           decoding="async"
@@ -57,6 +59,7 @@ function AdaptiveMedia({ url }: { url: string }) {
             if (im.naturalWidth && im.naturalHeight) setRatio(im.naturalWidth / im.naturalHeight);
           }}
         />
+
       )}
     </div>
   );
@@ -72,7 +75,7 @@ function AdCard({ ad }: { ad: Ad }) {
     items.forEach((url) => {
       if (!isVideoUrl(url)) {
         const im = new Image();
-        im.src = url;
+        im.src = optimizedImage(url, { width: 400, quality: 70 });
       }
     });
   }, [items]);
