@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import type { Seller } from "@/lib/sellers";
-import { optimizedImage } from "@/lib/image-url";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 import { MapPin } from "lucide-react";
 
 export function SellerCard({ seller }: { seller: Seller }) {
