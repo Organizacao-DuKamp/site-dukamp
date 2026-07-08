@@ -56,7 +56,7 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
             aria-hidden
           />
 
-          <div className="relative space-y-3 text-center md:text-left">
+          <div className="relative space-y-2 md:space-y-3 text-left">
 
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#d81f26] px-3 py-1 text-xs font-bold text-white shadow">
               <Star className="h-3.5 w-3.5 fill-white" /> DESTAQUE
