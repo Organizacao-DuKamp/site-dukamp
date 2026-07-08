@@ -23,6 +23,7 @@ function mediaList(ad: Ad): string[] {
 function AdaptiveMedia({ url }: { url: string }) {
   // aspect starts at 4/3 and adapts once we know the natural size
   const [ratio, setRatio] = useState<number>(4 / 3);
+  const [loaded, setLoaded] = useState(false);
   const video = isVideoUrl(url);
 
   // clamp so extremely tall/wide media stays elegant in the sidebar
@@ -30,7 +31,7 @@ function AdaptiveMedia({ url }: { url: string }) {
 
   return (
     <div
-      className="w-full bg-muted overflow-hidden"
+      className={`w-full overflow-hidden ${!loaded ? "bg-muted animate-pulse" : "bg-muted"}`}
       style={{ aspectRatio: `${clamp(ratio)}` }}
     >
       {video ? (
@@ -45,21 +46,24 @@ function AdaptiveMedia({ url }: { url: string }) {
           onLoadedMetadata={(e) => {
             const v = e.currentTarget;
             if (v.videoWidth && v.videoHeight) setRatio(v.videoWidth / v.videoHeight);
+            setLoaded(true);
           }}
         />
       ) : (
         <img
-          src={optimizedImage(url, { width: 400, quality: 70 })}
+          src={optimizedImage(url, { width: 400, quality: 65 })}
+          srcSet={optimizedSrcset(url, [240, 400, 600, 800], 65)}
+          sizes="(max-width: 1024px) 100vw, 320px"
           alt=""
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover"
+          className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
           onLoad={(e) => {
             const im = e.currentTarget;
             if (im.naturalWidth && im.naturalHeight) setRatio(im.naturalWidth / im.naturalHeight);
+            setLoaded(true);
           }}
         />
-
       )}
     </div>
   );
