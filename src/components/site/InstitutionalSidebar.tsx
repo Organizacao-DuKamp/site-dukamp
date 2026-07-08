@@ -75,7 +75,7 @@ function AdCard({ ad }: { ad: Ad }) {
     items.forEach((url) => {
       if (!isVideoUrl(url)) {
         const im = new Image();
-        im.src = url;
+        im.src = optimizedImage(url, { width: 400, quality: 70 });
       }
     });
   }, [items]);
