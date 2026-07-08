@@ -36,8 +36,28 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
         </div>
 
         {/* ============ DIREITA — informações do vendedor ============ */}
-        <div className="relative bg-white p-6 sm:p-8 md:p-10 flex flex-col justify-center">
-          <div className="space-y-3 text-center md:text-left">
+        <div className="relative overflow-hidden bg-white p-6 sm:p-8 md:p-10 flex flex-col justify-center">
+          {/* Faixas decorativas discretas — canto superior direito */}
+          <div
+            className="pointer-events-none absolute -right-16 -top-16 h-36 w-36 rounded-full bg-[#f6c515]/80 md:h-44 md:w-44"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute -right-8 -top-20 h-24 w-24 rounded-full bg-[#d81f26] md:h-32 md:w-32"
+            aria-hidden
+          />
+          {/* Traço amarelo fino inclinado — canto inferior direito */}
+          <div
+            className="pointer-events-none absolute -bottom-6 -right-10 h-2 w-40 rotate-[-14deg] rounded-full bg-[#f6c515] md:h-2.5 md:w-56"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute -bottom-3 -right-6 h-1.5 w-28 rotate-[-14deg] rounded-full bg-[#d81f26] md:h-2 md:w-40"
+            aria-hidden
+          />
+
+          <div className="relative space-y-3 text-center md:text-left">
+
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#d81f26] px-3 py-1 text-xs font-bold text-white shadow">
               <Star className="h-3.5 w-3.5 fill-white" /> DESTAQUE
             </span>
