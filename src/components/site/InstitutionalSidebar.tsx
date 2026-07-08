@@ -88,37 +88,48 @@ function AdCard({ ad }: { ad: Ad }) {
   }, [items.length]);
 
   const current = items[idx];
+  const [prev, setPrev] = useState<string | null>(null);
+  const [fading, setFading] = useState(false);
+  const lastUrl = useRef<string | null>(current ?? null);
+
+  useEffect(() => {
+    if (lastUrl.current && lastUrl.current !== current) {
+      setPrev(lastUrl.current);
+      setFading(false);
+      // next frame: trigger opacity transition
+      requestAnimationFrame(() => requestAnimationFrame(() => setFading(true)));
+      const t = window.setTimeout(() => setPrev(null), 800);
+      lastUrl.current = current;
+      return () => window.clearTimeout(t);
+    }
+    lastUrl.current = current;
+  }, [current]);
 
   const inner = (
     <div className="rounded-lg border bg-card overflow-hidden hover:shadow-md transition-shadow">
       {current && (
         <div className="relative">
           <AdaptiveMedia url={current} />
+          {prev && prev !== current && (
+            <div
+              className={`absolute inset-0 pointer-events-none transition-opacity duration-700 ease-in-out ${
+                fading ? "opacity-0" : "opacity-100"
+              }`}
+            >
+              <AdaptiveMedia url={prev} />
+            </div>
+          )}
           {items.length > 1 && (
-            <>
-              {items.map((url, i) =>
-                i === idx ? null : (
-                  <div
-                    key={url}
-                    className={`absolute inset-0 transition-opacity duration-700 ease-in-out pointer-events-none ${
-                      i === idx ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    <AdaptiveMedia url={url} />
-                  </div>
-                ),
-              )}
-              <div className="absolute bottom-1.5 left-0 right-0 flex justify-center gap-1">
-                {items.map((_, i) => (
-                  <span
-                    key={i}
-                    className={`h-1.5 rounded-full transition-all ${
-                      i === idx ? "w-4 bg-white" : "w-1.5 bg-white/60"
-                    }`}
-                  />
-                ))}
-              </div>
-            </>
+            <div className="absolute bottom-1.5 left-0 right-0 flex justify-center gap-1">
+              {items.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all ${
+                    i === idx ? "w-4 bg-white" : "w-1.5 bg-white/60"
+                  }`}
+                />
+              ))}
+            </div>
           )}
         </div>
       )}
