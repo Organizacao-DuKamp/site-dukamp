@@ -19,11 +19,17 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
         {/* ============ ESQUERDA — arte pronta enviada pelo admin ============ */}
         <div className="relative min-h-full bg-muted">
           {hasHero ? (
-            <img
-              src={optimizedImage(heroImage, { width: 1200, quality: 90 })}
+            <OptimizedImage
+              src={heroImage}
               alt={`Banner do vendedor ${seller.name}`}
-              className="absolute inset-0 h-full w-full object-cover object-left md:object-center"
-              decoding="async"
+              width={1200}
+              height={720}
+              quality={82}
+              srcsetWidths={[600, 900, 1200, 1600]}
+              sizes="(max-width: 768px) 50vw, 600px"
+              priority
+              wrapperClassName="absolute inset-0 w-full h-full"
+              className="object-left md:object-center"
             />
           ) : (
             <div className="absolute inset-0 grid place-items-center text-muted-foreground">
