@@ -23,12 +23,29 @@ function SellersPage() {
 
   return (
     <SiteLayout>
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-foreground">Equipe de Vendas</h1>
-        <p className="text-muted-foreground mt-2">
-          Fale diretamente com um dos nossos representantes.
-        </p>
+      <div className="relative mb-8 overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-8">
+        {/* Faixas decorativas — canto superior direito */}
+        <div
+          className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[#f6c515]/90 md:h-52 md:w-52"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -right-8 -top-24 h-32 w-32 rounded-full bg-[#d81f26] md:h-44 md:w-44"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute right-20 top-10 h-2 w-24 rotate-[-18deg] rounded-full bg-[#f6c515] md:right-28 md:top-14 md:h-2.5 md:w-32"
+          aria-hidden
+        />
+
+        <div className="relative">
+          <h1 className="text-3xl font-black text-foreground">Equipe de Vendas</h1>
+          <p className="text-muted-foreground mt-2 max-w-xl">
+            Fale diretamente com um dos nossos representantes.
+          </p>
+        </div>
       </div>
+
 
       {isLoading ? (
         <div className="flex justify-center py-16 text-muted-foreground">
