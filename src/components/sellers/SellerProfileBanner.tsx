@@ -22,7 +22,7 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
             <img
               src={optimizedImage(heroImage, { width: 1200, quality: 90 })}
               alt={`Banner do vendedor ${seller.name}`}
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover object-right md:object-center"
               decoding="async"
             />
           ) : (
