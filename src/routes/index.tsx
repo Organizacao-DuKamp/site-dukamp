@@ -123,7 +123,3 @@ function Home() {
     </SiteLayout>
   );
 }
-
-    </SiteLayout>
-  );
-}
