@@ -329,16 +329,19 @@ function SellerForm({
           </p>
         </div>
         <div className="sm:col-span-2">
-          <Label>Banner de fundo (opcional)</Label>
+          <Label>Imagem do banner esquerdo</Label>
           <ImageUpload
             value={values.banner_url ?? ""}
             onChange={(v) => set("banner_url", v)}
             folder="sellers/banners"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Substitui a imagem padrão de pasto (usada em cinza como marca d'água atrás do texto).
+            Arte pronta (PNG/JPG/WEBP) que ocupará TODA a área esquerda do banner do vendedor —
+            já com a foto, o pasto e as faixas vermelha/amarela montadas por você.
+            Proporção recomendada: ~4:3 (ex.: 1200×900). Se vazio, usa um fundo padrão.
           </p>
         </div>
+
         <div>
           <Label>Ordem de exibição</Label>
           <Input
