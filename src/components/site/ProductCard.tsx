@@ -68,17 +68,18 @@ export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: bool
         <span className="sr-only">Ver detalhes de {p.name}</span>
       </Link>
       <div className="aspect-[5/4] bg-white overflow-hidden">
-        <img
-          src={image}
-          srcSet={srcSet}
-          sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, (max-width: 1280px) 22vw, 18vw"
+        <OptimizedImage
+          src={rawImage}
           alt={p.name}
           width={320}
           height={256}
-          loading={eager ? "eager" : "lazy"}
-          fetchPriority={eager ? "high" : "auto"}
-          decoding="async"
-          className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform"
+          quality={65}
+          srcsetWidths={[160, 240, 320, 480]}
+          sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, (max-width: 1280px) 22vw, 18vw"
+          priority={eager}
+          fit="contain"
+          wrapperClassName="w-full h-full bg-white"
+          className="p-2 group-hover:scale-105 transition-transform"
         />
       </div>
 
