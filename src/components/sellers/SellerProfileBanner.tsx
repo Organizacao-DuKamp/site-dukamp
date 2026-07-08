@@ -10,79 +10,65 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
     `Olá ${seller.name}, vim pelo site da Dukamp!`,
   );
   const phoneDisplay = formatPhoneDisplay(seller.phone ?? seller.whatsapp);
-  // Prioriza a foto SEM FUNDO (cutout) para o banner
   const cutout = seller.cutout_url || seller.photo_url;
   const bg = seller.banner_url || bannerBg;
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-border bg-white shadow-xl">
-      {/* ============ MOBILE / DESKTOP UNIFIED ============ */}
-      <div className="relative grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:min-h-[340px]">
-        {/* ---------- LADO ESQUERDO: pasto + pessoa recortada ---------- */}
-        <div className="relative min-h-[280px] md:min-h-full overflow-hidden">
-          {/* Fundo de pasto/fazenda */}
+      <div className="relative grid md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:min-h-[360px]">
+        {/* ============ LADO ESQUERDO — pasto + pessoa + faixas ============ */}
+        <div className="relative min-h-[320px] md:min-h-full overflow-hidden">
+          {/* Fundo rural */}
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${bg})` }}
             aria-hidden
           />
-          {/* Leve calor / vinheta pra dar clima de fim de tarde */}
+          {/* Vinheta quente de fim de tarde */}
           <div
-            className="absolute inset-0 bg-gradient-to-tr from-amber-900/20 via-transparent to-yellow-200/20"
+            className="absolute inset-0 bg-gradient-to-tr from-amber-900/25 via-transparent to-yellow-200/20"
             aria-hidden
           />
-          {/* Transição para o branco do lado direito (desktop) */}
+          {/* Transição p/ branco (desktop → direita) */}
           <div
             className="hidden md:block absolute inset-y-0 right-0 w-40 bg-gradient-to-r from-transparent to-white"
             aria-hidden
           />
-          {/* Transição para o branco embaixo (mobile) */}
+          {/* Transição p/ branco (mobile → baixo) */}
           <div
             className="md:hidden absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-white"
             aria-hidden
           />
 
-          {/* Curvas decorativas ATRÁS da pessoa (canto superior esq. — dão contexto) */}
-          <div
-            className="pointer-events-none absolute -left-24 -top-20 h-52 w-52 rounded-full bg-[#f6c515]/80 md:h-64 md:w-64"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute -left-16 -top-28 h-40 w-40 rounded-full bg-[#d81f26]/90 md:h-52 md:w-52"
-            aria-hidden
-          />
-
-
-          {/* Pessoa recortada (sem fundo) por cima de tudo */}
+          {/* --- PESSOA (camada intermediária z-10) --- */}
           <div className="relative z-10 h-full flex items-end justify-center pt-6 md:pt-8">
             {cutout ? (
               <div className="relative flex items-end justify-center">
-                {/* Halo suave atrás da pessoa — ajuda a integrar ao fundo */}
+                {/* Sombra elíptica no chão */}
                 <div
-                  className="pointer-events-none absolute left-1/2 bottom-4 -translate-x-1/2 h-[70%] w-[85%] rounded-[50%] bg-white/25 blur-3xl"
+                  className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-2 h-5 w-[65%] rounded-[50%] bg-black/40 blur-lg"
                   aria-hidden
                 />
-                {/* Sombra elíptica no chão — dá contato com o pasto */}
+                {/* Halo suave */}
                 <div
-                  className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-1 h-6 w-[70%] rounded-[50%] bg-black/40 blur-xl"
+                  className="pointer-events-none absolute left-1/2 bottom-6 -translate-x-1/2 h-[65%] w-[80%] rounded-[50%] bg-white/20 blur-3xl"
                   aria-hidden
                 />
                 <img
                   src={optimizedImage(cutout, { width: 900, quality: 92 })}
                   alt={seller.name}
                   decoding="async"
-                  className="relative max-h-[280px] md:max-h-[360px] w-auto object-contain object-bottom"
+                  className="relative max-h-[300px] md:max-h-[380px] w-auto object-contain object-bottom"
                   style={{
-                    // Suaviza bordas e derrete a base da pessoa no pasto
                     WebkitMaskImage:
-                      "linear-gradient(to bottom, #000 0%, #000 88%, rgba(0,0,0,0.55) 96%, rgba(0,0,0,0) 100%)",
+                      "linear-gradient(to bottom, #000 0%, #000 90%, rgba(0,0,0,0.5) 97%, rgba(0,0,0,0) 100%)",
                     maskImage:
-                      "linear-gradient(to bottom, #000 0%, #000 88%, rgba(0,0,0,0.55) 96%, rgba(0,0,0,0) 100%)",
+                      "linear-gradient(to bottom, #000 0%, #000 90%, rgba(0,0,0,0.5) 97%, rgba(0,0,0,0) 100%)",
                     filter:
                       "drop-shadow(0 22px 14px rgba(0,0,0,0.35)) drop-shadow(0 4px 2px rgba(0,0,0,0.15))",
                   }}
                 />
-                {/* Camada quente sutil sobre a pessoa — casa a luz do campo */}
+                {/* Camada quente casando luz do campo com a pessoa */}
                 <div
                   className="pointer-events-none absolute inset-0 mix-blend-soft-light"
                   style={{
@@ -103,43 +89,59 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
             )}
           </div>
 
-          {/* ===== FAIXAS CURVAS NA FRENTE DA PESSOA (efeito de integração) ===== */}
-          {/* Faixa AMARELA (mais externa/baixa) — cobre parte inferior/lateral da foto */}
-          <div
-            className="pointer-events-none absolute z-20 -left-24 -bottom-28 h-64 w-[130%] rounded-[50%] bg-[#f6c515] shadow-[0_-8px_20px_rgba(0,0,0,0.15)] md:h-80 md:-bottom-36"
+          {/* --- FAIXAS CURVAS (camada frente z-20) --- */}
+          {/* SVG com dois swooshes finos que atravessam a base da foto */}
+          <svg
+            className="pointer-events-none absolute inset-0 z-20 h-full w-full"
+            viewBox="0 0 600 400"
+            preserveAspectRatio="none"
             aria-hidden
-          />
-          {/* Faixa VERMELHA (por cima da amarela, mordendo mais a pessoa) */}
-          <div
-            className="pointer-events-none absolute z-30 -left-20 -bottom-16 h-52 w-[125%] rounded-[50%] bg-[#d81f26] shadow-[0_-10px_24px_rgba(0,0,0,0.2)] md:h-64 md:-bottom-20"
-            aria-hidden
-          />
-          {/* Traço amarelo fino cortando a base — reforça a curva da referência */}
-          <div
-            className="pointer-events-none absolute z-40 -left-16 bottom-2 h-3 w-[120%] rotate-[-6deg] rounded-full bg-[#f6c515] md:h-4 md:bottom-6"
-            aria-hidden
-          />
+          >
+            {/* Faixa AMARELA — arco baixo, atrás da vermelha */}
+            <path
+              d="M -40 340 Q 220 240 680 330 L 680 420 L -40 420 Z"
+              fill="#f6c515"
+            />
+            {/* Faixa VERMELHA — arco mais alto, cortando a base da pessoa */}
+            <path
+              d="M -40 305 Q 240 210 680 300 L 680 360 Q 240 260 -40 355 Z"
+              fill="#d81f26"
+            />
+            {/* Fio amarelo fino de contorno */}
+            <path
+              d="M -40 300 Q 240 205 680 295"
+              stroke="#f6c515"
+              strokeWidth="4"
+              fill="none"
+              opacity="0.9"
+            />
+          </svg>
         </div>
 
-
-        {/* ---------- LADO DIREITO: informações ---------- */}
+        {/* ============ LADO DIREITO — infos ============ */}
         <div className="relative bg-white p-6 sm:p-8 md:p-10 flex flex-col justify-center">
-          {/* Textura rural sutil de fundo */}
+          {/* Marca d'água rural sutil */}
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.05] bg-cover bg-center"
             style={{ backgroundImage: `url(${bg})` }}
             aria-hidden
           />
-          {/* Curva vermelha decorativa - canto superior direito */}
-          <div
-            className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#d81f26] md:h-60 md:w-60"
+          {/* Curvinhas discretas no canto direito (identidade) */}
+          <svg
+            className="pointer-events-none absolute -right-2 -top-2 h-40 w-40 md:h-52 md:w-52"
+            viewBox="0 0 200 200"
             aria-hidden
-          />
-          {/* Curva amarela decorativa - canto inferior direito */}
-          <div
-            className="pointer-events-none absolute -right-24 -bottom-24 h-56 w-56 rounded-full bg-[#f6c515] md:h-64 md:w-64"
+          >
+            <path d="M200,0 Q120,20 200,120 Z" fill="#d81f26" />
+            <path d="M200,20 Q150,60 200,140 Z" fill="#f6c515" opacity="0.9" />
+          </svg>
+          <svg
+            className="pointer-events-none absolute -right-2 -bottom-2 h-32 w-32 md:h-44 md:w-44 rotate-180"
+            viewBox="0 0 200 200"
             aria-hidden
-          />
+          >
+            <path d="M200,0 Q120,20 200,120 Z" fill="#f6c515" />
+          </svg>
 
           <div className="relative z-10 space-y-3 text-center md:text-left">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#d81f26] px-3 py-1 text-xs font-bold text-white shadow">
