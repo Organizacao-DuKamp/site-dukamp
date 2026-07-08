@@ -107,27 +107,44 @@ function Home() {
           })
           .filter((s) => s.prods.length > 0);
 
-        // Bin-pack sections into rows summing to exactly 5 when possible
-        // (best-fit: pick the largest remaining section that fits the row).
+        // Bin-pack por busca de subconjunto: para cada linha, procuramos o
+        // grupo de categorias (entre as restantes) cuja soma de larguras se
+        // aproxime mais de 5 sem ultrapassar. Isso permite reordenar (ex.:
+        // trazer OVINOS n=1 pra completar uma linha que já tem n=4) em vez
+        // de deixar categorias pequenas isoladas.
         const remaining = [...sections];
         const rows: CatSec[][] = [];
-        while (remaining.length) {
-          const row: CatSec[] = [];
-          let cap = 5;
-          while (cap > 0) {
-            let bestIdx = -1;
-            for (let j = 0; j < remaining.length; j++) {
-              if (remaining[j].n <= cap) {
-                if (bestIdx === -1 || remaining[j].n > remaining[bestIdx].n) bestIdx = j;
+        const CAP = 5;
+        const pickRow = (): number[] => {
+          let best: number[] = [];
+          let bestSum = 0;
+          const dfs = (start: number, cap: number, sum: number, idxs: number[]) => {
+            if (sum > bestSum) {
+              bestSum = sum;
+              best = idxs.slice();
+            }
+            if (bestSum === CAP) return;
+            for (let i = start; i < remaining.length; i++) {
+              const n = remaining[i].n;
+              if (n <= cap) {
+                idxs.push(i);
+                dfs(i + 1, cap - n, sum + n, idxs);
+                idxs.pop();
+                if (bestSum === CAP) return;
               }
             }
-            if (bestIdx === -1) break;
-            const picked = remaining.splice(bestIdx, 1)[0];
-            row.push(picked);
-            cap -= picked.n;
-          }
+          };
+          dfs(0, CAP, 0, []);
+          return best;
+        };
+        while (remaining.length) {
+          const idxs = pickRow();
+          if (idxs.length === 0) break;
+          const row = idxs.map((i) => remaining[i]); // ordem original preservada
+          for (let k = idxs.length - 1; k >= 0; k--) remaining.splice(idxs[k], 1);
           rows.push(row);
         }
+
 
         // Static class maps so Tailwind JIT picks them up.
         // Packing só é ativado a partir do 2xl (>=1536px), onde 5 colunas
