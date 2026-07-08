@@ -93,64 +93,85 @@ function Home() {
       </section>
 
       {(() => {
-        type CatSec = { cat: { id: string; name: string; slug: string }; prods: any[] };
+        type CatSec = {
+          cat: { id: string; name: string; slug: string };
+          prods: any[];
+          n: 1 | 2 | 3 | 4 | 5;
+        };
         const sections: CatSec[] = (categories.data ?? [])
-          .map((cat) => ({
-            cat,
-            prods: (allProducts.data ?? []).filter((p) => p.catalog_id === cat.id).slice(0, 8),
-          }))
+          .map((cat) => {
+            const prods = (allProducts.data ?? [])
+              .filter((p) => p.catalog_id === cat.id)
+              .slice(0, 5);
+            return { cat, prods, n: prods.length as CatSec["n"] };
+          })
           .filter((s) => s.prods.length > 0);
 
-        // Pack consecutive "small" categories (<=2 items) into side-by-side pairs
+        // Greedy pack sections into rows of capacity 5 (matches xl grid).
         const rows: CatSec[][] = [];
-        for (let i = 0; i < sections.length; i++) {
-          const cur = sections[i];
-          const nxt = sections[i + 1];
-          if (cur.prods.length <= 2 && nxt && nxt.prods.length <= 2) {
-            rows.push([cur, nxt]);
-            i++;
-          } else {
-            rows.push([cur]);
+        let cur: CatSec[] = [];
+        let used = 0;
+        for (const s of sections) {
+          if (used + s.n > 5) {
+            if (cur.length) rows.push(cur);
+            cur = [];
+            used = 0;
           }
+          cur.push(s);
+          used += s.n;
         }
+        if (cur.length) rows.push(cur);
 
-        const renderSection = (s: CatSec, paired: boolean) => (
-          <section className="h-full">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3">
-                {s.cat.name}
-              </h2>
-              <Button asChild variant="ghost" size="sm">
-                <Link to="/produtos" search={{ categoria: s.cat.slug } as any}>
-                  Ver todos <ChevronRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-            <div
-              className={
-                paired
-                  ? "grid grid-cols-2 gap-3"
-                  : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
-              }
-            >
-              {s.prods.map((p) => (
-                <ProductCard key={p.id} p={p as any} />
-              ))}
-            </div>
-          </section>
-        );
+        // Static class maps so Tailwind JIT picks them up.
+        const spanCls: Record<CatSec["n"], string> = {
+          1: "xl:col-span-1",
+          2: "xl:col-span-2",
+          3: "xl:col-span-3",
+          4: "xl:col-span-4",
+          5: "xl:col-span-5",
+        };
+        const innerCls: Record<CatSec["n"], string> = {
+          1: "xl:grid-cols-1",
+          2: "xl:grid-cols-2",
+          3: "xl:grid-cols-3",
+          4: "xl:grid-cols-4",
+          5: "xl:grid-cols-5",
+        };
 
         return rows.map((row, rowIdx) => {
           const key = row.map((s) => s.cat.id).join("+");
-          const content =
-            row.length === 2 ? (
-              <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-8 lg:divide-x lg:divide-border">
-                <div className="lg:pr-8">{renderSection(row[0], true)}</div>
-                <div className="lg:pl-8">{renderSection(row[1], true)}</div>
-              </div>
-            ) : (
-              <div className="mt-10">{renderSection(row[0], false)}</div>
-            );
+          const content = (
+            <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-5 xl:gap-6">
+              {row.map((s, i) => (
+                <section
+                  key={s.cat.id}
+                  className={`${spanCls[s.n]} ${
+                    row.length > 1 && i > 0
+                      ? "xl:border-l xl:border-border xl:pl-6"
+                      : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3 truncate">
+                      {s.cat.name}
+                    </h2>
+                    <Button asChild variant="ghost" size="sm" className="shrink-0">
+                      <Link to="/produtos" search={{ categoria: s.cat.slug } as any}>
+                        Ver todos <ChevronRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                  <div
+                    className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${innerCls[s.n]} gap-3`}
+                  >
+                    {s.prods.map((p) => (
+                      <ProductCard key={p.id} p={p as any} />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          );
           if (rowIdx === 0) return <div key={key}>{content}</div>;
           return (
             <LazyMount key={key} minHeight={480}>
