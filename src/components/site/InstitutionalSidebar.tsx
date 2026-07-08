@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { isVideoUrl } from "@/components/admin/ImageUpload";
+import { optimizedImage } from "@/lib/image-url";
+
 
 type Ad = {
   id: string;
