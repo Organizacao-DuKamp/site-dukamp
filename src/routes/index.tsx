@@ -5,6 +5,8 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
+import { LazyMount } from "@/components/site/LazyMount";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -82,16 +84,16 @@ function Home() {
           </Button>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-          {featured.data?.map((p) => (
-            <ProductCard key={p.id} p={p as any} />
+          {featured.data?.map((p, i) => (
+            <ProductCard key={p.id} p={p as any} eager={i < 5} />
           ))}
         </div>
       </section>
 
-      {categories.data?.map((cat) => {
+      {categories.data?.map((cat, catIdx) => {
         const prods = (allProducts.data ?? []).filter((p) => p.catalog_id === cat.id).slice(0, 8);
         if (prods.length === 0) return null;
-        return (
+        const content = (
           <section key={cat.id} className="mt-10">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3">
@@ -109,6 +111,13 @@ function Home() {
               ))}
             </div>
           </section>
+        );
+        // First category renders immediately; the rest mount as the user scrolls near them
+        if (catIdx === 0) return content;
+        return (
+          <LazyMount key={cat.id} minHeight={480}>
+            {content}
+          </LazyMount>
         );
       })}
     </SiteLayout>
