@@ -98,10 +98,10 @@ export function SellerProfileBanner({ seller }: { seller: Seller }) {
                   href={wa}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3 font-bold text-white shadow-lg transition-colors hover:bg-[#1fbe5a] sm:w-auto"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-3 py-2 text-xs sm:text-sm md:text-base md:px-6 md:py-3 font-bold text-white shadow-lg transition-colors hover:bg-[#1fbe5a] sm:w-auto"
                 >
-                  <MessageCircle className="h-5 w-5 fill-white" />
-                  Falar no WhatsApp
+                  <MessageCircle className="h-4 w-4 md:h-5 md:w-5 fill-white" />
+                  <span className="whitespace-nowrap">WhatsApp</span>
                 </a>
               </div>
             )}
