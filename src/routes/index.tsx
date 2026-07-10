@@ -97,143 +97,72 @@ function Home() {
       </section>
 
       {(() => {
-        type CatSec = {
-          cat: { id: string; name: string; slug: string };
-          prods: any[];
-          n: 1 | 2 | 3 | 4 | 5;
-        };
-        // Até 5 cards por linha no xl (>=1280px). Categorias com 6+
-        // produtos exibem os 5 primeiros por padrão; "Ver todos"
-        // expande inline sem quebrar o layout.
         const CAP = 5;
-        const sections: CatSec[] = (categories.data ?? [])
+        const sections = (categories.data ?? [])
           .map((cat) => {
             const prods = (allProducts.data ?? []).filter(
               (p) => p.catalog_id === cat.id,
             );
-            const n = Math.min(prods.length, CAP) as CatSec["n"];
-            return { cat, prods, n };
+            return { cat, prods };
           })
           .filter((s) => s.prods.length > 0)
-          // Ordena por quantidade de produtos: mais → menos
-          // (bucket 6+, 5, 4, 3, 2, 1). Tie-break por nome pra ficar estável.
+          // Ordena por quantidade de produtos: mais → menos (6+, 5, 4, 3, 2, 1)
           .sort(
             (a, b) =>
               b.prods.length - a.prods.length ||
               a.cat.name.localeCompare(b.cat.name),
           );
 
+        return sections.map((s, idx) => {
+          const isExpanded = !!expanded[s.cat.id];
+          const hasMore = s.prods.length > CAP;
+          const visible = isExpanded ? s.prods : s.prods.slice(0, CAP);
 
-        const remaining = [...sections];
-        const rows: CatSec[][] = [];
-        // No máx. 2 blocos por linha no desktop. Blocos podem se juntar
-        // livremente (2+3, 3+1, 2+1, 1+1) — o max-width fixo do card
-        // impede qualquer esticamento visual.
-        const MAX_PER_ROW = 2;
-        const pickRow = (): number[] => {
-          let best: number[] = [];
-          let bestSum = 0;
-          const dfs = (start: number, cap: number, sum: number, idxs: number[]) => {
-            if (sum > bestSum) {
-              bestSum = sum;
-              best = idxs.slice();
-            }
-            if (bestSum === CAP) return;
-            if (idxs.length >= MAX_PER_ROW) return;
-            for (let i = start; i < remaining.length; i++) {
-              const n = remaining[i].n;
-              if (n > cap) continue;
-              idxs.push(i);
-              dfs(i + 1, cap - n, sum + n, idxs);
-              idxs.pop();
-              if (bestSum === CAP) return;
-            }
-          };
-          dfs(0, CAP, 0, []);
-          return best;
-        };
-        while (remaining.length) {
-          const idxs = pickRow();
-          if (idxs.length === 0) break;
-          const row = idxs.map((i) => remaining[i]);
-          for (let k = idxs.length - 1; k >= 0; k--) remaining.splice(idxs[k], 1);
-          rows.push(row);
-        }
-
-
-
-        const spanCls: Record<CatSec["n"], string> = {
-          1: "xl:col-span-1",
-          2: "xl:col-span-2",
-          3: "xl:col-span-3",
-          4: "xl:col-span-4",
-          5: "xl:col-span-5",
-        };
-
-
-        return rows.map((row, rowIdx) => {
-          const key = row.map((s) => s.cat.id).join("+");
           const content = (
-            <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-5 xl:gap-6">
-              {row.map((s, i) => {
-                const isExpanded = !!expanded[s.cat.id];
-                const hasMore = s.prods.length > s.n;
-                const visible = isExpanded ? s.prods : s.prods.slice(0, s.n);
-                return (
-                  <section
-                    key={s.cat.id}
-                    className={`min-w-0 ${row.length === 1 ? "xl:col-span-5" : spanCls[s.n]} ${
-                      row.length > 1 && i > 0
-                        ? "xl:border-l xl:border-border xl:pl-6"
-                        : ""
-                    }`}
-
+            <section className="mt-10">
+              <div className="flex items-center justify-between mb-3 gap-2">
+                <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3 truncate min-w-0">
+                  {s.cat.name}
+                </h2>
+                {hasMore ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="shrink-0"
+                    onClick={() =>
+                      setExpanded((prev) => ({
+                        ...prev,
+                        [s.cat.id]: !prev[s.cat.id],
+                      }))
+                    }
                   >
-                    <div className="flex items-center justify-between mb-3 gap-2">
-                      <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3 truncate min-w-0">
-                        {s.cat.name}
-                      </h2>
-                      {hasMore ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="shrink-0"
-                          onClick={() =>
-                            setExpanded((prev) => ({
-                              ...prev,
-                              [s.cat.id]: !prev[s.cat.id],
-                            }))
-                          }
-                        >
-                          {isExpanded ? "Ver menos" : "Ver todos"}{" "}
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      ) : (
-                        <Button asChild variant="ghost" size="sm" className="shrink-0">
-                          <Link to="/produtos" search={{ categoria: s.cat.slug } as any}>
-                            Ver todos <ChevronRight className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      )}
-                    </div>
-                    <div
-                      className="grid gap-3 justify-start [grid-template-columns:repeat(auto-fill,minmax(160px,220px))] sm:[grid-template-columns:repeat(auto-fill,minmax(180px,240px))] lg:[grid-template-columns:repeat(auto-fill,minmax(200px,260px))]"
-                    >
-                      {visible.map((p) => (
-                        <ProductCard key={p.id} p={p as any} />
-                      ))}
-                    </div>
-
-
-
-                  </section>
-                );
-              })}
-            </div>
+                    {isExpanded ? "Ver menos" : "Ver todos"}{" "}
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button asChild variant="ghost" size="sm" className="shrink-0">
+                    <Link to="/produtos" search={{ categoria: s.cat.slug } as any}>
+                      Ver todos <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                )}
+              </div>
+              {/* Grade fixa: 2/3/4/5 colunas por breakpoint, cards travados
+                  em max-w-[240px] e justify-items-start — nunca esticam,
+                  ficam agrupados à esquerda, espaço vazio só após o último. */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 justify-items-start">
+                {visible.map((p) => (
+                  <div key={p.id} className="w-full max-w-[240px]">
+                    <ProductCard p={p as any} />
+                  </div>
+                ))}
+              </div>
+            </section>
           );
-          if (rowIdx === 0) return <div key={key}>{content}</div>;
+
+          if (idx === 0) return <div key={s.cat.id}>{content}</div>;
           return (
-            <LazyMount key={key} minHeight={480}>
+            <LazyMount key={s.cat.id} minHeight={480}>
               {content}
             </LazyMount>
           );
@@ -243,3 +172,4 @@ function Home() {
     </SiteLayout>
   );
 }
+
