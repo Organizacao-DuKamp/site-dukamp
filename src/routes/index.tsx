@@ -96,25 +96,26 @@ function Home() {
         type CatSec = {
           cat: { id: string; name: string; slug: string };
           prods: any[];
-          n: 1 | 2 | 3 | 4 | 5;
+          n: 1 | 2 | 3 | 4;
         };
+        // Cap por card cap=4: no xl (>=1280px) 4 colunas dão ~290px cada,
+        // largura confortável. Categorias com 5 produtos exibem 4 no
+        // packing desktop (o 5º aparece em breakpoints menores/mobile via
+        // grid interno). Isso ativa o preenchimento inteligente já a
+        // partir do desktop comum, não só em telas ultra-largas.
+        const CAP = 4;
         const sections: CatSec[] = (categories.data ?? [])
           .map((cat) => {
             const prods = (allProducts.data ?? [])
               .filter((p) => p.catalog_id === cat.id)
               .slice(0, 5);
-            return { cat, prods, n: prods.length as CatSec["n"] };
+            const n = Math.min(prods.length, CAP) as CatSec["n"];
+            return { cat, prods, n };
           })
           .filter((s) => s.prods.length > 0);
 
-        // Bin-pack por busca de subconjunto: para cada linha, procuramos o
-        // grupo de categorias (entre as restantes) cuja soma de larguras se
-        // aproxime mais de 5 sem ultrapassar. Isso permite reordenar (ex.:
-        // trazer OVINOS n=1 pra completar uma linha que já tem n=4) em vez
-        // de deixar categorias pequenas isoladas.
         const remaining = [...sections];
         const rows: CatSec[][] = [];
-        const CAP = 5;
         const pickRow = (): number[] => {
           let best: number[] = [];
           let bestSum = 0;
@@ -140,42 +141,34 @@ function Home() {
         while (remaining.length) {
           const idxs = pickRow();
           if (idxs.length === 0) break;
-          const row = idxs.map((i) => remaining[i]); // ordem original preservada
+          const row = idxs.map((i) => remaining[i]);
           for (let k = idxs.length - 1; k >= 0; k--) remaining.splice(idxs[k], 1);
           rows.push(row);
         }
 
-
-        // Static class maps so Tailwind JIT picks them up.
-        // Packing só é ativado a partir do 2xl (>=1536px), onde 5 colunas
-        // garantem ~290px por card. Abaixo disso, cada seção ocupa a linha
-        // inteira com seu grid interno responsivo — nunca esprememos cards
-        // para forçar encaixe lateral.
         const spanCls: Record<CatSec["n"], string> = {
-          1: "2xl:col-span-1",
-          2: "2xl:col-span-2",
-          3: "2xl:col-span-3",
-          4: "2xl:col-span-4",
-          5: "2xl:col-span-5",
+          1: "xl:col-span-1",
+          2: "xl:col-span-2",
+          3: "xl:col-span-3",
+          4: "xl:col-span-4",
         };
         const innerCls: Record<CatSec["n"], string> = {
-          1: "2xl:grid-cols-1",
-          2: "2xl:grid-cols-2",
-          3: "2xl:grid-cols-3",
-          4: "2xl:grid-cols-4",
-          5: "2xl:grid-cols-5",
+          1: "xl:grid-cols-1",
+          2: "xl:grid-cols-2",
+          3: "xl:grid-cols-3",
+          4: "xl:grid-cols-4",
         };
 
         return rows.map((row, rowIdx) => {
           const key = row.map((s) => s.cat.id).join("+");
           const content = (
-            <div className="mt-10 grid grid-cols-1 gap-6 2xl:grid-cols-5 2xl:gap-6">
+            <div className="mt-10 grid grid-cols-1 gap-6 xl:grid-cols-4 xl:gap-6">
               {row.map((s, i) => (
                 <section
                   key={s.cat.id}
                   className={`min-w-0 ${spanCls[s.n]} ${
                     row.length > 1 && i > 0
-                      ? "2xl:border-l 2xl:border-border 2xl:pl-6"
+                      ? "xl:border-l xl:border-border xl:pl-6"
                       : ""
                   }`}
                 >
@@ -190,7 +183,7 @@ function Home() {
                     </Button>
                   </div>
                   <div
-                    className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 ${innerCls[s.n]} gap-3`}
+                    className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${innerCls[s.n]} gap-3`}
                   >
                     {s.prods.map((p) => (
                       <ProductCard key={p.id} p={p as any} />
