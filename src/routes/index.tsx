@@ -114,15 +114,16 @@ function Home() {
             const n = Math.min(prods.length, CAP) as CatSec["n"];
             return { cat, prods, n };
           })
-          .filter((s) => s.prods.length > 0);
+          .filter((s) => s.prods.length > 0)
+          // Ordena das categorias com mais produtos para as com menos
+          .sort((a, b) => b.prods.length - a.prods.length);
 
         const remaining = [...sections];
         const rows: CatSec[][] = [];
-        // No máx. 2 blocos por linha no desktop e cada bloco precisa de
-        // pelo menos 2 colunas (~256px cada) quando divide espaço com
-        // outro. Assim evita a 3ª coluna espremida.
+        // No máx. 2 blocos por linha no desktop. Blocos podem se juntar
+        // livremente (2+3, 3+1, 2+1, 1+1) — o max-width fixo do card
+        // impede qualquer esticamento visual.
         const MAX_PER_ROW = 2;
-        const MIN_SHARE_N = 2;
         const pickRow = (): number[] => {
           let best: number[] = [];
           let bestSum = 0;
@@ -136,18 +137,6 @@ function Home() {
             for (let i = start; i < remaining.length; i++) {
               const n = remaining[i].n;
               if (n > cap) continue;
-              // Ao compartilhar linha, cada bloco precisa ser >= MIN_SHARE_N
-              if (idxs.length >= 1 && n < MIN_SHARE_N) continue;
-              if (idxs.length === 0 && n < MIN_SHARE_N && remaining.length > 1) {
-                // Bloco pequeno sozinho ocupa a linha inteira
-                idxs.push(i);
-                if (sum + n > bestSum) {
-                  bestSum = sum + n;
-                  best = idxs.slice();
-                }
-                idxs.pop();
-                continue;
-              }
               idxs.push(i);
               dfs(i + 1, cap - n, sum + n, idxs);
               idxs.pop();
@@ -164,6 +153,7 @@ function Home() {
           for (let k = idxs.length - 1; k >= 0; k--) remaining.splice(idxs[k], 1);
           rows.push(row);
         }
+
 
 
         const spanCls: Record<CatSec["n"], string> = {
@@ -227,12 +217,15 @@ function Home() {
                       )}
                     </div>
                     <div
-                      className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${innerCls[s.n]} gap-3`}
+                      className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 ${innerCls[s.n]} gap-3 justify-items-start`}
                     >
                       {visible.map((p) => (
-                        <ProductCard key={p.id} p={p as any} />
+                        <div key={p.id} className="w-full max-w-[260px]">
+                          <ProductCard p={p as any} />
+                        </div>
                       ))}
                     </div>
+
                   </section>
                 );
               })}
