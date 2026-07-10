@@ -27,6 +27,8 @@ export const Route = createFileRoute("/")({
 const PRODUCT_COLS =
   "id,name,slug,code,price,consumer_price,reseller_price,producer_price,pix_price,consumer_pix_price,reseller_pix_price,producer_pix_price,images,brand,stock,installments,catalog_id,featured,created_at";
 
+const HOME_PRODUCT_LIMIT = 5;
+
 function Home() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
@@ -89,15 +91,16 @@ function Home() {
             </Link>
           </Button>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <div className="product-showcase-grid">
           {featured.data?.map((p, i) => (
-            <ProductCard key={p.id} p={p as any} eager={i < 5} />
+            <div key={p.id} className="product-showcase-card">
+              <ProductCard p={p as any} eager={i < HOME_PRODUCT_LIMIT} />
+            </div>
           ))}
         </div>
       </section>
 
       {(() => {
-        const CAP = 5;
         const sections = (categories.data ?? [])
           .map((cat) => {
             const prods = (allProducts.data ?? []).filter(
@@ -115,8 +118,10 @@ function Home() {
 
         return sections.map((s, idx) => {
           const isExpanded = !!expanded[s.cat.id];
-          const hasMore = s.prods.length > CAP;
-          const visible = isExpanded ? s.prods : s.prods.slice(0, CAP);
+          const hasMore = s.prods.length > HOME_PRODUCT_LIMIT;
+          const visible = isExpanded
+            ? s.prods
+            : s.prods.slice(0, HOME_PRODUCT_LIMIT);
 
           const content = (
             <section className="mt-10">
@@ -147,12 +152,11 @@ function Home() {
                   </Button>
                 )}
               </div>
-              {/* Grade fixa: 2/3/4/5 colunas por breakpoint, cards travados
-                  em max-w-[240px] e justify-items-start — nunca esticam,
-                  ficam agrupados à esquerda, espaço vazio só após o último. */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 justify-items-start">
+              {/* Grade com tracks explícitos: no desktop cabem sempre 5 cards
+                  por linha, sem esticar cards/imagens e sem quebrar 4+1. */}
+              <div className="product-showcase-grid">
                 {visible.map((p) => (
-                  <div key={p.id} className="w-full max-w-[240px]">
+                  <div key={p.id} className="product-showcase-card">
                     <ProductCard p={p as any} />
                   </div>
                 ))}
