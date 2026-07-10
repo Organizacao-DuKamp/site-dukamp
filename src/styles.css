@@ -108,6 +108,41 @@
 .prose-content li { margin: 0.25rem 0; }
 .prose-content a { color: var(--color-primary); text-decoration: underline; }
 
+/* Product showcase grids use explicit bounded tracks so desktop rows fit
+   exactly five cards without stretching images/cards or wrapping the 5th item. */
+.product-showcase-grid {
+  --product-showcase-card-max: 174px;
+  display: grid;
+  gap: 0.75rem;
+  justify-content: start;
+  align-items: stretch;
+  grid-template-columns: repeat(2, minmax(0, min(var(--product-showcase-card-max), calc((100% - 0.75rem) / 2))));
+}
+
+.product-showcase-card {
+  width: 100%;
+  min-width: 0;
+  max-width: var(--product-showcase-card-max);
+}
+
+@media (min-width: 640px) {
+  .product-showcase-grid {
+    grid-template-columns: repeat(3, minmax(0, min(var(--product-showcase-card-max), calc((100% - 1.5rem) / 3))));
+  }
+}
+
+@media (min-width: 1024px) {
+  .product-showcase-grid {
+    grid-template-columns: repeat(4, minmax(0, min(var(--product-showcase-card-max), calc((100% - 2.25rem) / 4))));
+  }
+}
+
+@media (min-width: 1280px) {
+  .product-showcase-grid {
+    grid-template-columns: repeat(5, minmax(0, min(var(--product-showcase-card-max), calc((100% - 3rem) / 5))));
+  }
+}
+
 /* Quotes panel expand/collapse */
 .layout-grid { transition: grid-template-columns 350ms cubic-bezier(0.4, 0, 0.2, 1); }
 @keyframes quotes-panel-in {
