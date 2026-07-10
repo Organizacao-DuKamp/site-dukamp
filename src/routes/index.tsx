@@ -118,6 +118,11 @@ function Home() {
 
         const remaining = [...sections];
         const rows: CatSec[][] = [];
+        // No máx. 2 blocos por linha no desktop e cada bloco precisa de
+        // pelo menos 2 colunas (~256px cada) quando divide espaço com
+        // outro. Assim evita a 3ª coluna espremida.
+        const MAX_PER_ROW = 2;
+        const MIN_SHARE_N = 2;
         const pickRow = (): number[] => {
           let best: number[] = [];
           let bestSum = 0;
@@ -127,14 +132,26 @@ function Home() {
               best = idxs.slice();
             }
             if (bestSum === CAP) return;
+            if (idxs.length >= MAX_PER_ROW) return;
             for (let i = start; i < remaining.length; i++) {
               const n = remaining[i].n;
-              if (n <= cap) {
+              if (n > cap) continue;
+              // Ao compartilhar linha, cada bloco precisa ser >= MIN_SHARE_N
+              if (idxs.length >= 1 && n < MIN_SHARE_N) continue;
+              if (idxs.length === 0 && n < MIN_SHARE_N && remaining.length > 1) {
+                // Bloco pequeno sozinho ocupa a linha inteira
                 idxs.push(i);
-                dfs(i + 1, cap - n, sum + n, idxs);
+                if (sum + n > bestSum) {
+                  bestSum = sum + n;
+                  best = idxs.slice();
+                }
                 idxs.pop();
-                if (bestSum === CAP) return;
+                continue;
               }
+              idxs.push(i);
+              dfs(i + 1, cap - n, sum + n, idxs);
+              idxs.pop();
+              if (bestSum === CAP) return;
             }
           };
           dfs(0, CAP, 0, []);
@@ -147,6 +164,7 @@ function Home() {
           for (let k = idxs.length - 1; k >= 0; k--) remaining.splice(idxs[k], 1);
           rows.push(row);
         }
+
 
         const spanCls: Record<CatSec["n"], string> = {
           1: "xl:col-span-1",
@@ -174,11 +192,12 @@ function Home() {
                 return (
                   <section
                     key={s.cat.id}
-                    className={`min-w-0 ${spanCls[s.n]} ${
+                    className={`min-w-0 ${row.length === 1 ? "xl:col-span-5" : spanCls[s.n]} ${
                       row.length > 1 && i > 0
                         ? "xl:border-l xl:border-border xl:pl-6"
                         : ""
                     }`}
+
                   >
                     <div className="flex items-center justify-between mb-3 gap-2">
                       <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3 truncate min-w-0">
