@@ -129,7 +129,7 @@ export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: bool
           >
             <WhatsAppIcon className="h-4 w-4 shrink-0" />
             <span>WhatsApp</span>
-          </a>
+          </button>
         </div>
       </div>
     </div>
