@@ -6,7 +6,7 @@ import { PartyPopper } from "lucide-react";
 export function ApprovalNoticeModal() {
   const { approvalNotice, dismissApprovalNotice } = useAuth();
   const open = !!approvalNotice;
-  const label = "Produtor Rural";
+  const label = approvalNotice === "empresa" ? "Empresa" : "Produtor Rural";
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) dismissApprovalNotice(); }}>
