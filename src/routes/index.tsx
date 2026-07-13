@@ -25,7 +25,7 @@ export const Route = createFileRoute("/")({
 });
 
 const PRODUCT_COLS =
-  "id,name,slug,code,price,consumer_price,reseller_price,producer_price,pix_price,consumer_pix_price,reseller_pix_price,producer_pix_price,images,brand,stock,installments,catalog_id,featured,created_at";
+  "id,name,slug,code,price,consumer_price,reseller_price,producer_price,pix_price,consumer_pix_price,reseller_pix_price,producer_pix_price,images,brand,stock,installments,catalog_id,featured,created_at,category_position";
 
 const HOME_PRODUCT_LIMIT = 5;
 
