@@ -112,7 +112,7 @@ function SolicitacoesPage() {
                   <div>{r.full_name}</div>
                   <div className="text-xs text-muted-foreground">{r.email}</div>
                 </TableCell>
-                <TableCell><Badge variant="secondary">{r.requested_type === "produtor" ? "Produtor Rural" : r.requested_type}</Badge></TableCell>
+                <TableCell><Badge variant="secondary">{r.requested_type === "produtor" ? "Produtor Rural" : r.requested_type === "empresa" ? "Empresa" : r.requested_type}</Badge></TableCell>
                 <TableCell>{r.uf}</TableCell>
                 <TableCell className="text-xs">{r.cnpj ? `CNPJ: ${r.cnpj}` : `CPF: ${r.cpf}`}</TableCell>
                 <TableCell className="hidden md:table-cell text-xs">
