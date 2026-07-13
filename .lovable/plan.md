@@ -1,19 +1,26 @@
-Atualizar o slogan da Dukamp de **"Saúde animal de confiança"** para **"Alimentando a pecuária brasileira"**.
+## Alteração
 
-## Onde está
+No `src/components/site/Footer.tsx`, coluna "Contato", trocar a lista atual (email + telefone único + endereço único) por três blocos:
 
-O slogan não é hardcoded no código — fica em `site_settings` (chave `general`, campo `tagline`) e é lido no `Footer.tsx`.
+1. **E-mail** (mantido no topo)
+   - contato@dukamp.com.br
 
-## Mudança
+2. **Matriz** (indústria · administrativa · logística)
+   - (17) 3275-3106
+   - Av. Santos Dumont, 403 — Monte Aprazível/SP
 
-Uma única atualização de dado no banco:
+3. **Filial — São José do Rio Preto**
+   - (17) 2136-1111
+   - R. Pedro Amaral, 3409 — Vila Ercília, São José do Rio Preto/SP, 15014-000
 
-```sql
-UPDATE site_settings
-SET value = jsonb_set(value, '{tagline}', '"Alimentando a pecuária brasileira"'::jsonb)
-WHERE key = 'general';
-```
+## Detalhes técnicos
 
-Isso reflete automaticamente no Footer (e em qualquer outro lugar que leia `tagline`).
+- Os valores das duas unidades ficam **hardcoded** no `Footer.tsx` (o `site_settings.phone`/`address` continua existindo no banco para outros usos, mas o footer deixa de exibi-los para evitar duplicidade/conflito com os dois endereços).
+- E-mail continua vindo de `settings?.email` (com fallback).
+- Cada bloco terá um subtítulo pequeno em negrito ("Matriz", "Filial — São José do Rio Preto") para separação visual, seguindo o estilo já usado nas outras colunas.
+- Nenhuma outra parte da página é alterada (header, navbar, produtos, etc.).
 
-Nenhum arquivo será editado.
+## Fora do escopo
+
+- Página `/unidades` não é alterada nesta task.
+- Não mexo em `site_settings` no banco.
