@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { ProductCard } from "@/components/site/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
@@ -121,15 +121,38 @@ function Home() {
           })
           .filter((s) => s.prods.length > 0);
 
-        return sections.map((s, idx) => {
+        // Group consecutive small categories (<=2 visible products, not expanded)
+        // into shared rows so they sit side-by-side on desktop.
+        type Row = { small: boolean; items: typeof sections; slots: number };
+        const rows: Row[] = [];
+        let current: Row | null = null;
+        for (const s of sections) {
+          const isExpanded = !!expanded[s.cat.id];
+          const vc = Math.min(s.prods.length, HOME_PRODUCT_LIMIT);
+          const isSmall = !isExpanded && vc <= 2;
+          if (isSmall) {
+            if (current && current.slots + vc <= HOME_PRODUCT_LIMIT) {
+              current.items.push(s);
+              current.slots += vc;
+            } else {
+              if (current) rows.push(current);
+              current = { small: true, items: [s], slots: vc };
+            }
+          } else {
+            if (current) { rows.push(current); current = null; }
+            rows.push({ small: false, items: [s], slots: HOME_PRODUCT_LIMIT });
+          }
+        }
+        if (current) rows.push(current);
+
+        const renderSection = (s: (typeof sections)[number]) => {
           const isExpanded = !!expanded[s.cat.id];
           const hasMore = s.prods.length > HOME_PRODUCT_LIMIT;
           const visible = isExpanded
             ? s.prods
             : s.prods.slice(0, HOME_PRODUCT_LIMIT);
-
-          const content = (
-            <section className="mt-10">
+          return (
+            <section className="mt-10 min-w-0">
               <div className="flex items-center justify-between mb-3 gap-2">
                 <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide border-l-4 border-primary pl-3 truncate min-w-0">
                   {s.cat.name}
@@ -157,8 +180,6 @@ function Home() {
                   </Button>
                 )}
               </div>
-              {/* Grade com tracks explícitos: no desktop cabem sempre 5 cards
-                  por linha, sem esticar cards/imagens e sem quebrar 4+1. */}
               <div className="product-showcase-grid">
                 {visible.map((p) => (
                   <div key={p.id} className="product-showcase-card">
@@ -168,10 +189,45 @@ function Home() {
               </div>
             </section>
           );
+        };
 
-          if (idx === 0) return <div key={s.cat.id}>{content}</div>;
+        return rows.map((row, idx) => {
+          const key = row.items.map((s) => s.cat.id).join("+");
+          let content: ReactNode;
+          if (row.small && row.items.length > 1) {
+            // Side-by-side small categories on lg+, stacked on mobile.
+            content = (
+              <div
+                className="grid grid-cols-1 lg:grid-cols-5 gap-x-6"
+                style={{ alignItems: "start" }}
+              >
+                {row.items.map((s) => {
+                  const vc = Math.min(s.prods.length, HOME_PRODUCT_LIMIT);
+                  const span =
+                    vc >= 5
+                      ? "lg:col-span-5"
+                      : vc === 4
+                        ? "lg:col-span-4"
+                        : vc === 3
+                          ? "lg:col-span-3"
+                          : vc === 2
+                            ? "lg:col-span-2"
+                            : "lg:col-span-1";
+                  return (
+                    <div key={s.cat.id} className={span}>
+                      {renderSection(s)}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          } else {
+            content = renderSection(row.items[0]);
+          }
+
+          if (idx === 0) return <div key={key}>{content}</div>;
           return (
-            <LazyMount key={s.cat.id} minHeight={480}>
+            <LazyMount key={key} minHeight={480}>
               {content}
             </LazyMount>
           );
