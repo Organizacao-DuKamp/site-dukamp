@@ -31,12 +31,12 @@ function AdaptiveMedia({ url }: { url: string }) {
   return (
     <div
       className={`w-full overflow-hidden ${!loaded ? "bg-muted animate-pulse" : "bg-muted"}`}
-      style={{ aspectRatio: `${clamp(ratio)}` }}
+      style={{ aspectRatio: `${ratio}` }}
     >
       {video ? (
         <video
           src={url}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           autoPlay
           muted
           loop
@@ -56,7 +56,7 @@ function AdaptiveMedia({ url }: { url: string }) {
           alt=""
           loading="lazy"
           decoding="async"
-          className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
+          className={`w-full h-full object-contain transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
           onLoad={(e) => {
             const im = e.currentTarget;
             if (im.naturalWidth && im.naturalHeight) setRatio(im.naturalWidth / im.naturalHeight);
@@ -67,6 +67,7 @@ function AdaptiveMedia({ url }: { url: string }) {
     </div>
   );
 }
+
 
 function AdCard({ ad }: { ad: Ad }) {
   const items = useMemo(() => mediaList(ad), [ad]);
