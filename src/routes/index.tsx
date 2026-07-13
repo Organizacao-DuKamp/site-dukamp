@@ -104,18 +104,22 @@ function Home() {
       {(() => {
         const sections = (categories.data ?? [])
           .map((cat) => {
-            const prods = (allProducts.data ?? []).filter(
-              (p) => p.catalog_id === cat.id,
-            );
+            const prods = (allProducts.data ?? [])
+              .filter((p) => p.catalog_id === cat.id)
+              .sort((a: any, b: any) => {
+                const ap = a.category_position;
+                const bp = b.category_position;
+                if (ap != null && bp != null) return ap - bp;
+                if (ap != null) return -1;
+                if (bp != null) return 1;
+                return (
+                  new Date(b.created_at).getTime() -
+                  new Date(a.created_at).getTime()
+                );
+              });
             return { cat, prods };
           })
-          .filter((s) => s.prods.length > 0)
-          // Ordena por quantidade de produtos: mais → menos (6+, 5, 4, 3, 2, 1)
-          .sort(
-            (a, b) =>
-              b.prods.length - a.prods.length ||
-              a.cat.name.localeCompare(b.cat.name),
-          );
+          .filter((s) => s.prods.length > 0);
 
         return sections.map((s, idx) => {
           const isExpanded = !!expanded[s.cat.id];
