@@ -190,6 +190,29 @@ export function MainNav() {
                       </li>
                     );
                   }
+                  if (it.key === "institucional") {
+                    return (
+                      <li key={it.key} className="border-b">
+                        <div className="py-2.5 px-2 text-sm font-medium">{it.label}</div>
+                        <div className="pb-2 pl-3">
+                          <Link
+                            to="/institucional/nossa-historia"
+                            onClick={() => setOpen(false)}
+                            className="block py-1.5 text-sm text-muted-foreground hover:text-primary"
+                          >
+                            Nossa História
+                          </Link>
+                          <Link
+                            to="/institucional/nossos-produtos"
+                            onClick={() => setOpen(false)}
+                            className="block py-1.5 text-sm text-muted-foreground hover:text-primary"
+                          >
+                            Nossos Produtos
+                          </Link>
+                        </div>
+                      </li>
+                    );
+                  }
                   return (
                     <li key={it.key}>
                       <Link to={it.to} onClick={() => setOpen(false)} className={mobCls}>
@@ -197,6 +220,7 @@ export function MainNav() {
                       </Link>
                     </li>
                   );
+
                 })}
               </ul>
               <div className="mt-6">
