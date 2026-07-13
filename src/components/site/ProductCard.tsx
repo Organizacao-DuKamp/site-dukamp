@@ -86,7 +86,7 @@ export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: bool
 
       <div className="p-3 flex-1 flex flex-col">
         {p.brand && <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.brand}</div>}
-        <div className="font-medium text-sm line-clamp-2 mt-1 min-h-[2.5rem] group-hover:text-primary">
+        <div className="font-medium text-sm mt-1 break-words group-hover:text-primary">
           {p.name}
         </div>
         <div className="mt-2 space-y-0.5">
