@@ -77,7 +77,7 @@ function SolicitacoesPage() {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold">Solicitações</h1>
-        <p className="text-sm text-muted-foreground">Pedidos de cadastro como Produtor Rural.</p>
+        <p className="text-sm text-muted-foreground">Pedidos de cadastro como Produtor Rural e Empresa.</p>
       </div>
 
       <div className="flex gap-2">
