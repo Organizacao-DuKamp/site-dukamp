@@ -13,8 +13,7 @@ export function Footer() {
   const siteName = settings?.site_name || "Dukamp Saúde Animal";
   const tagline = settings?.tagline || "Mais de 20 anos cuidando da saúde dos animais.";
   const email = settings?.email || "contato@dukamp.com.br";
-  const phone = settings?.phone || "(00) 0000-0000";
-  const address = settings?.address || "";
+
   const informacoes = FOOTER_PAGES.filter((p) => p.group === "informacoes");
   const seguranca = FOOTER_PAGES.filter((p) => p.group === "seguranca");
 
