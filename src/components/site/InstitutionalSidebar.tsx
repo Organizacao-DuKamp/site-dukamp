@@ -166,12 +166,12 @@ export function InstitutionalSidebar() {
     },
   });
 
+  const first = (data ?? [])[0];
   return (
-    <aside className="space-y-4">
-      {(data ?? []).map((ad) => (
-
-        <AdCard key={ad.id} ad={ad} />
-      ))}
+    <aside>
+      <div className="sticky top-4">
+        {first && <AdCard ad={first} />}
+      </div>
     </aside>
   );
 }
