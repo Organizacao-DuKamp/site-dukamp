@@ -86,10 +86,10 @@ export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: bool
 
       <div className="p-3 flex-1 flex flex-col">
         {p.brand && <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.brand}</div>}
-        <div className="font-medium text-sm mt-1 break-words group-hover:text-primary">
+        <div className="font-medium text-sm mt-1 break-words group-hover:text-primary flex-1">
           {p.name}
         </div>
-        <div className="mt-2 space-y-0.5">
+        <div className="mt-3 space-y-0.5">
           {tierLabel && <div className="text-[10px] uppercase tracking-wider text-primary font-semibold">Preço {tierLabel}</div>}
           <div className="text-xl font-bold text-foreground">{formatBRL(displayPrice)}</div>
           {displayPix != null && (
