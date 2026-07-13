@@ -26,18 +26,17 @@ function AdaptiveMedia({ url }: { url: string }) {
   const [loaded, setLoaded] = useState(false);
   const video = isVideoUrl(url);
 
-  // clamp so extremely tall/wide media stays elegant in the sidebar
-  const clamp = (r: number) => Math.max(3 / 4, Math.min(16 / 9, r));
+
 
   return (
     <div
       className={`w-full overflow-hidden ${!loaded ? "bg-muted animate-pulse" : "bg-muted"}`}
-      style={{ aspectRatio: `${clamp(ratio)}` }}
+      style={{ aspectRatio: `${ratio}` }}
     >
       {video ? (
         <video
           src={url}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           autoPlay
           muted
           loop
@@ -57,7 +56,7 @@ function AdaptiveMedia({ url }: { url: string }) {
           alt=""
           loading="lazy"
           decoding="async"
-          className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
+          className={`w-full h-full object-contain transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
           onLoad={(e) => {
             const im = e.currentTarget;
             if (im.naturalWidth && im.naturalHeight) setRatio(im.naturalWidth / im.naturalHeight);
@@ -68,6 +67,7 @@ function AdaptiveMedia({ url }: { url: string }) {
     </div>
   );
 }
+
 
 function AdCard({ ad }: { ad: Ad }) {
   const items = useMemo(() => mediaList(ad), [ad]);
@@ -140,12 +140,8 @@ function AdCard({ ad }: { ad: Ad }) {
           )}
         </div>
       )}
-      <div className="p-3">
-        <div className="font-semibold text-sm">{ad.title}</div>
-        {ad.content && (
-          <p className="text-xs text-muted-foreground mt-1 line-clamp-3">{ad.content}</p>
-        )}
-      </div>
+
+
     </div>
   );
 
@@ -172,10 +168,8 @@ export function InstitutionalSidebar() {
 
   return (
     <aside className="space-y-4">
-      <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium px-1">
-        Institucional
-      </div>
       {(data ?? []).map((ad) => (
+
         <AdCard key={ad.id} ad={ad} />
       ))}
     </aside>

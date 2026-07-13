@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export type NavItemKey = "inicio" | "produtos" | "vendas" | "unidades" | "carrinho";
+export type NavItemKey = "inicio" | "produtos" | "vendas" | "institucional" | "unidades" | "carrinho";
 
 export type NavItem = {
   key: NavItemKey;
@@ -11,12 +11,14 @@ export type NavItem = {
 };
 
 export const DEFAULT_NAV_ITEMS: NavItem[] = [
-  { key: "inicio",   label: "Início",           to: "/",                  visible: true },
-  { key: "produtos", label: "Produtos",         to: "/produtos",          visible: true },
-  { key: "vendas",   label: "Equipe de Vendas", to: "/equipe-de-vendas",  visible: true },
-  { key: "unidades", label: "Nossas Unidades",  to: "/unidades",          visible: true },
-  { key: "carrinho", label: "Meu Carrinho",     to: "/carrinho",          visible: true },
+  { key: "inicio",        label: "Início",           to: "/",                  visible: true },
+  { key: "produtos",      label: "Produtos",         to: "/produtos",          visible: true },
+  { key: "vendas",        label: "Equipe de Vendas", to: "/equipe-de-vendas",  visible: true },
+  { key: "institucional", label: "Institucional",    to: "/institucional/nossa-historia", visible: true },
+  { key: "unidades",      label: "Nossas Unidades",  to: "/unidades",          visible: true },
+  { key: "carrinho",      label: "Meu Carrinho",     to: "/carrinho",          visible: true },
 ];
+
 
 function mergeWithDefaults(items: unknown): NavItem[] {
   if (!Array.isArray(items)) return DEFAULT_NAV_ITEMS;

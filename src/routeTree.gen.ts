@@ -30,6 +30,8 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProdutosSlugRouteImport } from './routes/produtos.$slug'
 import { Route as PedidoIdRouteImport } from './routes/pedido.$id'
 import { Route as PaginasSlugRouteImport } from './routes/paginas.$slug'
+import { Route as InstitucionalNossosProdutosRouteImport } from './routes/institucional.nossos-produtos'
+import { Route as InstitucionalNossaHistoriaRouteImport } from './routes/institucional.nossa-historia'
 import { Route as EquipeDeVendasSlugRouteImport } from './routes/equipe-de-vendas.$slug'
 import { Route as CatalogosSlugRouteImport } from './routes/catalogos.$slug'
 import { Route as AdminSolicitacoesRouteImport } from './routes/admin.solicitacoes'
@@ -158,6 +160,18 @@ const PaginasSlugRoute = PaginasSlugRouteImport.update({
   path: '/paginas/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InstitucionalNossosProdutosRoute =
+  InstitucionalNossosProdutosRouteImport.update({
+    id: '/institucional/nossos-produtos',
+    path: '/institucional/nossos-produtos',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const InstitucionalNossaHistoriaRoute =
+  InstitucionalNossaHistoriaRouteImport.update({
+    id: '/institucional/nossa-historia',
+    path: '/institucional/nossa-historia',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const EquipeDeVendasSlugRoute = EquipeDeVendasSlugRouteImport.update({
   id: '/equipe-de-vendas/$slug',
   path: '/equipe-de-vendas/$slug',
@@ -300,6 +314,8 @@ export interface FileRoutesByFullPath {
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/equipe-de-vendas/$slug': typeof EquipeDeVendasSlugRoute
+  '/institucional/nossa-historia': typeof InstitucionalNossaHistoriaRoute
+  '/institucional/nossos-produtos': typeof InstitucionalNossosProdutosRoute
   '/paginas/$slug': typeof PaginasSlugRoute
   '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
@@ -342,6 +358,8 @@ export interface FileRoutesByTo {
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/equipe-de-vendas/$slug': typeof EquipeDeVendasSlugRoute
+  '/institucional/nossa-historia': typeof InstitucionalNossaHistoriaRoute
+  '/institucional/nossos-produtos': typeof InstitucionalNossosProdutosRoute
   '/paginas/$slug': typeof PaginasSlugRoute
   '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
@@ -388,6 +406,8 @@ export interface FileRoutesById {
   '/admin/solicitacoes': typeof AdminSolicitacoesRoute
   '/catalogos/$slug': typeof CatalogosSlugRoute
   '/equipe-de-vendas/$slug': typeof EquipeDeVendasSlugRoute
+  '/institucional/nossa-historia': typeof InstitucionalNossaHistoriaRoute
+  '/institucional/nossos-produtos': typeof InstitucionalNossosProdutosRoute
   '/paginas/$slug': typeof PaginasSlugRoute
   '/pedido/$id': typeof PedidoIdRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
@@ -435,6 +455,8 @@ export interface FileRouteTypes {
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/equipe-de-vendas/$slug'
+    | '/institucional/nossa-historia'
+    | '/institucional/nossos-produtos'
     | '/paginas/$slug'
     | '/pedido/$id'
     | '/produtos/$slug'
@@ -477,6 +499,8 @@ export interface FileRouteTypes {
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/equipe-de-vendas/$slug'
+    | '/institucional/nossa-historia'
+    | '/institucional/nossos-produtos'
     | '/paginas/$slug'
     | '/pedido/$id'
     | '/produtos/$slug'
@@ -522,6 +546,8 @@ export interface FileRouteTypes {
     | '/admin/solicitacoes'
     | '/catalogos/$slug'
     | '/equipe-de-vendas/$slug'
+    | '/institucional/nossa-historia'
+    | '/institucional/nossos-produtos'
     | '/paginas/$slug'
     | '/pedido/$id'
     | '/produtos/$slug'
@@ -554,6 +580,8 @@ export interface RootRouteChildren {
   SobreRoute: typeof SobreRoute
   UnidadesRoute: typeof UnidadesRoute
   EquipeDeVendasSlugRoute: typeof EquipeDeVendasSlugRoute
+  InstitucionalNossaHistoriaRoute: typeof InstitucionalNossaHistoriaRoute
+  InstitucionalNossosProdutosRoute: typeof InstitucionalNossosProdutosRoute
   PaginasSlugRoute: typeof PaginasSlugRoute
   PedidoIdRoute: typeof PedidoIdRoute
   EquipeDeVendasIndexRoute: typeof EquipeDeVendasIndexRoute
@@ -708,6 +736,20 @@ declare module '@tanstack/react-router' {
       path: '/paginas/$slug'
       fullPath: '/paginas/$slug'
       preLoaderRoute: typeof PaginasSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/institucional/nossos-produtos': {
+      id: '/institucional/nossos-produtos'
+      path: '/institucional/nossos-produtos'
+      fullPath: '/institucional/nossos-produtos'
+      preLoaderRoute: typeof InstitucionalNossosProdutosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/institucional/nossa-historia': {
+      id: '/institucional/nossa-historia'
+      path: '/institucional/nossa-historia'
+      fullPath: '/institucional/nossa-historia'
+      preLoaderRoute: typeof InstitucionalNossaHistoriaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/equipe-de-vendas/$slug': {
@@ -957,6 +999,8 @@ const rootRouteChildren: RootRouteChildren = {
   SobreRoute: SobreRoute,
   UnidadesRoute: UnidadesRoute,
   EquipeDeVendasSlugRoute: EquipeDeVendasSlugRoute,
+  InstitucionalNossaHistoriaRoute: InstitucionalNossaHistoriaRoute,
+  InstitucionalNossosProdutosRoute: InstitucionalNossosProdutosRoute,
   PaginasSlugRoute: PaginasSlugRoute,
   PedidoIdRoute: PedidoIdRoute,
   EquipeDeVendasIndexRoute: EquipeDeVendasIndexRoute,
@@ -966,13 +1010,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
