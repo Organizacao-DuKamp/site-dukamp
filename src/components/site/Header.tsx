@@ -131,7 +131,7 @@ export function Header() {
                   className="hidden sm:inline-flex bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm gap-1.5 animate-in fade-in"
                   title="Criar sua conta"
                 >
-                  <Link to="/auth" search={{ tab: "register" } as any}>
+                  <Link to="/auth" hash="cadastro">
                     <Plus className="h-4 w-4" />
                     Novo cliente? Cadastre-se
                   </Link>
