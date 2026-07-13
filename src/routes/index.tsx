@@ -50,9 +50,10 @@ function Home() {
     queryFn: async () => {
       const { data } = await supabase
         .from("catalogs")
-        .select("id,name,slug,active")
+        .select("id,name,slug,active,sort_order")
         .eq("active", true)
-        .order("name");
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true });
       return data ?? [];
     },
   });
