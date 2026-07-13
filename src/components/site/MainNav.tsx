@@ -70,6 +70,39 @@ function DesktopItem({ item }: { item: NavItem }) {
     );
   }
 
+  if (item.key === "institucional") {
+    return (
+      <li className="relative group">
+        <Link
+          to={item.to}
+          className="flex items-center gap-1 px-4 py-3 hover:bg-white/10 transition-colors"
+          activeProps={{ className: "flex items-center gap-1 px-4 py-3 bg-white/15" }}
+        >
+          {item.label} <ChevronDown className="h-3.5 w-3.5 opacity-80" />
+        </Link>
+        <div
+          className="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute left-0 top-full z-50 pt-1
+                     translate-y-1 group-hover:translate-y-0 transition-all duration-200 ease-out"
+        >
+          <div className="rounded-b-md bg-white text-foreground shadow-xl border border-black/10 p-3 w-64">
+            <Link
+              to="/institucional/nossa-historia"
+              className="block px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors"
+            >
+              Nossa História
+            </Link>
+            <Link
+              to="/institucional/nossos-produtos"
+              className="block px-3 py-2 text-sm rounded-md hover:bg-primary/10 hover:text-primary transition-colors"
+            >
+              Nossos Produtos
+            </Link>
+          </div>
+        </div>
+      </li>
+    );
+  }
+
   return (
     <li>
       <Link
@@ -82,6 +115,7 @@ function DesktopItem({ item }: { item: NavItem }) {
     </li>
   );
 }
+
 
 export function MainNav() {
   const [open, setOpen] = useState(false);
