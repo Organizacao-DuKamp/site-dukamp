@@ -193,7 +193,7 @@ function Home() {
 
         return rows.map((row, idx) => {
           const key = row.items.map((s) => s.cat.id).join("+");
-          let content: React.ReactNode;
+          let content: ReactNode;
           if (row.small && row.items.length > 1) {
             // Side-by-side small categories on lg+, stacked on mobile.
             content = (
