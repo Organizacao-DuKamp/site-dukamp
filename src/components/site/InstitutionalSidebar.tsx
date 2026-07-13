@@ -140,12 +140,8 @@ function AdCard({ ad }: { ad: Ad }) {
           )}
         </div>
       )}
-      <div className="p-3">
-        <div className="font-semibold text-sm">{ad.title}</div>
-        {ad.content && (
-          <p className="text-xs text-muted-foreground mt-1 line-clamp-3">{ad.content}</p>
-        )}
-      </div>
+
+
     </div>
   );
 
