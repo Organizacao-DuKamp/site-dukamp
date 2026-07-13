@@ -56,7 +56,7 @@ export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: bool
 
   return (
     <div
-      className="group relative rounded-lg border bg-card overflow-hidden flex flex-col hover:shadow-lg transition-shadow"
+      className="group relative h-full rounded-lg border bg-card overflow-hidden flex flex-col hover:shadow-lg transition-shadow"
     >
       <Link
         to="/produtos/$slug"
@@ -85,8 +85,10 @@ export function ProductCard({ p, eager = false }: { p: ProductLite; eager?: bool
 
 
       <div className="p-3 flex-1 flex flex-col">
-        {p.brand && <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{p.brand}</div>}
-        <div className="font-medium text-sm mt-1 break-words group-hover:text-primary flex-1">
+        <div className="min-h-[0.875rem] text-[10px] uppercase tracking-wider text-muted-foreground">
+          {p.brand ?? ""}
+        </div>
+        <div className="mt-1 min-h-[4.5rem] font-medium text-sm leading-[1.3] break-words whitespace-normal group-hover:text-primary flex-1">
           {p.name}
         </div>
         <div className="mt-3 space-y-0.5">
