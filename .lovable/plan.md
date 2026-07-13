@@ -1,58 +1,76 @@
-# Equipe de Vendas — Plano
+## Objetivo
 
-## Estimativa de créditos
-Operação média (nova tabela + migration + 4 componentes + 2 rotas + 1 CRUD admin + ajuste de navbar). Estimo **~6–8 créditos**. Como passa de 5, **aguardo sua confirmação** antes de executar.
+Reformular o dropdown de **Produtos** no navbar (desktop) para:
+1. Mostrar apenas 10 categorias específicas, na ordem pedida.
+2. Ao passar o mouse em uma categoria, **não navegar** — expandir um painel lateral **dentro do mesmo mega-menu** com os produtos daquela categoria, com animação de entrada.
+3. Só navegar para a página da categoria/produto quando houver **clique** real.
 
-## O que será construído
+## Categorias fixas (na ordem)
 
-### 1. Banco de dados (migration)
-Nova tabela `public.sellers`:
-- `name`, `role` (cargo), `region` (cidade/UF), `phone`, `whatsapp`, `photo_url`, `banner_url` (opcional), `active` (bool), `display_order` (int), `slug` (único, gerado do nome)
-- RLS: leitura pública apenas de `active = true`; escrita só para admin (`has_role`)
-- GRANTs corretos para `anon` (SELECT) / `authenticated` / `service_role`
-- Trigger `updated_at`
+1. Suplementos Minerais *(ver observação abaixo)*
+2. Rações Gado de Corte
+3. Rações Gado Leiteiro
+4. Núcleos
+5. Concentrados
+6. Proteinados Energéticos
+7. Equinos
+8. Ovinos
+9. Confinamento Grão Inteiro
+10. Aditivados Premium
 
-### 2. Navbar
-Adicionar o item **"Equipe de Vendas"** apontando para `/equipe-de-vendas` em `src/lib/navbar-settings.ts` (`DEFAULT_NAV_ITEMS`), substituindo o atual "Equipe de Vendas" que hoje aponta pra `/contato`.
+**Observação sobre "Suplementos Minerais":** no banco existe hoje `Suplementos Naturais` (slug `suplementos-naturais`) — não existe `Suplementos Minerais`. Vou considerar que se trata da mesma categoria e usar o slug existente, apenas exibindo o rótulo "Suplementos Minerais" no navbar. Se preferir renomear a categoria no banco (ou criar uma nova), me avise antes de implementar.
 
-### 3. Rotas públicas
-- `src/routes/equipe-de-vendas.index.tsx` — grid responsivo de vendedores ativos ordenados por `display_order`. Card mostra foto (frame circular) + nome + cargo + cidade. SEO head próprio.
-- `src/routes/equipe-de-vendas.$slug.tsx` — página de perfil com o **banner estilo Dukamp** (referência da imagem enviada):
-  - Fundo branco com **curvas vermelhas e amarelas** nas laterais (SVG puro, sem imagem)
-  - Foto do vendedor em moldura circular grande à esquerda (com anel vermelho/amarelo)
-  - Badge "DESTAQUE" vermelho, nome grande, cargo em vermelho
-  - Ícones de localização e telefone (telefone com `tel:` clicável)
-  - Botão verde **"Falar no WhatsApp"** abrindo `https://wa.me/<numero>` em nova aba
-  - Se `banner_url` estiver definido, usar como background da faixa mantendo o botão sobreposto
-  - Layout responsivo: mobile empilha foto em cima, desktop lado a lado
-  - SEO: title/description/og com nome do vendedor + og:image = foto
+## Comportamento do mega-menu (desktop)
 
-### 4. Componentes reutilizáveis
-- `src/components/sellers/SellerCard.tsx` — card do grid
-- `src/components/sellers/SellerProfileBanner.tsx` — banner grande com curvas SVG, foto circular, CTA WhatsApp; aceita `banner_url` opcional
-- `src/components/sellers/SellerForm.tsx` — formulário admin
-- `src/components/sellers/AdminSellerTable.tsx` — tabela admin com toggle ativo, editar/excluir, botões ↑/↓ para reordenar
+```text
+┌─────────────────────────────────────────────────────────────┐
+│  [Categorias]                │   [Preview de produtos]      │
+│  • Suplementos Minerais  ►   │   ┌────┐ ┌────┐ ┌────┐ ┌────┐│
+│  • Rações Gado de Corte      │   │card│ │card│ │card│ │card││
+│  • Rações Gado Leiteiro      │   └────┘ └────┘ └────┘ └────┘│
+│  • Núcleos                   │   Ver todos em Suplementos → │
+│  • Concentrados              │                              │
+│  • ...                       │                              │
+│  ─────────────────────────   │                              │
+│  Ver todos os produtos →     │                              │
+└─────────────────────────────────────────────────────────────┘
+```
 
-### 5. Admin
-- Nova rota `src/routes/admin.equipe-vendas.tsx` (dentro do layout admin existente)
-- Item novo na sidebar admin (em `src/routes/admin.tsx`)
-- CRUD completo: criar, editar, excluir, ativar/desativar, reordenar (↑/↓ atualizando `display_order`)
-- Upload de foto e banner via `ImageUpload` existente (bucket `media`), com sugestão de PNG com fundo transparente para melhor encaixe
-- **Remoção automática de fundo:** vou usar CSS (foto em moldura circular com `object-cover`) como fallback confiável universal. Remoção real de fundo exigiria integração com API externa paga (remove.bg) ou modelo em cliente pesado (~5MB); recomendo o admin subir PNG já sem fundo. Se quiser, posso propor a integração como próximo passo separado.
+- Layout em duas colunas dentro do painel branco existente. Coluna esquerda = lista das 10 categorias; coluna direita = preview.
+- **Hover em uma categoria** → apenas destaca a linha e troca o conteúdo da direita (sem navegar).
+- **Clique na categoria** → navega para `/produtos?categoria=<slug>` (comportamento atual).
+- **Clique num card de produto do preview** → navega para a página do produto.
+- Categoria ativa por padrão (quando o menu abre): a primeira da lista.
+- Se o mouse sair do painel, o menu fecha (comportamento atual do `group-hover`).
 
-### 6. Formatação
-Helper `formatWhatsappUrl(number)` que limpa o número e monta `https://wa.me/55XXXXXXXXXXX`. Helper `formatPhoneDisplay` para exibir bonito.
+## Preview de produtos
 
-## Detalhes técnicos (para referência)
+- Buscar os **primeiros 4 produtos ativos** da categoria em foco (`products` filtrado por `catalog_id` correspondente ao slug, com `active = true`, ordenados por nome).
+- Cache via TanStack Query com key `["nav-preview", slug]` — carrega sob demanda no primeiro hover e mantém em cache.
+- Cards compactos: imagem quadrada + nome + preço (versão reduzida de `ProductCard`, ou um mini-card local).
+- Estado vazio: "Nenhum produto nesta categoria ainda."
+- Link final: **"Ver todos em <Categoria> →"** apontando para `/produtos?categoria=<slug>`.
 
-- Queries via TanStack Query com `supabase` client
-- Loader nas rotas públicas SEM `requireSupabaseAuth` (leitura pública via policy anon)
-- Página de perfil usa loader para popular `head()` com og:image do vendedor
-- Curvas do banner: 2 SVGs absolutos (esquerda vermelha, direita amarela) com `pointer-events-none`
-- Cores usando tokens existentes; adicionar tokens `--seller-red` e `--seller-yellow` em `src/styles.css` se necessário para o gradiente do banner
+## Animação
+
+- Ao trocar a categoria em foco, o painel de preview aplica `animate-fade-in` (utilitário já disponível no projeto) usando `key={slugAtivo}` no wrapper para reexecutar a animação a cada troca.
+- Abertura/fechamento do mega-menu mantém a transição atual (`opacity` + `translate-y`).
+
+## Mobile
+
+Comportamento mobile atual permanece (sheet lateral, lista simples de categorias, cada uma linka para `/produtos?categoria=<slug>`). Não faz sentido preview inline no drawer estreito. Apenas aplico o mesmo **filtro fixo das 10 categorias** e a mesma ordem.
+
+## Detalhes técnicos
+
+- Arquivo alterado: `src/components/site/MainNav.tsx`.
+- Constante local `FEATURED_CATEGORIES` com pares `{ slug, label }` na ordem desejada. O `useCategories` existente busca todas do banco; filtro/ordenação aplicados via `FEATURED_CATEGORIES.map(f => catsBySlug.get(f.slug))`, ignorando as que não existirem.
+- Estado `hoveredSlug` no `DesktopItem` de produtos (default = primeiro slug da lista); handlers `onMouseEnter` em cada `<li>` de categoria trocam o estado.
+- Novo hook local `useCategoryPreview(slug)` — `useQuery` disparado com `enabled: !!slug`, seleciona `id, name, slug, image_url, price, consumer_price, producer_price` de `products` por `catalog_id`, limite 4.
+- Cada categoria da coluna esquerda continua sendo um `<Link>` (para permitir clique → navegar) mas com `onMouseEnter` para trocar preview. **Não** trocamos por `<button>` para preservar o clique/navegação e acessibilidade.
+- Largura do painel aumenta de `w-[min(90vw,720px)]` para `w-[min(95vw,880px)]` para acomodar as duas colunas.
+- Nenhuma alteração de schema, RLS ou rotas.
 
 ## Fora do escopo
-- Remoção automática de fundo por IA (fallback = frame circular)
-- Filtros/busca de vendedores (posso adicionar depois se quiser)
 
-Confirma para eu prosseguir?
+- Editor admin do navbar (`/admin/navbar`) continua controlando visibilidade/label do item "Produtos" apenas — a lista de 10 categorias é fixa no código, conforme pedido.
+- Página `/produtos` e filtros existentes ficam intactos.
