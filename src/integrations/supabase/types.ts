@@ -480,6 +480,7 @@ export type Database = {
           brand: string | null
           catalog_id: string | null
           category_id: string | null
+          category_position: number | null
           code: string
           comprimento: number | null
           consumer_pix_price: number | null
@@ -510,6 +511,7 @@ export type Database = {
           brand?: string | null
           catalog_id?: string | null
           category_id?: string | null
+          category_position?: number | null
           code: string
           comprimento?: number | null
           consumer_pix_price?: number | null
@@ -540,6 +542,7 @@ export type Database = {
           brand?: string | null
           catalog_id?: string | null
           category_id?: string | null
+          category_position?: number | null
           code?: string
           comprimento?: number | null
           consumer_pix_price?: number | null

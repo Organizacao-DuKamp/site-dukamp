@@ -38,6 +38,7 @@ function ProductsAdmin() {
         
         { key: "producer_price", label: "Produtor Rural", format: (v) => v != null ? Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "—" },
 
+        { key: "category_position", label: "Posição", format: (v) => v ?? "—" },
         { key: "stock", label: "Estoque" },
         { key: "active", label: "Ativo", format: (v) => v ? "Sim" : "Não" },
       ]}
@@ -47,7 +48,8 @@ function ProductsAdmin() {
         { name: "slug", label: "Slug (URL)", required: true },
         { name: "brand", label: "Marca" },
         { name: "category_id", label: "Categoria", type: "select", options: (cats.data ?? []).map((c) => ({ value: c.id, label: c.name })) },
-        { name: "catalog_id", label: "Catálogo", type: "select", options: (catalogs.data ?? []).map((c) => ({ value: c.id, label: c.name })) },
+        { name: "catalog_id", label: "Catálogo (categoria)", type: "select", options: (catalogs.data ?? []).map((c) => ({ value: c.id, label: c.name })) },
+        { name: "category_position", label: "Posição na categoria (deixe vazio para ordem padrão)", type: "number", step: "1" },
         { name: "consumer_price", label: "Preço — Consumidor", type: "number", step: "0.01", required: true, defaultValue: 0 },
         
         { name: "producer_price", label: "Preço — Produtor Rural", type: "number", step: "0.01" },

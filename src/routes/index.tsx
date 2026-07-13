@@ -25,7 +25,7 @@ export const Route = createFileRoute("/")({
 });
 
 const PRODUCT_COLS =
-  "id,name,slug,code,price,consumer_price,reseller_price,producer_price,pix_price,consumer_pix_price,reseller_pix_price,producer_pix_price,images,brand,stock,installments,catalog_id,featured,created_at";
+  "id,name,slug,code,price,consumer_price,reseller_price,producer_price,pix_price,consumer_pix_price,reseller_pix_price,producer_pix_price,images,brand,stock,installments,catalog_id,featured,created_at,category_position";
 
 const HOME_PRODUCT_LIMIT = 5;
 
@@ -50,9 +50,10 @@ function Home() {
     queryFn: async () => {
       const { data } = await supabase
         .from("catalogs")
-        .select("id,name,slug,active")
+        .select("id,name,slug,active,sort_order")
         .eq("active", true)
-        .order("name");
+        .order("sort_order", { ascending: true })
+        .order("name", { ascending: true });
       return data ?? [];
     },
   });
@@ -103,18 +104,22 @@ function Home() {
       {(() => {
         const sections = (categories.data ?? [])
           .map((cat) => {
-            const prods = (allProducts.data ?? []).filter(
-              (p) => p.catalog_id === cat.id,
-            );
+            const prods = (allProducts.data ?? [])
+              .filter((p) => p.catalog_id === cat.id)
+              .sort((a: any, b: any) => {
+                const ap = a.category_position;
+                const bp = b.category_position;
+                if (ap != null && bp != null) return ap - bp;
+                if (ap != null) return -1;
+                if (bp != null) return 1;
+                return (
+                  new Date(b.created_at).getTime() -
+                  new Date(a.created_at).getTime()
+                );
+              });
             return { cat, prods };
           })
-          .filter((s) => s.prods.length > 0)
-          // Ordena por quantidade de produtos: mais → menos (6+, 5, 4, 3, 2, 1)
-          .sort(
-            (a, b) =>
-              b.prods.length - a.prods.length ||
-              a.cat.name.localeCompare(b.cat.name),
-          );
+          .filter((s) => s.prods.length > 0);
 
         return sections.map((s, idx) => {
           const isExpanded = !!expanded[s.cat.id];

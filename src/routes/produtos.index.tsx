@@ -34,7 +34,10 @@ function Page() {
       let qy = supabase.from("products").select("*", { count: "exact" }).eq("active", true).gt("stock", 0);
       if (catId) qy = qy.eq("catalog_id", catId);
       if (q) qy = qy.ilike("name", `%${q}%`);
-      const { data, count } = await qy.order("created_at", { ascending: false }).range(from, to);
+      const { data, count } = await qy
+        .order("category_position", { ascending: true, nullsFirst: false })
+        .order("created_at", { ascending: false })
+        .range(from, to);
       return { rows: data ?? [], count: count ?? 0 };
     },
   });
