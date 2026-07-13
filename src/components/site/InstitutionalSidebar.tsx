@@ -168,10 +168,8 @@ export function InstitutionalSidebar() {
 
   return (
     <aside className="space-y-4">
-      <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium px-1">
-        Institucional
-      </div>
       {(data ?? []).map((ad) => (
+
         <AdCard key={ad.id} ad={ad} />
       ))}
     </aside>
