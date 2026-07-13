@@ -143,6 +143,15 @@
   }
 }
 
+/* Ultrawide / TV: acomoda 6 cards por linha para não deixar espaço vazio
+   parecendo uma coluna cortada à direita. */
+@media (min-width: 1600px) {
+  .product-showcase-grid {
+    --product-showcase-card-max: 190px;
+    grid-template-columns: repeat(6, minmax(0, min(var(--product-showcase-card-max), calc((100% - 3.75rem) / 6))));
+  }
+}
+
 /* Quotes panel expand/collapse */
 .layout-grid { transition: grid-template-columns 350ms cubic-bezier(0.4, 0, 0.2, 1); }
 @keyframes quotes-panel-in {
