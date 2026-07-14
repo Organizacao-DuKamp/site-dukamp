@@ -168,8 +168,8 @@ export function InstitutionalSidebar() {
 
   const first = (data ?? [])[0];
   return (
-    <aside>
-      <div className="sticky top-4">
+    <aside className="lg:h-[calc(100vh-1rem)] lg:sticky lg:top-4">
+      <div className="lg:h-full lg:overflow-y-auto lg:pr-1">
         {first && <AdCard ad={first} />}
       </div>
     </aside>
