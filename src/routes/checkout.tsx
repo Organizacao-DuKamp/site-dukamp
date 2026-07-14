@@ -77,6 +77,7 @@ function CheckoutPage() {
   const [loadingFrete, setLoadingFrete] = useState(false);
   const [method, setMethod] = useState<"pix" | "card">("pix");
   const [frete, setFrete] = useState<{ valor: number; prazoDias: number; servico: string; dataMaxima?: string } | null>(null);
+  const [freteOpcoes, setFreteOpcoes] = useState<Array<{ valor: number; prazoDias: number; servico: string; dataMaxima?: string }>>([]);
 
   const createOrder = useServerFn(createPixOrder);
   const calcFrete = useServerFn(calculateShipping);
