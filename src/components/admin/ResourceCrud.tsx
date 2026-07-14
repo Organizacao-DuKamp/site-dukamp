@@ -230,7 +230,7 @@ function ResourceForm({ fields, initial, onSubmit, submitting }: {
       if (f.type === "imageList" || f.type === "mediaList") {
         v[f.name] = Array.isArray(initial?.[f.name]) ? initial[f.name] : (f.defaultValue ?? []);
       } else {
-        v[f.name] = initial?.[f.name] ?? f.defaultValue ?? (f.type === "boolean" ? false : f.type === "number" ? 0 : "");
+        v[f.name] = initial?.[f.name] ?? f.defaultValue ?? (f.type === "boolean" ? false : "");
       }
     });
     return v;
