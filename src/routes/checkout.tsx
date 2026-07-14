@@ -312,14 +312,41 @@ function CheckoutPage() {
                       />
                     </TabsContent>
                   </Tabs>
-                  {frete && (
-                    <div className="mt-3 flex flex-wrap items-center gap-2 rounded-md bg-background p-3 border">
-                      <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
-                      <div className="text-sm min-w-0">
-                        <span className="font-semibold">{frete.servico}</span>
-                        <span className="text-muted-foreground"> — entrega em até {frete.prazoDias} dia(s){frete.dataMaxima ? ` (${frete.dataMaxima})` : ""}</span>
+                  {freteOpcoes.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Escolha o tipo de entrega
                       </div>
-                      <div className="ml-auto text-base font-bold text-primary">{formatBRL(frete.valor)}</div>
+                      {freteOpcoes.map((op) => {
+                        const selected = frete?.servico === op.servico;
+                        return (
+                          <button
+                            key={op.servico}
+                            type="button"
+                            onClick={() => setFrete(op)}
+                            className={`w-full flex flex-wrap items-center gap-2 rounded-md border-2 p-3 text-left transition ${
+                              selected
+                                ? "border-primary bg-primary/5"
+                                : "border-border bg-background hover:border-primary/50"
+                            }`}
+                          >
+                            <CheckCircle2
+                              className={`h-5 w-5 shrink-0 ${selected ? "text-primary" : "text-muted-foreground/40"}`}
+                            />
+                            <div className="text-sm min-w-0">
+                              <span className="font-semibold">{op.servico}</span>
+                              <span className="text-muted-foreground">
+                                {" "}
+                                — entrega em até {op.prazoDias} dia(s)
+                                {op.dataMaxima ? ` (${op.dataMaxima})` : ""}
+                              </span>
+                            </div>
+                            <div className="ml-auto text-base font-bold text-primary">
+                              {formatBRL(op.valor)}
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
