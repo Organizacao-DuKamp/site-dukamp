@@ -205,12 +205,12 @@ export function MediaListUpload({
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
-  async function handle(files: FileList | null) {
-    if (!files || files.length === 0) return;
+  async function handle(files: FileList | File[] | null) {
+    if (!files || (files as any).length === 0) return;
     setBusy(true);
     try {
       const urls: string[] = [];
-      for (const f of Array.from(files)) urls.push(await uploadOne(f, folder));
+      for (const f of Array.from(files as any) as File[]) urls.push(await uploadOne(f, folder));
       onChange([...(value ?? []), ...urls]);
     } catch (e: any) {
       toast.error(e.message ?? "Erro ao enviar arquivo");
@@ -219,6 +219,25 @@ export function MediaListUpload({
       if (ref.current) ref.current.value = "";
     }
   }
+
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      const files: File[] = [];
+      for (const it of Array.from(items)) {
+        if (it.kind === "file" && (it.type.startsWith("image/") || it.type.startsWith("video/"))) {
+          const f = it.getAsFile();
+          if (f) files.push(f);
+        }
+      }
+      if (files.length === 0) return;
+      e.preventDefault();
+      handle(files);
+    }
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, [value]);
 
   function removeAt(i: number) {
     const next = [...(value ?? [])];
