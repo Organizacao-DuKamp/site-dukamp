@@ -127,7 +127,7 @@ function Page() {
                 wrapperClassName="w-full h-full bg-white"
                 className="p-4"
               />
-            </div>
+            </ZoomBox>
           )}
           {images.length > 1 && (
             <div className="grid grid-cols-5 gap-2">
