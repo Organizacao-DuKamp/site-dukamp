@@ -41,11 +41,13 @@ export function ImageUpload({
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
-  async function handle(files: FileList | null) {
-    if (!files?.[0]) return;
+  async function handle(files: FileList | File[] | null) {
+    if (!files || (files as any).length === 0) return;
+    const first = (files as any)[0] as File;
+    if (!first) return;
     setBusy(true);
     try {
-      const url = await uploadOne(files[0], folder);
+      const url = await uploadOne(first, folder);
       onChange(url);
     } catch (e: any) {
       toast.error(e.message ?? "Erro ao enviar imagem");
@@ -54,6 +56,25 @@ export function ImageUpload({
       if (ref.current) ref.current.value = "";
     }
   }
+
+  useEffect(() => {
+    function onPaste(e: ClipboardEvent) {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      const imgs: File[] = [];
+      for (const it of Array.from(items)) {
+        if (it.kind === "file" && it.type.startsWith("image/")) {
+          const f = it.getAsFile();
+          if (f) imgs.push(f);
+        }
+      }
+      if (imgs.length === 0) return;
+      e.preventDefault();
+      handle(imgs);
+    }
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, []);
 
   return (
     <div className="space-y-2">
