@@ -14,9 +14,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         <div className="layout-grid grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
           <main className="min-w-0 order-1">{children}</main>
           <div className="hidden lg:block order-2 min-w-0">
-            <div className="h-full">
-              <InstitutionalSidebar />
-            </div>
+            <InstitutionalSidebar />
           </div>
         </div>
       </div>
