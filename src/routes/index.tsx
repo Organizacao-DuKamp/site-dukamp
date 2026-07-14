@@ -29,8 +29,12 @@ const PRODUCT_COLS =
 
 const HOME_PRODUCT_LIMIT = 5;
 
+const INITIAL_ROWS = 3;
+const ROWS_INCREMENT = 2;
+
 function Home() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [visibleRows, setVisibleRows] = useState<number>(INITIAL_ROWS);
 
   const featured = useQuery({
     queryKey: ["products", "featured"],
