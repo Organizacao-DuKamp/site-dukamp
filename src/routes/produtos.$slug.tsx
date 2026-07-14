@@ -13,6 +13,40 @@ import { cn } from "@/lib/utils";
 import { RichContent } from "@/components/site/RichContent";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 
+function ZoomBox({ children }: { children: React.ReactNode }) {
+  const [origin, setOrigin] = useState("50% 50%");
+  const [zoom, setZoom] = useState(false);
+  return (
+    <div
+      className="aspect-square rounded-lg bg-white border overflow-hidden cursor-zoom-in"
+      onMouseEnter={() => setZoom(true)}
+      onMouseLeave={() => setZoom(false)}
+      onMouseMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width) * 100;
+        const y = ((e.clientY - r.top) / r.height) * 100;
+        setOrigin(`${x}% ${y}%`);
+      }}
+      style={{
+        // @ts-expect-error CSS custom property
+        "--zoom-origin": origin,
+      }}
+    >
+      <div
+        className="w-full h-full transition-transform duration-150 ease-out"
+        style={{
+          transform: zoom ? "scale(2.2)" : "scale(1)",
+          transformOrigin: origin,
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+
+
 
 export const Route = createFileRoute("/produtos/$slug")({
   component: Page,
@@ -57,7 +91,7 @@ function Page() {
               <CarouselContent>
                 {images.map((src, i) => (
                   <CarouselItem key={i}>
-                    <div className="aspect-square rounded-lg bg-white border overflow-hidden">
+                    <ZoomBox>
                       <OptimizedImage
                         src={src}
                         alt={`${p.name} ${i + 1}`}
@@ -71,7 +105,7 @@ function Page() {
                         wrapperClassName="w-full h-full bg-white"
                         className="p-4"
                       />
-                    </div>
+                    </ZoomBox>
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -79,7 +113,7 @@ function Page() {
               <CarouselNext className="right-2" />
             </Carousel>
           ) : (
-            <div className="aspect-square rounded-lg bg-white border overflow-hidden">
+            <ZoomBox>
               <OptimizedImage
                 src={images[0]}
                 alt={p.name}
@@ -93,7 +127,7 @@ function Page() {
                 wrapperClassName="w-full h-full bg-white"
                 className="p-4"
               />
-            </div>
+            </ZoomBox>
           )}
           {images.length > 1 && (
             <div className="grid grid-cols-5 gap-2">
