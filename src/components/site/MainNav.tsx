@@ -13,7 +13,7 @@ import { optimizedImage } from "@/lib/image-url";
 // Categorias fixas que aparecem no mega-menu de Produtos, na ordem desejada.
 // "Suplementos Minerais" reaproveita o catálogo existente "suplementos-naturais".
 const FEATURED_CATEGORIES: { slug: string; label: string }[] = [
-  { slug: "suplementos-naturais",     label: "Suplementos Minerais" },
+  { slug: "suplementos-minerais",     label: "Suplementos Minerais" },
   { slug: "racoes-gado-corte",        label: "Rações Gado de Corte" },
   { slug: "racoes-gado-leiteiro",     label: "Rações Gado Leiteiro" },
   { slug: "nucleos",                  label: "Núcleos" },
@@ -23,6 +23,19 @@ const FEATURED_CATEGORIES: { slug: string; label: string }[] = [
   { slug: "ovinos",                   label: "Ovinos" },
   { slug: "confinamento-grao-inteiro",label: "Confinamento Grão Inteiro" },
   { slug: "aditivados-premium",       label: "Aditivados Premium" },
+  { slug: "vermifugos",               label: "Vermífugos" },
+  { slug: "antibioticos",             label: "Antibióticos" },
+  { slug: "antiinflamatorio",         label: "Antiinflamatório" },
+  { slug: "vacinas-cat",              label: "Vacinas" },
+  { slug: "reproducao",               label: "Reprodução" },
+  { slug: "demais-medicamentos",      label: "Demais Medicamentos" },
+  { slug: "ferragens",                label: "Ferragens" },
+  { slug: "arames",                   label: "Arames" },
+  { slug: "lonas-e-coberturas",       label: "Lonas e Coberturas" },
+  { slug: "utensilios-gerais",        label: "Utensílios Gerais" },
+  { slug: "sementes",                 label: "Sementes" },
+  { slug: "defensivos",               label: "Defensivos" },
+  { slug: "pets",                     label: "Pets" },
 ];
 
 function useCategories() {
