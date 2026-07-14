@@ -124,10 +124,15 @@ function CheckoutPage() {
           items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })),
         },
       });
-      setFrete(r);
-      toast.success(`Frete ${r.servico}: ${formatBRL(r.valor)} em até ${r.prazoDias} dia(s)`);
+      const opcoes = (r as any).opcoes ?? [r];
+      setFreteOpcoes(opcoes);
+      // seleciona a opção mais barata por padrão
+      const barata = [...opcoes].sort((a, b) => a.valor - b.valor)[0];
+      setFrete(barata);
+      toast.success(`Frete calculado: ${opcoes.length} opção(ões) disponível(is)`);
     } catch (e) {
       setFrete(null);
+      setFreteOpcoes([]);
       toast.error(e instanceof Error ? e.message : "Erro ao calcular frete");
     } finally {
       setLoadingFrete(false);
