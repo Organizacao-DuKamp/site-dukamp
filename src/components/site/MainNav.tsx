@@ -109,8 +109,9 @@ function DesktopItem({ item }: { item: NavItem }) {
           <div className="rounded-b-md bg-white text-foreground shadow-xl border border-black/10 w-[min(95vw,880px)] overflow-hidden">
             <div className="grid grid-cols-[minmax(220px,260px)_1fr]">
               {/* Left: categories */}
-              <div className="border-r bg-muted/30 p-2">
+              <div className="border-r bg-muted/30 p-2 max-h-[70vh] overflow-y-auto">
                 <ul className="flex flex-col">
+
                   {featured.length === 0 && (
                     <li className="px-3 py-2 text-sm text-muted-foreground">Nenhuma categoria</li>
                   )}
