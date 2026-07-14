@@ -214,7 +214,7 @@ async function calculateCorreiosRestShipping(token: string, cepDest: string, _co
   }
 
   return {
-    servico: CORREIOS_SERVICO_NOME,
+    servico,
     valor: Number(valor.toFixed(2)),
     prazoDias: prazoDias || 7,
     dataMaxima,
