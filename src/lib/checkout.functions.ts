@@ -162,8 +162,8 @@ async function calculateLegacyCorreiosShipping(cepDest: string, servico: Service
   };
 }
 
-async function calculateCorreiosRestShipping(token: string, cepDest: string, _contrato: string, pacotes: ShippingPackage[]) {
-  const cod = CORREIOS_COD_PRODUTO;
+async function calculateCorreiosRestShipping(token: string, cepDest: string, _contrato: string, servico: ServiceName, pacotes: ShippingPackage[]) {
+  const cod = SERVICES[servico].rest;
   const headers = { Authorization: `Bearer ${token}`, accept: "application/json" };
 
   let valor = 0;
