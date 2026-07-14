@@ -2,10 +2,18 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const CEP_ORIGEM = (process.env.CORREIOS_CEP_ORIGEM || "15150104").replace(/\D/g, "");
-// Código do produto Correios. 03220 = SEDEX contrato; pode ser sobrescrito por env.
-const CORREIOS_COD_PRODUTO = (process.env.CORREIOS_COD_PRODUTO || "03220").trim();
-const CORREIOS_SERVICO_PUBLICO = "04510";
-const CORREIOS_SERVICO_NOME = CORREIOS_COD_PRODUTO === "03298" ? "PAC" : "SEDEX";
+
+type ServiceName = "PAC" | "SEDEX";
+const SERVICES: Record<ServiceName, { rest: string; legacy: string }> = {
+  SEDEX: {
+    rest: (process.env.CORREIOS_COD_SEDEX || "03220").trim(),
+    legacy: "04014",
+  },
+  PAC: {
+    rest: (process.env.CORREIOS_COD_PAC || "03298").trim(),
+    legacy: "04510",
+  },
+};
 
 type ShippingPackage = {
   pesoKg: number;
@@ -95,7 +103,7 @@ function parseCorreiosXmlTag(xml: string, tag: string) {
   return match?.[1]?.trim() || "";
 }
 
-async function calculateLegacyCorreiosPackage(cepDest: string, pacote: ShippingPackage) {
+async function calculateLegacyCorreiosPackage(cepDest: string, servico: ServiceName, pacote: ShippingPackage) {
   const url = new URL("https://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx");
   url.searchParams.set("nCdEmpresa", "");
   url.searchParams.set("sDsSenha", "");
@@ -110,7 +118,7 @@ async function calculateLegacyCorreiosPackage(cepDest: string, pacote: ShippingP
   url.searchParams.set("sCdMaoPropria", "N");
   url.searchParams.set("nVlValorDeclarado", "0");
   url.searchParams.set("sCdAvisoRecebimento", "N");
-  url.searchParams.set("nCdServico", CORREIOS_SERVICO_PUBLICO);
+  url.searchParams.set("nCdServico", SERVICES[servico].legacy);
   url.searchParams.set("StrRetorno", "xml");
   url.searchParams.set("nIndicaCalculo", "3");
 
@@ -137,25 +145,25 @@ async function calculateLegacyCorreiosPackage(cepDest: string, pacote: ShippingP
   return { valor, prazoDias: Number.isFinite(prazoDias) && prazoDias > 0 ? prazoDias : 7 };
 }
 
-async function calculateLegacyCorreiosShipping(cepDest: string, pacotes: ShippingPackage[]) {
+async function calculateLegacyCorreiosShipping(cepDest: string, servico: ServiceName, pacotes: ShippingPackage[]) {
   let valor = 0;
   let prazoDias = 0;
 
   for (const pacote of pacotes) {
-    const result = await calculateLegacyCorreiosPackage(cepDest, pacote);
+    const result = await calculateLegacyCorreiosPackage(cepDest, servico, pacote);
     valor += result.valor;
     prazoDias = Math.max(prazoDias, result.prazoDias);
   }
 
   return {
-    servico: CORREIOS_SERVICO_NOME,
+    servico,
     valor: Number(valor.toFixed(2)),
     prazoDias: prazoDias || 7,
   };
 }
 
-async function calculateCorreiosRestShipping(token: string, cepDest: string, _contrato: string, pacotes: ShippingPackage[]) {
-  const cod = CORREIOS_COD_PRODUTO;
+async function calculateCorreiosRestShipping(token: string, cepDest: string, _contrato: string, servico: ServiceName, pacotes: ShippingPackage[]) {
+  const cod = SERVICES[servico].rest;
   const headers = { Authorization: `Bearer ${token}`, accept: "application/json" };
 
   let valor = 0;
@@ -206,7 +214,7 @@ async function calculateCorreiosRestShipping(token: string, cepDest: string, _co
   }
 
   return {
-    servico: CORREIOS_SERVICO_NOME,
+    servico,
     valor: Number(valor.toFixed(2)),
     prazoDias: prazoDias || 7,
     dataMaxima,
@@ -337,10 +345,11 @@ async function correiosToken() {
 }
 
 export const calculateShipping = createServerFn({ method: "POST" })
-  .inputValidator((data: { cepDestino: string; items: Array<{ product_id: string; quantity: number }> }) =>
+  .inputValidator((data: { cepDestino: string; servico?: "PAC" | "SEDEX"; items: Array<{ product_id: string; quantity: number }> }) =>
     z
       .object({
         cepDestino: z.string().min(8),
+        servico: z.enum(["PAC", "SEDEX"]).optional(),
         items: z
           .array(z.object({ product_id: z.string().uuid(), quantity: z.number().int().positive() }))
           .min(1),
@@ -375,35 +384,49 @@ export const calculateShipping = createServerFn({ method: "POST" })
 
     if (!pacotes.length) throw new Error("Produto inválido no carrinho");
 
-    try {
-      const envToken = cleanSecret(process.env.CORREIOS_TOKEN);
-      const token = envToken || (await correiosToken()).token;
-      const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
-      return await calculateCorreiosRestShipping(token, cepDest, contrato, pacotes);
-    } catch (error) {
-      const restMsg = error instanceof Error ? error.message : String(error);
-      if (isCorreiosPermissionError(restMsg)) {
-        console.error("[Correios] REST sem permissão para API de preço", {
+    const services: ServiceName[] = data.servico ? [data.servico] : ["SEDEX", "PAC"];
+
+    const calcOne = async (servico: ServiceName) => {
+      try {
+        const envToken = cleanSecret(process.env.CORREIOS_TOKEN);
+        const token = envToken || (await correiosToken()).token;
+        const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
+        return await calculateCorreiosRestShipping(token, cepDest, contrato, servico, pacotes);
+      } catch (error) {
+        const restMsg = error instanceof Error ? error.message : String(error);
+        if (isCorreiosPermissionError(restMsg)) {
+          console.error("[Correios] REST sem permissão para API de preço", {
+            reason: restMsg.slice(0, 500),
+            packages: pacotes.length,
+          });
+          throw new Error(restMsg);
+        }
+        console.error("[Correios] API REST indisponível; usando calculador público", {
           reason: restMsg.slice(0, 500),
           packages: pacotes.length,
         });
-        throw new Error(restMsg);
+        try {
+          return await calculateLegacyCorreiosShipping(cepDest, servico, pacotes);
+        } catch (legacyError) {
+          const legacyMsg = legacyError instanceof Error ? legacyError.message : String(legacyError);
+          throw new Error(`Falha ao calcular frete (${servico}). REST: ${restMsg} | Legado: ${legacyMsg}`);
+        }
       }
+    };
 
-      console.error("[Correios] API REST indisponível; usando calculador público", {
-        reason: restMsg.slice(0, 500),
-        packages: pacotes.length,
-      });
-      try {
-        return await calculateLegacyCorreiosShipping(cepDest, pacotes);
-      } catch (legacyError) {
-        console.error("[Correios] calculador público falhou", {
-          reason: legacyError instanceof Error ? legacyError.message.slice(0, 500) : String(legacyError),
-        });
-        const legacyMsg = legacyError instanceof Error ? legacyError.message : String(legacyError);
-        throw new Error(`Falha ao calcular frete. REST: ${restMsg} | Legado (CalcPrecoPrazo): ${legacyMsg}`);
-      }
+    const results = await Promise.allSettled(services.map(calcOne));
+    const opcoes = results
+      .map((r, i) => (r.status === "fulfilled" ? r.value : null))
+      .filter((v): v is NonNullable<typeof v> => v !== null);
+
+    if (!opcoes.length) {
+      const firstErr = results.find((r) => r.status === "rejected") as PromiseRejectedResult | undefined;
+      throw new Error(firstErr?.reason instanceof Error ? firstErr.reason.message : "Falha ao calcular frete");
     }
+
+    // Retrocompat: primeiro item = escolha padrão (SEDEX quando ambos)
+    const primary = opcoes[0];
+    return { ...primary, opcoes };
   });
 
 // ---------- Order + Mercado Pago Pix ----------
