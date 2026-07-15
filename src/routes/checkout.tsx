@@ -90,6 +90,15 @@ function CheckoutPage() {
 
   const createOrder = useServerFn(createPixOrder);
   const calcFrete = useServerFn(calculateShipping);
+  const fetchMpKey = useServerFn(getMpPublicKey);
+  const payCard = useServerFn(processCardPayment);
+
+  const brickContainerRef = useRef<HTMLDivElement | null>(null);
+  const brickControllerRef = useRef<any>(null);
+  const mpInstanceRef = useRef<any>(null);
+  const [mpPublicKey, setMpPublicKey] = useState<string | null>(null);
+  const [mpSdkReady, setMpSdkReady] = useState(false);
+  const [brickError, setBrickError] = useState<string | null>(null);
 
   function set<K extends keyof Form>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
