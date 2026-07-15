@@ -208,7 +208,8 @@ function CheckoutPage() {
     setLoadingPay(true);
     try {
       const r = await createOrderNow();
-      clear();
+      // NÃO limpar o carrinho aqui — só ao confirmar o pagamento (a página /pedido/$id
+      // faz polling do status e limpa o carrinho quando aprovado).
       nav({ to: "/pedido/$id", params: { id: r.orderId } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao criar pedido");
@@ -246,10 +247,13 @@ function CheckoutPage() {
         toast.error("Pagamento recusado pela operadora. Tente outro cartão.");
         throw new Error("rejected");
       }
-      clear();
-      toast.success(
-        r.status === "approved" ? "Pagamento aprovado!" : "Pagamento em análise. Acompanhe pelo seu pedido.",
-      );
+      // Só limpa o carrinho quando o pagamento foi efetivamente aprovado.
+      if (r.status === "approved") {
+        clear();
+        toast.success("Pagamento aprovado!");
+      } else {
+        toast.success("Pagamento em análise. Acompanhe pelo seu pedido.");
+      }
       nav({ to: "/pedido/$id", params: { id: order.orderId } });
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Erro ao processar pagamento";
