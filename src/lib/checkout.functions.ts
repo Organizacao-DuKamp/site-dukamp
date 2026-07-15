@@ -431,6 +431,32 @@ export const calculateShipping = createServerFn({ method: "POST" })
 
 // ---------- Order + Mercado Pago Pix ----------
 
+// Tabela de taxas do cartão de crédito — canônico no servidor.
+// Frontend só EXIBE; o servidor recalcula do zero e ignora qualquer valor enviado.
+export const CARD_FEE_TABLE = {
+  1: 0.0502, // à vista
+  2: 0.0702,
+  3: 0.0890,
+} as const;
+export type CardInstallments = keyof typeof CARD_FEE_TABLE;
+
+export function computePaymentTotals(
+  base: number,
+  method: "pix" | "card",
+  installments: CardInstallments | null,
+) {
+  const baseAmount = Number(base.toFixed(2));
+  if (method === "pix") {
+    return { baseAmount, feePct: 0, feeAmount: 0, total: baseAmount, installments: null as null };
+  }
+  const inst = (installments ?? 1) as CardInstallments;
+  const feePct = CARD_FEE_TABLE[inst];
+  if (feePct == null) throw new Error("Parcelamento inválido");
+  const total = Number((baseAmount * (1 + feePct)).toFixed(2));
+  const feeAmount = Number((total - baseAmount).toFixed(2));
+  return { baseAmount, feePct, feeAmount, total, installments: inst };
+}
+
 const orderSchema = z.object({
   customer_name: z.string().min(2).max(120),
   email: z.string().email(),
@@ -455,7 +481,10 @@ const orderSchema = z.object({
   shipping_cost: z.number().nonnegative(),
   shipping_service: z.string().min(1),
   shipping_deadline_days: z.number().int().nonnegative(),
+  payment_method: z.enum(["pix", "card"]).default("pix"),
+  card_installments: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
 });
+
 
 export const createPixOrder = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => orderSchema.parse(data))
