@@ -756,7 +756,7 @@ export const processCardPayment = createServerFn({ method: "POST" })
       .from("orders")
       .update({
         mp_payment_id: String(body.id),
-        payment_status: status,
+        payment_status: status as any,
       })
       .eq("id", order.id);
 
