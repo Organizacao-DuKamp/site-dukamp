@@ -186,27 +186,29 @@ function CheckoutPage() {
     return null;
   }
 
+  async function createOrderNow() {
+    const r = await createOrder({
+      data: {
+        ...form,
+        items: items.map((i) => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price })),
+        shipping_cost: frete?.valor ?? 0,
+        shipping_service: frete?.servico ?? "A combinar",
+        shipping_deadline_days: frete?.prazoDias ?? 0,
+        payment_method: method,
+        card_installments: method === "card" ? installments : undefined,
+      },
+    });
+    return r;
+  }
+
   async function handleBuy() {
+    // Só chamado no fluxo Pix. Cartão finaliza pelo Brick (handleCardSubmit).
     const err = validateDelivery();
     if (err) return toast.error(err);
     setLoadingPay(true);
     try {
-      const r = await createOrder({
-        data: {
-          ...form,
-          items: items.map((i) => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price })),
-          shipping_cost: frete?.valor ?? 0,
-          shipping_service: frete?.servico ?? "A combinar",
-          shipping_deadline_days: frete?.prazoDias ?? 0,
-          payment_method: method,
-          card_installments: method === "card" ? installments : undefined,
-        },
-      });
+      const r = await createOrderNow();
       clear();
-      if (method === "card" && r.redirectUrl) {
-        window.location.href = r.redirectUrl;
-        return;
-      }
       nav({ to: "/pedido/$id", params: { id: r.orderId } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao criar pedido");
@@ -214,6 +216,158 @@ function CheckoutPage() {
       setLoadingPay(false);
     }
   }
+
+  async function handleCardSubmit(formData: {
+    token: string;
+    payment_method_id: string;
+    issuer_id?: string;
+    installments: number;
+    payer: { email: string; identification: { type: string; number: string } };
+  }) {
+    const err = validateDelivery();
+    if (err) {
+      toast.error(err);
+      throw new Error(err);
+    }
+    setLoadingPay(true);
+    try {
+      const order = await createOrderNow();
+      const r = await payCard({
+        data: {
+          order_id: order.orderId,
+          token: formData.token,
+          payment_method_id: formData.payment_method_id,
+          issuer_id: formData.issuer_id || null,
+          installments: formData.installments,
+          payer: formData.payer,
+        },
+      });
+      if (r.status === "rejected" || r.status === "cancelled") {
+        toast.error("Pagamento recusado pela operadora. Tente outro cartão.");
+        throw new Error("rejected");
+      }
+      clear();
+      toast.success(
+        r.status === "approved" ? "Pagamento aprovado!" : "Pagamento em análise. Acompanhe pelo seu pedido.",
+      );
+      nav({ to: "/pedido/$id", params: { id: order.orderId } });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Erro ao processar pagamento";
+      if (msg !== "rejected") toast.error(msg);
+      throw e;
+    } finally {
+      setLoadingPay(false);
+    }
+  }
+
+  // Carrega SDK do Mercado Pago e a public key quando o método cartão é escolhido.
+  useEffect(() => {
+    if (method !== "card") return;
+    if (typeof window === "undefined") return;
+    (async () => {
+      try {
+        if (!mpPublicKey) {
+          const { publicKey } = await fetchMpKey();
+          setMpPublicKey(publicKey);
+        }
+        if (!(window as any).MercadoPago) {
+          await new Promise<void>((resolve, reject) => {
+            const existing = document.querySelector<HTMLScriptElement>("script[data-mp-sdk]");
+            if (existing) {
+              existing.addEventListener("load", () => resolve(), { once: true });
+              existing.addEventListener("error", () => reject(new Error("Falha ao carregar SDK Mercado Pago")), { once: true });
+              return;
+            }
+            const s = document.createElement("script");
+            s.src = "https://sdk.mercadopago.com/js/v2";
+            s.async = true;
+            s.dataset.mpSdk = "1";
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error("Falha ao carregar SDK Mercado Pago"));
+            document.head.appendChild(s);
+          });
+        }
+        setMpSdkReady(true);
+      } catch (e) {
+        setBrickError(e instanceof Error ? e.message : "Erro ao preparar pagamento com cartão");
+      }
+    })();
+  }, [method, mpPublicKey, fetchMpKey]);
+
+  // (Re)cria o Card Payment Brick sempre que muda valor, parcelamento ou email.
+  useEffect(() => {
+    if (method !== "card" || !mpSdkReady || !mpPublicKey) return;
+    if (typeof window === "undefined") return;
+    const MP = (window as any).MercadoPago;
+    if (!MP) return;
+    const amount = computePaymentTotals(subtotal + (frete?.valor ?? 0), "card", installments).total;
+    if (!amount || amount <= 0) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        // Reset brick anterior
+        if (brickControllerRef.current?.unmount) {
+          try { brickControllerRef.current.unmount(); } catch {}
+          brickControllerRef.current = null;
+        }
+        if (!mpInstanceRef.current) {
+          mpInstanceRef.current = new MP(mpPublicKey, { locale: "pt-BR" });
+        }
+        const bricksBuilder = mpInstanceRef.current.bricks();
+        if (cancelled) return;
+        brickControllerRef.current = await bricksBuilder.create("cardPayment", "dukamp-card-brick", {
+          initialization: {
+            amount,
+            payer: { email: form.email || undefined },
+          },
+          customization: {
+            paymentMethods: {
+              maxInstallments: installments,
+              minInstallments: installments,
+            },
+            visual: { style: { theme: "default" } },
+          },
+          callbacks: {
+            onReady: () => setBrickError(null),
+            onError: (err: any) => {
+              console.error("[MP Brick]", err);
+              setBrickError(err?.message || "Erro no formulário de cartão");
+            },
+            onSubmit: async ({ formData }: any) => {
+              try {
+                await handleCardSubmit({
+                  token: formData.token,
+                  payment_method_id: formData.payment_method_id,
+                  issuer_id: formData.issuer_id,
+                  installments: formData.installments,
+                  payer: formData.payer,
+                });
+              } catch {
+                // erro já tratado no handleCardSubmit
+              }
+            },
+          },
+        });
+      } catch (e) {
+        if (!cancelled) setBrickError(e instanceof Error ? e.message : "Erro ao montar formulário");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [method, mpSdkReady, mpPublicKey, installments, subtotal, frete?.valor, form.email]);
+
+  useEffect(() => {
+    return () => {
+      if (brickControllerRef.current?.unmount) {
+        try { brickControllerRef.current.unmount(); } catch {}
+      }
+    };
+  }, []);
+
 
   const baseAmount = subtotal + (frete?.valor ?? 0);
   const totals = computePaymentTotals(baseAmount, method, method === "card" ? installments : null);
