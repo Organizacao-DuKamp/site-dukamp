@@ -1,26 +1,26 @@
-## Alteração
+Cole estas variáveis no Netlify em **Site settings → Environment variables** (ou num arquivo `.env` local, se for pra rodar fora do Lovable):
 
-No `src/components/site/Footer.tsx`, coluna "Contato", trocar a lista atual (email + telefone único + endereço único) por três blocos:
+```env
+VITE_SUPABASE_URL=https://mkehkhngltpltrtxdksi.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_D2K_2kVyuP2jluJvowPBWA_gshiIUDp
+VITE_SUPABASE_PROJECT_ID=mkehkhngltpltrtxdksi
 
-1. **E-mail** (mantido no topo)
-   - contato@dukamp.com.br
+SUPABASE_URL=https://mkehkhngltpltrtxdksi.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_D2K_2kVyuP2jluJvowPBWA_gshiIUDp
+```
 
-2. **Matriz** (indústria · administrativa · logística)
-   - (17) 3275-3106
-   - Av. Santos Dumont, 403 — Monte Aprazível/SP
+## Passos no Netlify
 
-3. **Filial — São José do Rio Preto**
-   - (17) 2136-1111
-   - R. Pedro Amaral, 3409 — Vila Ercília, São José do Rio Preto/SP, 15014-000
+1. **Site settings → Environment variables** — apague qualquer variável antiga apontando pra `ymujutvxlbwhnsfdlwpz` (URL, publishable key, anon key).
+2. Adicione as 5 variáveis acima com os valores novos.
+3. Se existir uma **integração da Supabase** conectada em Site settings → Integrations, **desconecte** — ela reinjeta as variáveis do projeto antigo a cada deploy e sobrescreve o que você colocar manualmente.
+4. **Deploys → Trigger deploy → Clear cache and deploy site** (não basta um redeploy normal).
+5. Abra o site publicado, DevTools → Network, confirme que as chamadas vão pra `mkehkhngltpltrtxdksi.supabase.co`.
 
-## Detalhes técnicos
+## Segredos server-side (Mercado Pago, Correios)
 
-- Os valores das duas unidades ficam **hardcoded** no `Footer.tsx` (o `site_settings.phone`/`address` continua existindo no banco para outros usos, mas o footer deixa de exibi-los para evitar duplicidade/conflito com os dois endereços).
-- E-mail continua vindo de `settings?.email` (com fallback).
-- Cada bloco terá um subtítulo pequeno em negrito ("Matriz", "Filial — São José do Rio Preto") para separação visual, seguindo o estilo já usado nas outras colunas.
-- Nenhuma outra parte da página é alterada (header, navbar, produtos, etc.).
+Estes **não** vão no Netlify como env vars públicas — ficam nos secrets do Lovable Cloud (já configurados: `MERCADO_PAGO_ACCESS_TOKEN`, `MERCADO_PAGO_WEBHOOK_SECRET`, `CORREIOS_*`). Não precisa mexer.
 
-## Fora do escopo
+## Observação técnica
 
-- Página `/unidades` não é alterada nesta task.
-- Não mexo em `site_settings` no banco.
+O `vite.config.ts` já tem fallback pras credenciais novas, mas ele só é usado quando `process.env.SUPABASE_URL` está **ausente** no build. Como o Netlify tem a variável antiga definida, o fallback é ignorado — por isso o build sai apontando pra Supabase velha mesmo com o código atualizado.
