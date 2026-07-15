@@ -94,11 +94,14 @@ function CheckoutPage() {
   const payCard = useServerFn(processCardPayment);
 
   const brickContainerRef = useRef<HTMLDivElement | null>(null);
+  const cardPaymentPanelRef = useRef<HTMLDivElement | null>(null);
   const brickControllerRef = useRef<any>(null);
   const mpInstanceRef = useRef<any>(null);
+  const latestCardSubmitRef = useRef(handleCardSubmit);
   const [mpPublicKey, setMpPublicKey] = useState<string | null>(null);
   const [mpSdkReady, setMpSdkReady] = useState(false);
   const [brickError, setBrickError] = useState<string | null>(null);
+  const [focusCardPanel, setFocusCardPanel] = useState(false);
 
   function set<K extends keyof Form>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
@@ -264,6 +267,27 @@ function CheckoutPage() {
     }
   }
 
+  useEffect(() => {
+    latestCardSubmitRef.current = handleCardSubmit;
+  });
+
+  useEffect(() => {
+    if (method !== "card" || !focusCardPanel) return;
+    const t = window.setTimeout(() => {
+      cardPaymentPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setFocusCardPanel(false);
+    }, 120);
+    return () => window.clearTimeout(t);
+  }, [method, focusCardPanel]);
+
+  function destroyCardBrick() {
+    if (brickControllerRef.current?.unmount) {
+      try { brickControllerRef.current.unmount(); } catch {}
+    }
+    brickControllerRef.current = null;
+    if (brickContainerRef.current) brickContainerRef.current.innerHTML = "";
+  }
+
   // Carrega SDK do Mercado Pago e a public key quando o método cartão é escolhido.
   useEffect(() => {
     if (method !== "card") return;
@@ -298,29 +322,28 @@ function CheckoutPage() {
     })();
   }, [method, mpPublicKey, fetchMpKey]);
 
-  // (Re)cria o Card Payment Brick sempre que muda valor, parcelamento ou email.
+  // Monta o Card Payment Brick de forma estável: sem recriar durante digitação
+  // e com cleanup real para não quebrar os iframes seguros do Mercado Pago.
   useEffect(() => {
     if (method !== "card" || !mpSdkReady || !mpPublicKey) return;
     if (typeof window === "undefined") return;
     const MP = (window as any).MercadoPago;
     if (!MP) return;
+    if (!brickContainerRef.current) return;
     const amount = computePaymentTotals(subtotal + (frete?.valor ?? 0), "card", installments).total;
     if (!amount || amount <= 0) return;
 
     let cancelled = false;
+    let createdController: any = null;
     (async () => {
       try {
-        // Reset brick anterior
-        if (brickControllerRef.current?.unmount) {
-          try { brickControllerRef.current.unmount(); } catch {}
-          brickControllerRef.current = null;
-        }
+        destroyCardBrick();
         if (!mpInstanceRef.current) {
           mpInstanceRef.current = new MP(mpPublicKey, { locale: "pt-BR" });
         }
         const bricksBuilder = mpInstanceRef.current.bricks();
         if (cancelled) return;
-        brickControllerRef.current = await bricksBuilder.create("cardPayment", "dukamp-card-brick", {
+        const controller = await bricksBuilder.create("cardPayment", "dukamp-card-brick", {
           initialization: {
             amount,
             payer: { email: form.email || undefined },
@@ -340,7 +363,7 @@ function CheckoutPage() {
             },
             onSubmit: async ({ formData }: any) => {
               try {
-                await handleCardSubmit({
+                await latestCardSubmitRef.current({
                   token: formData.token,
                   payment_method_id: formData.payment_method_id,
                   issuer_id: formData.issuer_id,
@@ -353,6 +376,12 @@ function CheckoutPage() {
             },
           },
         });
+        if (cancelled) {
+          try { controller?.unmount?.(); } catch {}
+          return;
+        }
+        createdController = controller;
+        brickControllerRef.current = controller;
       } catch (e) {
         if (!cancelled) setBrickError(e instanceof Error ? e.message : "Erro ao montar formulário");
       }
@@ -360,6 +389,10 @@ function CheckoutPage() {
 
     return () => {
       cancelled = true;
+      if (createdController) {
+        try { createdController.unmount?.(); } catch {}
+        if (brickControllerRef.current === createdController) brickControllerRef.current = null;
+      }
     };
     // Não incluir subtotal/frete/email nas deps: recriar o brick a cada tecla
     // dispara "The integration with Secure Fields failed" no Mercado Pago.
@@ -368,9 +401,7 @@ function CheckoutPage() {
 
   useEffect(() => {
     return () => {
-      if (brickControllerRef.current?.unmount) {
-        try { brickControllerRef.current.unmount(); } catch {}
-      }
+      destroyCardBrick();
     };
   }, []);
 
@@ -405,7 +436,7 @@ function CheckoutPage() {
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Finalizar compra</h1>
           <p className="mt-1 text-sm sm:text-base text-muted-foreground">
-            Revise seu pedido, calcule o frete e finalize com Pix.
+            Revise seu pedido, calcule o frete e finalize com Pix ou cartão.
           </p>
         </div>
 
@@ -606,7 +637,10 @@ function CheckoutPage() {
 
                 <button
                   type="button"
-                  onClick={() => setMethod("card")}
+                  onClick={() => {
+                    setMethod("card");
+                    setFocusCardPanel(true);
+                  }}
                   className={`w-full flex items-center gap-3 rounded-lg border-2 p-4 text-left transition-all ${
                     method === "card" ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
                   }`}
@@ -628,40 +662,39 @@ function CheckoutPage() {
                     <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                       Escolha o parcelamento
                     </div>
-                    {([1, 2, 3] as CardInstallments[]).map((n) => {
-                      const t = computePaymentTotals(baseAmount, "card", n);
-                      const selected = installments === n;
-                      const parcela = t.total / n;
-                      const label = n === 1 ? "À vista" : `${n}x`;
-                      return (
-                        <button
-                          key={n}
-                          type="button"
-                          onClick={() => setInstallments(n)}
-                          className={`w-full flex items-center gap-3 rounded-md border-2 p-3 text-left transition ${
-                            selected ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/50"
-                          }`}
-                        >
-                          <div className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border-2 ${selected ? "border-primary" : "border-muted-foreground/40"}`}>
-                            {selected && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold">
-                              {label} de {formatBRL(parcela)}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {([1, 2, 3] as CardInstallments[]).map((n) => {
+                        const t = computePaymentTotals(baseAmount, "card", n);
+                        const selected = installments === n;
+                        const parcela = t.total / n;
+                        const label = n === 1 ? "À vista" : `${n}x`;
+                        return (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => setInstallments(n)}
+                            className={`min-h-16 rounded-md border-2 p-2.5 text-left transition ${
+                              selected ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/50"
+                            }`}
+                          >
+                            <p className="text-sm font-semibold leading-tight">
+                              {label}
                             </p>
-                            <p className="text-[11px] text-muted-foreground">
-                              Total {formatBRL(t.total)} · taxa {(t.feePct * 100).toFixed(2).replace(".", ",")}%
-                              {" "}({formatBRL(t.feeAmount)})
+                            <p className="mt-1 text-xs font-medium leading-tight">
+                              {formatBRL(parcela)}
                             </p>
-                          </div>
-                        </button>
-                      );
-                    })}
+                            <p className="mt-1 text-[11px] text-muted-foreground leading-tight">
+                              Total {formatBRL(t.total)}
+                            </p>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
 
                 {method === "card" && (
-                  <div className="rounded-lg border-2 border-primary/30 bg-background p-4">
+                  <div ref={cardPaymentPanelRef} className="rounded-lg border-2 border-primary/30 bg-background p-4 scroll-mt-4">
                     <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
                       <Lock className="h-4 w-4 text-primary" />
                       Preencha os dados do cartão
@@ -669,7 +702,7 @@ function CheckoutPage() {
                     <p className="mb-3 text-xs text-muted-foreground">
                       Seus dados são enviados diretamente ao Mercado Pago com criptografia. Nada trafega pelos nossos servidores.
                     </p>
-                    <div id="dukamp-card-brick" ref={brickContainerRef} />
+                    <div id="dukamp-card-brick" ref={brickContainerRef} className="min-h-[540px]" />
                     {!mpSdkReady && !brickError && (
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Loader2 className="h-4 w-4 animate-spin" /> Carregando formulário seguro...
