@@ -507,16 +507,27 @@ function CheckoutPage() {
                       Entrega em até <b className="text-foreground">{frete.prazoDias} dia{frete.prazoDias === 1 ? "" : "s"} úte{frete.prazoDias === 1 ? "l" : "is"}</b>
                     </div>
                   )}
+                  {method === "card" && totals.feeAmount > 0 && (
+                    <Row
+                      label={`Taxa cartão (${(totals.feePct * 100).toFixed(2).replace(".", ",")}%)`}
+                      value={formatBRL(totals.feeAmount)}
+                    />
+                  )}
                   <Separator />
                   <div className="flex items-end justify-between">
                     <span className="text-sm font-medium text-muted-foreground">Total</span>
                     <span className="text-2xl sm:text-3xl font-bold text-primary tracking-tight">{formatBRL(total)}</span>
                   </div>
+                  {method === "card" && installments > 1 && (
+                    <div className="text-right text-xs text-muted-foreground">
+                      em {installments}x de <b className="text-foreground">{formatBRL(total / installments)}</b>
+                    </div>
+                  )}
 
                   <Button
                     type="button"
                     onClick={handleBuy}
-                    disabled={loadingPay || method !== "pix"}
+                    disabled={loadingPay}
                     size="lg"
                     className="w-full h-12 text-base font-bold gap-2 mt-2"
                   >
