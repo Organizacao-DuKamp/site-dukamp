@@ -3,10 +3,11 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { useServerFn } from "@tanstack/react-start";
 import { getOrderPublic } from "@/lib/checkout.functions";
 import { useQuery } from "@tanstack/react-query";
-import { formatBRL } from "@/lib/cart";
+import { formatBRL, useCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Clock, XCircle, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useRef } from "react";
 
 export const Route = createFileRoute("/pedido/$id")({
   ssr: false,
@@ -17,6 +18,8 @@ export const Route = createFileRoute("/pedido/$id")({
 function OrderPage() {
   const { id } = Route.useParams();
   const fetchOrder = useServerFn(getOrderPublic);
+  const { clear } = useCart();
+  const clearedRef = useRef(false);
   const q = useQuery({
     queryKey: ["order", id],
     queryFn: () => fetchOrder({ data: { id } }),
@@ -32,6 +35,12 @@ function OrderPage() {
   const { order, items } = q.data;
   const isPaid = order.payment_status === "approved";
   const isFailed = order.payment_status === "rejected" || order.payment_status === "cancelled";
+
+  // Limpa o carrinho SOMENTE quando o pagamento foi confirmado pelo Mercado Pago.
+  if (isPaid && !clearedRef.current) {
+    clearedRef.current = true;
+    clear();
+  }
 
   function copyPix() {
     if (!order.mp_qr_code) return;
