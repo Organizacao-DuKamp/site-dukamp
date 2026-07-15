@@ -427,15 +427,61 @@ function CheckoutPage() {
                   </div>
                 </button>
 
-                <div className="flex items-center gap-3 rounded-lg border-2 border-dashed p-4 opacity-60 cursor-not-allowed">
-                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground">
+                <button
+                  type="button"
+                  onClick={() => setMethod("card")}
+                  className={`w-full flex items-center gap-3 rounded-lg border-2 p-4 text-left transition-all ${
+                    method === "card" ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-primary/10 text-primary">
                     <CreditCard className="h-5 w-5" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold">Cartão de crédito</p>
-                    <p className="text-xs text-muted-foreground">Em breve</p>
+                    <p className="text-xs text-muted-foreground">Até 3x — pagamento seguro via Mercado Pago</p>
                   </div>
-                </div>
+                  <div className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${method === "card" ? "border-primary" : "border-muted-foreground/40"}`}>
+                    {method === "card" && <div className="h-2 w-2 rounded-full bg-primary" />}
+                  </div>
+                </button>
+
+                {method === "card" && baseAmount > 0 && (
+                  <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Escolha o parcelamento
+                    </div>
+                    {([1, 2, 3] as CardInstallments[]).map((n) => {
+                      const t = computePaymentTotals(baseAmount, "card", n);
+                      const selected = installments === n;
+                      const parcela = t.total / n;
+                      const label = n === 1 ? "À vista" : `${n}x`;
+                      return (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => setInstallments(n)}
+                          className={`w-full flex items-center gap-3 rounded-md border-2 p-3 text-left transition ${
+                            selected ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/50"
+                          }`}
+                        >
+                          <div className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border-2 ${selected ? "border-primary" : "border-muted-foreground/40"}`}>
+                            {selected && <div className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold">
+                              {label} de {formatBRL(parcela)}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              Total {formatBRL(t.total)} · taxa {(t.feePct * 100).toFixed(2).replace(".", ",")}%
+                              {" "}({formatBRL(t.feeAmount)})
+                            </p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </Section>
           </div>
