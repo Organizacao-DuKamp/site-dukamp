@@ -721,16 +721,22 @@ function CheckoutPage() {
                     </div>
                   )}
 
-                  <Button
-                    type="button"
-                    onClick={handleBuy}
-                    disabled={loadingPay}
-                    size="lg"
-                    className="w-full h-12 text-base font-bold gap-2 mt-2"
-                  >
-                    {loadingPay ? <Loader2 className="h-5 w-5 animate-spin" /> : <Lock className="h-4 w-4" />}
-                    PAGAR AGORA
-                  </Button>
+                  {method === "pix" ? (
+                    <Button
+                      type="button"
+                      onClick={handleBuy}
+                      disabled={loadingPay}
+                      size="lg"
+                      className="w-full h-12 text-base font-bold gap-2 mt-2"
+                    >
+                      {loadingPay ? <Loader2 className="h-5 w-5 animate-spin" /> : <Lock className="h-4 w-4" />}
+                      PAGAR COM PIX
+                    </Button>
+                  ) : (
+                    <div className="mt-2 rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
+                      Preencha os dados do cartão na seção <b>Pagamento</b> ao lado e clique em <b>Pagar</b> para finalizar sem sair do site.
+                    </div>
+                  )}
 
                   <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                     <ShieldCheck className="h-3.5 w-3.5 text-primary" />
