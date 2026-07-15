@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useServerFn } from "@tanstack/react-start";
-import { createPixOrder, calculateShipping } from "@/lib/checkout.functions";
+import { createPixOrder, calculateShipping, CARD_FEE_TABLE, computePaymentTotals, type CardInstallments } from "@/lib/checkout.functions";
 import { useSiteSettings } from "@/lib/site-settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
