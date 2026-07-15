@@ -2,7 +2,15 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useServerFn } from "@tanstack/react-start";
-import { createPixOrder, calculateShipping, CARD_FEE_TABLE, computePaymentTotals, type CardInstallments } from "@/lib/checkout.functions";
+import {
+  createPixOrder,
+  calculateShipping,
+  CARD_FEE_TABLE,
+  computePaymentTotals,
+  getMpPublicKey,
+  processCardPayment,
+  type CardInstallments,
+} from "@/lib/checkout.functions";
 import { useSiteSettings } from "@/lib/site-settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { MapCepPicker } from "@/components/site/MapCepPicker";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Loader2,
