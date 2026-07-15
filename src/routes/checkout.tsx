@@ -2,7 +2,15 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { useCart, formatBRL } from "@/lib/cart";
 import { useServerFn } from "@tanstack/react-start";
-import { createPixOrder, calculateShipping, CARD_FEE_TABLE, computePaymentTotals, type CardInstallments } from "@/lib/checkout.functions";
+import {
+  createPixOrder,
+  calculateShipping,
+  CARD_FEE_TABLE,
+  computePaymentTotals,
+  getMpPublicKey,
+  processCardPayment,
+  type CardInstallments,
+} from "@/lib/checkout.functions";
 import { useSiteSettings } from "@/lib/site-settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { MapCepPicker } from "@/components/site/MapCepPicker";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Loader2,
@@ -82,6 +90,15 @@ function CheckoutPage() {
 
   const createOrder = useServerFn(createPixOrder);
   const calcFrete = useServerFn(calculateShipping);
+  const fetchMpKey = useServerFn(getMpPublicKey);
+  const payCard = useServerFn(processCardPayment);
+
+  const brickContainerRef = useRef<HTMLDivElement | null>(null);
+  const brickControllerRef = useRef<any>(null);
+  const mpInstanceRef = useRef<any>(null);
+  const [mpPublicKey, setMpPublicKey] = useState<string | null>(null);
+  const [mpSdkReady, setMpSdkReady] = useState(false);
+  const [brickError, setBrickError] = useState<string | null>(null);
 
   function set<K extends keyof Form>(k: K, v: string) {
     setForm((f) => ({ ...f, [k]: v }));
@@ -169,27 +186,29 @@ function CheckoutPage() {
     return null;
   }
 
+  async function createOrderNow() {
+    const r = await createOrder({
+      data: {
+        ...form,
+        items: items.map((i) => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price })),
+        shipping_cost: frete?.valor ?? 0,
+        shipping_service: frete?.servico ?? "A combinar",
+        shipping_deadline_days: frete?.prazoDias ?? 0,
+        payment_method: method,
+        card_installments: method === "card" ? installments : undefined,
+      },
+    });
+    return r;
+  }
+
   async function handleBuy() {
+    // Só chamado no fluxo Pix. Cartão finaliza pelo Brick (handleCardSubmit).
     const err = validateDelivery();
     if (err) return toast.error(err);
     setLoadingPay(true);
     try {
-      const r = await createOrder({
-        data: {
-          ...form,
-          items: items.map((i) => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price })),
-          shipping_cost: frete?.valor ?? 0,
-          shipping_service: frete?.servico ?? "A combinar",
-          shipping_deadline_days: frete?.prazoDias ?? 0,
-          payment_method: method,
-          card_installments: method === "card" ? installments : undefined,
-        },
-      });
+      const r = await createOrderNow();
       clear();
-      if (method === "card" && r.redirectUrl) {
-        window.location.href = r.redirectUrl;
-        return;
-      }
       nav({ to: "/pedido/$id", params: { id: r.orderId } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Erro ao criar pedido");
@@ -197,6 +216,158 @@ function CheckoutPage() {
       setLoadingPay(false);
     }
   }
+
+  async function handleCardSubmit(formData: {
+    token: string;
+    payment_method_id: string;
+    issuer_id?: string;
+    installments: number;
+    payer: { email: string; identification: { type: string; number: string } };
+  }) {
+    const err = validateDelivery();
+    if (err) {
+      toast.error(err);
+      throw new Error(err);
+    }
+    setLoadingPay(true);
+    try {
+      const order = await createOrderNow();
+      const r = await payCard({
+        data: {
+          order_id: order.orderId,
+          token: formData.token,
+          payment_method_id: formData.payment_method_id,
+          issuer_id: formData.issuer_id || null,
+          installments: formData.installments,
+          payer: formData.payer,
+        },
+      });
+      if (r.status === "rejected" || r.status === "cancelled") {
+        toast.error("Pagamento recusado pela operadora. Tente outro cartão.");
+        throw new Error("rejected");
+      }
+      clear();
+      toast.success(
+        r.status === "approved" ? "Pagamento aprovado!" : "Pagamento em análise. Acompanhe pelo seu pedido.",
+      );
+      nav({ to: "/pedido/$id", params: { id: order.orderId } });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Erro ao processar pagamento";
+      if (msg !== "rejected") toast.error(msg);
+      throw e;
+    } finally {
+      setLoadingPay(false);
+    }
+  }
+
+  // Carrega SDK do Mercado Pago e a public key quando o método cartão é escolhido.
+  useEffect(() => {
+    if (method !== "card") return;
+    if (typeof window === "undefined") return;
+    (async () => {
+      try {
+        if (!mpPublicKey) {
+          const { publicKey } = await fetchMpKey();
+          setMpPublicKey(publicKey);
+        }
+        if (!(window as any).MercadoPago) {
+          await new Promise<void>((resolve, reject) => {
+            const existing = document.querySelector<HTMLScriptElement>("script[data-mp-sdk]");
+            if (existing) {
+              existing.addEventListener("load", () => resolve(), { once: true });
+              existing.addEventListener("error", () => reject(new Error("Falha ao carregar SDK Mercado Pago")), { once: true });
+              return;
+            }
+            const s = document.createElement("script");
+            s.src = "https://sdk.mercadopago.com/js/v2";
+            s.async = true;
+            s.dataset.mpSdk = "1";
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error("Falha ao carregar SDK Mercado Pago"));
+            document.head.appendChild(s);
+          });
+        }
+        setMpSdkReady(true);
+      } catch (e) {
+        setBrickError(e instanceof Error ? e.message : "Erro ao preparar pagamento com cartão");
+      }
+    })();
+  }, [method, mpPublicKey, fetchMpKey]);
+
+  // (Re)cria o Card Payment Brick sempre que muda valor, parcelamento ou email.
+  useEffect(() => {
+    if (method !== "card" || !mpSdkReady || !mpPublicKey) return;
+    if (typeof window === "undefined") return;
+    const MP = (window as any).MercadoPago;
+    if (!MP) return;
+    const amount = computePaymentTotals(subtotal + (frete?.valor ?? 0), "card", installments).total;
+    if (!amount || amount <= 0) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        // Reset brick anterior
+        if (brickControllerRef.current?.unmount) {
+          try { brickControllerRef.current.unmount(); } catch {}
+          brickControllerRef.current = null;
+        }
+        if (!mpInstanceRef.current) {
+          mpInstanceRef.current = new MP(mpPublicKey, { locale: "pt-BR" });
+        }
+        const bricksBuilder = mpInstanceRef.current.bricks();
+        if (cancelled) return;
+        brickControllerRef.current = await bricksBuilder.create("cardPayment", "dukamp-card-brick", {
+          initialization: {
+            amount,
+            payer: { email: form.email || undefined },
+          },
+          customization: {
+            paymentMethods: {
+              maxInstallments: installments,
+              minInstallments: installments,
+            },
+            visual: { style: { theme: "default" } },
+          },
+          callbacks: {
+            onReady: () => setBrickError(null),
+            onError: (err: any) => {
+              console.error("[MP Brick]", err);
+              setBrickError(err?.message || "Erro no formulário de cartão");
+            },
+            onSubmit: async ({ formData }: any) => {
+              try {
+                await handleCardSubmit({
+                  token: formData.token,
+                  payment_method_id: formData.payment_method_id,
+                  issuer_id: formData.issuer_id,
+                  installments: formData.installments,
+                  payer: formData.payer,
+                });
+              } catch {
+                // erro já tratado no handleCardSubmit
+              }
+            },
+          },
+        });
+      } catch (e) {
+        if (!cancelled) setBrickError(e instanceof Error ? e.message : "Erro ao montar formulário");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [method, mpSdkReady, mpPublicKey, installments, subtotal, frete?.valor, form.email]);
+
+  useEffect(() => {
+    return () => {
+      if (brickControllerRef.current?.unmount) {
+        try { brickControllerRef.current.unmount(); } catch {}
+      }
+    };
+  }, []);
+
 
   const baseAmount = subtotal + (frete?.valor ?? 0);
   const totals = computePaymentTotals(baseAmount, method, method === "card" ? installments : null);
@@ -482,6 +653,32 @@ function CheckoutPage() {
                     })}
                   </div>
                 )}
+
+                {method === "card" && (
+                  <div className="rounded-lg border-2 border-primary/30 bg-background p-4">
+                    <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                      <Lock className="h-4 w-4 text-primary" />
+                      Preencha os dados do cartão
+                    </div>
+                    <p className="mb-3 text-xs text-muted-foreground">
+                      Seus dados são enviados diretamente ao Mercado Pago com criptografia. Nada trafega pelos nossos servidores.
+                    </p>
+                    <div id="dukamp-card-brick" ref={brickContainerRef} />
+                    {!mpSdkReady && !brickError && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Carregando formulário seguro...
+                      </div>
+                    )}
+                    {brickError && (
+                      <p className="mt-2 text-sm text-destructive">{brickError}</p>
+                    )}
+                    {loadingPay && (
+                      <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="h-4 w-4 animate-spin" /> Processando pagamento...
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </Section>
           </div>
@@ -524,16 +721,22 @@ function CheckoutPage() {
                     </div>
                   )}
 
-                  <Button
-                    type="button"
-                    onClick={handleBuy}
-                    disabled={loadingPay}
-                    size="lg"
-                    className="w-full h-12 text-base font-bold gap-2 mt-2"
-                  >
-                    {loadingPay ? <Loader2 className="h-5 w-5 animate-spin" /> : <Lock className="h-4 w-4" />}
-                    PAGAR AGORA
-                  </Button>
+                  {method === "pix" ? (
+                    <Button
+                      type="button"
+                      onClick={handleBuy}
+                      disabled={loadingPay}
+                      size="lg"
+                      className="w-full h-12 text-base font-bold gap-2 mt-2"
+                    >
+                      {loadingPay ? <Loader2 className="h-5 w-5 animate-spin" /> : <Lock className="h-4 w-4" />}
+                      PAGAR COM PIX
+                    </Button>
+                  ) : (
+                    <div className="mt-2 rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
+                      Preencha os dados do cartão na seção <b>Pagamento</b> ao lado e clique em <b>Pagar</b> para finalizar sem sair do site.
+                    </div>
+                  )}
 
                   <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                     <ShieldCheck className="h-3.5 w-3.5 text-primary" />
