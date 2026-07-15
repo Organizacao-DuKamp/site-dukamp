@@ -749,8 +749,9 @@ export const processCardPayment = createServerFn({ method: "POST" })
       throw new Error(translateMpError(mpMsg));
     }
 
-    const status = String(body.status || "pending") as
-      | "pending" | "approved" | "in_process" | "rejected" | "cancelled" | "refunded" | "charged_back";
+    const validStatuses = ["pending", "in_process", "approved", "rejected", "cancelled", "refunded"] as const;
+    const rawStatus = String(body.status || "pending");
+    const status = (validStatuses as readonly string[]).includes(rawStatus) ? rawStatus : "pending";
     await supa
       .from("orders")
       .update({
