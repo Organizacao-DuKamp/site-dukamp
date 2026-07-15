@@ -361,8 +361,10 @@ function CheckoutPage() {
     return () => {
       cancelled = true;
     };
+    // Não incluir subtotal/frete/email nas deps: recriar o brick a cada tecla
+    // dispara "The integration with Secure Fields failed" no Mercado Pago.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [method, mpSdkReady, mpPublicKey, installments, subtotal, frete?.valor, form.email]);
+  }, [method, mpSdkReady, mpPublicKey, installments]);
 
   useEffect(() => {
     return () => {
