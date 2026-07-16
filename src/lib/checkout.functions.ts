@@ -281,7 +281,14 @@ async function readCorreiosError(res: Response) {
 }
 
 // ---------- Correios CWS ----------
+// Cache em memória do token (válido por ~24h; renovamos a cada 20h).
+let cachedCorreiosToken: { token: string; expiresAt: number } | null = null;
+
 async function correiosToken() {
+  if (cachedCorreiosToken && cachedCorreiosToken.expiresAt > Date.now()) {
+    return { token: cachedCorreiosToken.token };
+  }
+
   const rawUsuario = cleanSecret(process.env.CORREIOS_USUARIO);
   const usuario = normalizeCorreiosUser(process.env.CORREIOS_USUARIO);
   const senha = cleanSecret(process.env.CORREIOS_SENHA);
@@ -310,69 +317,59 @@ async function correiosToken() {
   validateCorreiosCredentials(usuario, senha, cartao);
 
   const basic = Buffer.from(`${usuario}:${senha}`).toString("base64");
-  console.log("[Correios] basic auth header", { basicLen: basic.length, basicPreview: `${basic.slice(0, 6)}...${basic.slice(-4)}` });
   const headers = { Authorization: `Basic ${basic}`, "Content-Type": "application/json", Accept: "application/json" };
   const attempts: Array<{ name: string; status: number; detail: string }> = [];
 
   async function tryToken(name: string, url: string, body?: Record<string, string | number>) {
-    console.log(`[Correios] tentando ${name}`, {
-      hasBody: !!body,
-      bodyKeys: body ? Object.keys(body) : [],
-    });
-
     const res = await fetch(url, {
       method: "POST",
       headers,
       body: body ? JSON.stringify(body) : undefined,
     });
-
     if (res.ok) {
-      const json = (await res.json()) as { token: string; ambiente?: string };
+      const json = (await res.json()) as { token: string; ambiente?: string; expiraEm?: string };
       console.log(`[Correios] auth OK via ${name}`, { ambiente: json.ambiente, tokenLen: json.token?.length });
       return json;
     }
-
     const detail = await readCorreiosError(res);
     attempts.push({ name, status: res.status, detail });
-    console.error(`[Correios] ${name} falhou`, {
-      status: res.status,
-      statusText: res.statusText,
-      body: detail?.slice(0, 500),
-      wwwAuthenticate: res.headers.get("www-authenticate") || null,
-    });
+    console.error(`[Correios] ${name} falhou`, { status: res.status, body: detail?.slice(0, 300) });
     return null;
   }
 
   const defaultToken =
     (await tryToken("autentica-v1", "https://api.correios.com.br/token/v1/autentica")) ||
     (await tryToken("autentica", "https://api.correios.com.br/token/autentica"));
-  if (defaultToken) return defaultToken;
 
-  if (contrato) {
-    const contractToken =
-      (await tryToken("contrato-v1", "https://api.correios.com.br/token/v1/autentica/contrato", {
-        numero: contrato,
-      })) ||
-      (await tryToken("contrato", "https://api.correios.com.br/token/autentica/contrato", {
-        numero: contrato,
-      }));
-    if (contractToken) return contractToken;
+  let issued: { token: string } | null = defaultToken;
+
+  if (!issued && contrato) {
+    issued =
+      (await tryToken("contrato-v1", "https://api.correios.com.br/token/v1/autentica/contrato", { numero: contrato })) ||
+      (await tryToken("contrato", "https://api.correios.com.br/token/autentica/contrato", { numero: contrato }));
   }
 
-  const cardBody: Record<string, string> = { numero: cartao };
-  if (contrato) cardBody.contrato = contrato;
-  const cardToken =
-    (await tryToken("cartaopostagem-v1", "https://api.correios.com.br/token/v1/autentica/cartaopostagem", cardBody)) ||
-    (await tryToken("cartaopostagem", "https://api.correios.com.br/token/autentica/cartaopostagem", cardBody));
-  if (cardToken) return cardToken;
+  if (!issued) {
+    const cardBody: Record<string, string> = { numero: cartao };
+    if (contrato) cardBody.contrato = contrato;
+    issued =
+      (await tryToken("cartaopostagem-v1", "https://api.correios.com.br/token/v1/autentica/cartaopostagem", cardBody)) ||
+      (await tryToken("cartaopostagem", "https://api.correios.com.br/token/autentica/cartaopostagem", cardBody));
+  }
 
-  const details = attempts
-    .map((attempt) => `${attempt.name}=${attempt.status} (${attempt.detail?.slice(0, 200) || "sem detalhe"})`)
-    .join(". ");
-  const authIssue = summarizeCorreiosAuthIssue(attempts, usuario);
+  if (!issued) {
+    const details = attempts
+      .map((a) => `${a.name}=${a.status} (${a.detail?.slice(0, 200) || "sem detalhe"})`)
+      .join(". ");
+    const authIssue = summarizeCorreiosAuthIssue(attempts, usuario);
+    throw new Error(`Correios auth falhou: ${attempts.at(-1)?.status || 401}. ${details}.${authIssue}`);
+  }
 
-  throw new Error(`Correios auth falhou: ${attempts.at(-1)?.status || 401}. ${details}.${authIssue}`);
+  // cache 20h — o token dos Correios normalmente vale 24h
+  cachedCorreiosToken = { token: issued.token, expiresAt: Date.now() + 20 * 60 * 60 * 1000 };
+  return { token: issued.token };
 }
+
 
 export const calculateShipping = createServerFn({ method: "POST" })
   .inputValidator((data: { cepDestino: string; servico?: "PAC" | "SEDEX"; items: Array<{ product_id: string; quantity: number }> }) =>
@@ -426,32 +423,36 @@ export const calculateShipping = createServerFn({ method: "POST" })
     const services: ServiceName[] = data.servico ? [data.servico] : ["SEDEX", "PAC"];
 
     const calcOne = async (servico: ServiceName) => {
+      let restMsg = "";
       try {
         const envToken = cleanSecret(process.env.CORREIOS_TOKEN);
         const token = envToken || (await correiosToken()).token;
         const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
         return await calculateCorreiosRestShipping(token, cepDest, contrato, servico, pacotes);
       } catch (error) {
-        const restMsg = error instanceof Error ? error.message : String(error);
-        if (isCorreiosPermissionError(restMsg)) {
-          console.error("[Correios] REST sem permissão para API de preço", {
-            reason: restMsg.slice(0, 500),
-            packages: pacotes.length,
-          });
-          throw new Error(restMsg);
+        restMsg = error instanceof Error ? error.message : String(error);
+        // Invalida cache de token em 401/403 para tentar re-autenticar na próxima chamada
+        if (/HTTP 401|HTTP 403|token inválido/i.test(restMsg)) {
+          cachedCorreiosToken = null;
         }
-        console.error("[Correios] API REST indisponível; usando calculador público", {
+        console.error(`[Correios] REST falhou (${servico}); tentando calculador público`, {
           reason: restMsg.slice(0, 500),
           packages: pacotes.length,
         });
-        try {
-          return await calculateLegacyCorreiosShipping(cepDest, servico, pacotes);
-        } catch (legacyError) {
-          const legacyMsg = legacyError instanceof Error ? legacyError.message : String(legacyError);
-          throw new Error(`Falha ao calcular frete (${servico}). REST: ${restMsg} | Legado: ${legacyMsg}`);
-        }
+      }
+      // Fallback SEMPRE — inclusive para erros de permissão (GTW-012),
+      // pois o calculador público não exige contrato/token.
+      try {
+        return await calculateLegacyCorreiosShipping(cepDest, servico, pacotes);
+      } catch (legacyError) {
+        const legacyMsg = legacyError instanceof Error ? legacyError.message : String(legacyError);
+        throw new Error(
+          `Não foi possível calcular o frete ${servico} para o CEP ${cepDest}. ` +
+            `Tente novamente em instantes. Detalhes técnicos — REST: ${restMsg || "n/a"} | Público: ${legacyMsg}`,
+        );
       }
     };
+
 
     const results = await Promise.allSettled(services.map(calcOne));
     const opcoes = results
