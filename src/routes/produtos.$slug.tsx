@@ -58,6 +58,7 @@ function Page() {
   const { add } = useCart();
   const { accountType } = useAuth();
   const [activeImg, setActiveImg] = useState(0);
+  const [qty, setQtyState] = useState(1);
   const { data: p, isLoading, isFetched } = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => (await supabase.from("products").select("*").eq("slug", slug).maybeSingle()).data,
