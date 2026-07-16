@@ -27,11 +27,40 @@ function onlyDigits(s: string) {
 }
 
 async function getServerSupabase() {
-  // Use the generated admin client which correctly handles the new sb_secret_* opaque
-  // API key format (strips the Bearer Authorization header that PostgREST rejects as
-  // "Invalid API key" / "Expected 3 parts in JWT; got 1").
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  return supabaseAdmin;
+  const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const publishableKey =
+    process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const key = serviceKey || publishableKey;
+
+  if (!url || !key) {
+    const missing = [
+      ...(!url ? ["SUPABASE_URL"] : []),
+      ...(!key ? ["SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_PUBLISHABLE_KEY"] : []),
+    ];
+    throw new Error(
+      `Supabase não configurado no ambiente atual (faltando: ${missing.join(", ")}). ` +
+        `Adicione essas variáveis nas Environment variables do Netlify e faça Clear cache and deploy.`,
+    );
+  }
+
+  const { createClient } = await import("@supabase/supabase-js");
+  const isOpaque = key.startsWith("sb_publishable_") || key.startsWith("sb_secret_");
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
+    global: {
+      fetch: (input, init) => {
+        const headers = new Headers(init?.headers);
+        // Novas API keys sb_* são opacas — PostgREST rejeita Authorization: Bearer sb_*
+        // como "Invalid API key" / "Expected 3 parts in JWT; got 1".
+        if (isOpaque && headers.get("Authorization") === `Bearer ${key}`) {
+          headers.delete("Authorization");
+        }
+        headers.set("apikey", key);
+        return fetch(input, { ...init, headers });
+      },
+    },
+  });
 }
 
 
