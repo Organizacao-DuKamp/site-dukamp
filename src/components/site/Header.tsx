@@ -28,7 +28,7 @@ const socials = [
 
 
 export function Header() {
-  const { count, items, total, remove, setQty } = useCart();
+  const { count } = useCart();
   const { user, isAdmin, accountType, signOut } = useAuth();
   const { ticket, openChat } = useSupport();
   
