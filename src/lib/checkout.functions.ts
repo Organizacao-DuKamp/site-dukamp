@@ -27,14 +27,13 @@ function onlyDigits(s: string) {
 }
 
 async function getServerSupabase() {
-  const { createClient } = await import("@supabase/supabase-js");
-  const url = process.env.SUPABASE_URL;
-  // Prefer service role (produção). Fallback para publishable key no preview local,
-  // onde a service role não é exposta pelo Lovable Cloud.
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) throw new Error("Supabase não configurado no servidor");
-  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  // Use the generated admin client which correctly handles the new sb_secret_* opaque
+  // API key format (strips the Bearer Authorization header that PostgREST rejects as
+  // "Invalid API key" / "Expected 3 parts in JWT; got 1").
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  return supabaseAdmin;
 }
+
 
 function translateMpError(msg: string): string {
   const m = (msg || "").toLowerCase();
