@@ -50,6 +50,7 @@ import { Route as AdminAnunciosRouteImport } from './routes/admin.anuncios'
 import { Route as AdminContasIndexRouteImport } from './routes/admin.contas.index'
 import { Route as ApiPublicMercadopagoWebhookRouteImport } from './routes/api/public/mercadopago-webhook'
 import { Route as ApiPublicInitAdminRouteImport } from './routes/api/public/init-admin'
+import { Route as ApiPublicApplyDescOnceRouteImport } from './routes/api/public/apply-desc-once'
 import { Route as AdminVendasPedidosRouteImport } from './routes/admin.vendas.pedidos'
 import { Route as AdminVendasPainelRouteImport } from './routes/admin.vendas.painel'
 import { Route as AdminVendasHistoricoRouteImport } from './routes/admin.vendas.historico'
@@ -263,6 +264,11 @@ const ApiPublicInitAdminRoute = ApiPublicInitAdminRouteImport.update({
   path: '/api/public/init-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicApplyDescOnceRoute = ApiPublicApplyDescOnceRouteImport.update({
+  id: '/api/public/apply-desc-once',
+  path: '/api/public/apply-desc-once',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminVendasPedidosRoute = AdminVendasPedidosRouteImport.update({
   id: '/vendas/pedidos',
   path: '/vendas/pedidos',
@@ -327,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
   '/admin/vendas/painel': typeof AdminVendasPainelRoute
   '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
+  '/api/public/apply-desc-once': typeof ApiPublicApplyDescOnceRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas/': typeof AdminContasIndexRoute
@@ -371,6 +378,7 @@ export interface FileRoutesByTo {
   '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
   '/admin/vendas/painel': typeof AdminVendasPainelRoute
   '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
+  '/api/public/apply-desc-once': typeof ApiPublicApplyDescOnceRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas': typeof AdminContasIndexRoute
@@ -419,6 +427,7 @@ export interface FileRoutesById {
   '/admin/vendas/historico': typeof AdminVendasHistoricoRoute
   '/admin/vendas/painel': typeof AdminVendasPainelRoute
   '/admin/vendas/pedidos': typeof AdminVendasPedidosRoute
+  '/api/public/apply-desc-once': typeof ApiPublicApplyDescOnceRoute
   '/api/public/init-admin': typeof ApiPublicInitAdminRoute
   '/api/public/mercadopago-webhook': typeof ApiPublicMercadopagoWebhookRoute
   '/admin/contas/': typeof AdminContasIndexRoute
@@ -468,6 +477,7 @@ export interface FileRouteTypes {
     | '/admin/vendas/historico'
     | '/admin/vendas/painel'
     | '/admin/vendas/pedidos'
+    | '/api/public/apply-desc-once'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
     | '/admin/contas/'
@@ -512,6 +522,7 @@ export interface FileRouteTypes {
     | '/admin/vendas/historico'
     | '/admin/vendas/painel'
     | '/admin/vendas/pedidos'
+    | '/api/public/apply-desc-once'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
     | '/admin/contas'
@@ -559,6 +570,7 @@ export interface FileRouteTypes {
     | '/admin/vendas/historico'
     | '/admin/vendas/painel'
     | '/admin/vendas/pedidos'
+    | '/api/public/apply-desc-once'
     | '/api/public/init-admin'
     | '/api/public/mercadopago-webhook'
     | '/admin/contas/'
@@ -585,6 +597,7 @@ export interface RootRouteChildren {
   PaginasSlugRoute: typeof PaginasSlugRoute
   PedidoIdRoute: typeof PedidoIdRoute
   EquipeDeVendasIndexRoute: typeof EquipeDeVendasIndexRoute
+  ApiPublicApplyDescOnceRoute: typeof ApiPublicApplyDescOnceRoute
   ApiPublicInitAdminRoute: typeof ApiPublicInitAdminRoute
   ApiPublicMercadopagoWebhookRoute: typeof ApiPublicMercadopagoWebhookRoute
 }
@@ -878,6 +891,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicInitAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/apply-desc-once': {
+      id: '/api/public/apply-desc-once'
+      path: '/api/public/apply-desc-once'
+      fullPath: '/api/public/apply-desc-once'
+      preLoaderRoute: typeof ApiPublicApplyDescOnceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/vendas/pedidos': {
       id: '/admin/vendas/pedidos'
       path: '/vendas/pedidos'
@@ -1004,6 +1024,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaginasSlugRoute: PaginasSlugRoute,
   PedidoIdRoute: PedidoIdRoute,
   EquipeDeVendasIndexRoute: EquipeDeVendasIndexRoute,
+  ApiPublicApplyDescOnceRoute: ApiPublicApplyDescOnceRoute,
   ApiPublicInitAdminRoute: ApiPublicInitAdminRoute,
   ApiPublicMercadopagoWebhookRoute: ApiPublicMercadopagoWebhookRoute,
 }

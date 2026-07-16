@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-// @ts-expect-error - raw text import
 import proddescRaw from '../../../../proddesc.txt?raw';
 
 const SECRET = 'dukamp-desc-2026-one-shot';
