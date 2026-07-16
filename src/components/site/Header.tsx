@@ -1,18 +1,12 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ShoppingCart, Search, User, LogOut, LayoutDashboard, MessageCircle, UserCircle, Minus, Plus, Trash2 } from "lucide-react";
+import { ShoppingCart, Search, User, LogOut, LayoutDashboard, MessageCircle, UserCircle, Plus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCart, formatBRL } from "@/lib/cart";
+import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import { useSupport } from "@/lib/support";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
