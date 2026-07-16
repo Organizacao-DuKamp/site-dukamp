@@ -169,13 +169,54 @@ function Page() {
             {displayPix != null && <div className="text-sm text-primary mt-1">ou {formatBRL(displayPix)} no PIX</div>}
             {installments > 1 && <div className="text-sm text-muted-foreground">em até {installments}x sem juros</div>}
           </div>
-          <Button
-            className="mt-6 w-full md:w-auto"
-            disabled={p.stock <= 0}
-            onClick={() => { add({ id: p.id, name: p.name, price: displayPrice, image: images[0] }); toast.success("Adicionado ao carrinho"); }}
-          >
-            <ShoppingCart className="h-4 w-4 mr-2" /> {p.stock > 0 ? "Adicionar ao carrinho" : "Indisponível"}
-          </Button>
+          <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="inline-flex items-center border rounded-md h-10">
+              <button
+                type="button"
+                onClick={() => setQtyState((q) => Math.max(1, q - 1))}
+                disabled={qty <= 1}
+                className="h-10 w-10 grid place-items-center disabled:opacity-40"
+                aria-label="Diminuir quantidade"
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <Input
+                type="text"
+                inputMode="numeric"
+                value={qty}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/\D/g, "");
+                  if (raw === "") { setQtyState(1); return; }
+                  const n = parseInt(raw, 10);
+                  if (Number.isFinite(n) && n > 0) setQtyState(Math.min(n, Math.max(1, p.stock || 999)));
+                }}
+                onBlur={(e) => {
+                  const n = parseInt(e.target.value.replace(/\D/g, ""), 10);
+                  setQtyState(Number.isFinite(n) && n > 0 ? n : 1);
+                }}
+                className="h-10 w-14 text-center border-0 focus-visible:ring-0 px-0"
+                aria-label="Quantidade"
+              />
+              <button
+                type="button"
+                onClick={() => setQtyState((q) => q + 1)}
+                className="h-10 w-10 grid place-items-center"
+                aria-label="Aumentar quantidade"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+            <Button
+              className="flex-1 sm:flex-none"
+              disabled={p.stock <= 0}
+              onClick={() => {
+                add({ id: p.id, name: p.name, price: displayPrice, image: images[0] }, qty);
+                toast.success(`${qty} ${qty === 1 ? "item adicionado" : "itens adicionados"} ao carrinho`);
+              }}
+            >
+              <ShoppingCart className="h-4 w-4 mr-2" /> {p.stock > 0 ? "Adicionar ao carrinho" : "Indisponível"}
+            </Button>
+          </div>
           <div className="mt-6 text-sm text-muted-foreground">
             <div>Estoque: {p.stock}</div>
             {p.weight != null && <div>Peso: {p.weight} kg</div>}
