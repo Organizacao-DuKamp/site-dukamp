@@ -699,10 +699,11 @@ export const processCardPayment = createServerFn({ method: "POST" })
     const supa = await getServerSupabase();
     const { data: order, error } = await supa
       .from("orders")
-      .select("id,order_number,total,payment_method,payment_status,card_installments,email,customer_name,cpf_cnpj")
+      .select("id,order_number,total,payment_method,payment_status,card_installments,email,customer_name,cpf_cnpj" as any)
       .eq("id", data.order_id)
-      .single();
+      .single<{ id: string; order_number: string; total: number; payment_method: string; payment_status: string; card_installments: number | null; email: string; customer_name: string; cpf_cnpj: string }>();
     if (error || !order) throw new Error("Pedido não encontrado");
+
     if (order.payment_method !== "card") throw new Error("Pedido não é de cartão de crédito");
     if (order.payment_status === "approved") throw new Error("Pedido já foi pago");
     if (order.card_installments && order.card_installments !== data.installments) {
