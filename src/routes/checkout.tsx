@@ -154,7 +154,10 @@ function CheckoutPage() {
     } catch (e) {
       setFrete(null);
       setFreteOpcoes([]);
-      toast.error(e instanceof Error ? e.message : "Erro ao calcular frete");
+      const raw = e instanceof Error ? e.message : String(e ?? "");
+      console.error("[Frete] Falha ao calcular", { cep, itens: items.length, error: e });
+      const detail = raw && raw !== "Invalid API Error" ? raw : "resposta inesperada do servidor (Invalid API Error). Verifique CORREIOS_TOKEN, CORREIOS_CONTRATO e CORREIOS_CEP_ORIGEM nas Environment variables da Netlify e faça Clear cache and deploy.";
+      toast.error(`Frete (CEP ${cep}): ${detail}`, { duration: 10000 });
     } finally {
       setLoadingFrete(false);
     }
