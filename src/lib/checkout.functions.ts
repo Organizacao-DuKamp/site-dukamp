@@ -26,17 +26,19 @@ function onlyDigits(s: string) {
   return (s || "").replace(/\D/g, "");
 }
 
-async function getServerSupabase() {
+async function getServerSupabase(mode: "admin" | "public" = "admin") {
   const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const publishableKey =
     process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-  const key = serviceKey || publishableKey;
+  const key = mode === "public" ? publishableKey : serviceKey || publishableKey;
 
   if (!url || !key) {
     const missing = [
       ...(!url ? ["SUPABASE_URL"] : []),
-      ...(!key ? ["SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_PUBLISHABLE_KEY"] : []),
+      ...(!key
+        ? [mode === "public" ? "SUPABASE_PUBLISHABLE_KEY" : "SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_PUBLISHABLE_KEY"]
+        : []),
     ];
     throw new Error(
       `Supabase não configurado no ambiente atual (faltando: ${missing.join(", ")}). ` +
@@ -389,13 +391,22 @@ export const calculateShipping = createServerFn({ method: "POST" })
     if (cepDest.length !== 8) throw new Error("CEP de destino inválido");
 
     // Buscar dimensões dos produtos
-    const supa = await getServerSupabase();
+    const supa = await getServerSupabase("public");
     const ids = data.items.map((i) => i.product_id);
     const { data: prods, error } = await supa
       .from("products")
       .select("id,name,peso,altura,largura,comprimento")
       .in("id", ids);
-    if (error) throw new Error(error.message);
+    if (error) {
+      const message = error.message || "Falha ao consultar produtos";
+      if (/invalid api key/i.test(message)) {
+        throw new Error(
+          "Backend: chave pública inválida ao consultar produtos para o frete. " +
+            "Confira VITE_SUPABASE_PUBLISHABLE_KEY e SUPABASE_PUBLISHABLE_KEY no Netlify e faça Clear cache and deploy.",
+        );
+      }
+      throw new Error(message);
+    }
 
     const pacotes: ShippingPackage[] = [];
     for (const item of data.items) {
