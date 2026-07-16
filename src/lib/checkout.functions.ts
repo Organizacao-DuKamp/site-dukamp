@@ -423,32 +423,36 @@ export const calculateShipping = createServerFn({ method: "POST" })
     const services: ServiceName[] = data.servico ? [data.servico] : ["SEDEX", "PAC"];
 
     const calcOne = async (servico: ServiceName) => {
+      let restMsg = "";
       try {
         const envToken = cleanSecret(process.env.CORREIOS_TOKEN);
         const token = envToken || (await correiosToken()).token;
         const contrato = onlyDigits(cleanSecret(process.env.CORREIOS_CONTRATO));
         return await calculateCorreiosRestShipping(token, cepDest, contrato, servico, pacotes);
       } catch (error) {
-        const restMsg = error instanceof Error ? error.message : String(error);
-        if (isCorreiosPermissionError(restMsg)) {
-          console.error("[Correios] REST sem permissão para API de preço", {
-            reason: restMsg.slice(0, 500),
-            packages: pacotes.length,
-          });
-          throw new Error(restMsg);
+        restMsg = error instanceof Error ? error.message : String(error);
+        // Invalida cache de token em 401/403 para tentar re-autenticar na próxima chamada
+        if (/HTTP 401|HTTP 403|token inválido/i.test(restMsg)) {
+          cachedCorreiosToken = null;
         }
-        console.error("[Correios] API REST indisponível; usando calculador público", {
+        console.error(`[Correios] REST falhou (${servico}); tentando calculador público`, {
           reason: restMsg.slice(0, 500),
           packages: pacotes.length,
         });
-        try {
-          return await calculateLegacyCorreiosShipping(cepDest, servico, pacotes);
-        } catch (legacyError) {
-          const legacyMsg = legacyError instanceof Error ? legacyError.message : String(legacyError);
-          throw new Error(`Falha ao calcular frete (${servico}). REST: ${restMsg} | Legado: ${legacyMsg}`);
-        }
+      }
+      // Fallback SEMPRE — inclusive para erros de permissão (GTW-012),
+      // pois o calculador público não exige contrato/token.
+      try {
+        return await calculateLegacyCorreiosShipping(cepDest, servico, pacotes);
+      } catch (legacyError) {
+        const legacyMsg = legacyError instanceof Error ? legacyError.message : String(legacyError);
+        throw new Error(
+          `Não foi possível calcular o frete ${servico} para o CEP ${cepDest}. ` +
+            `Tente novamente em instantes. Detalhes técnicos — REST: ${restMsg || "n/a"} | Público: ${legacyMsg}`,
+        );
       }
     };
+
 
     const results = await Promise.allSettled(services.map(calcOne));
     const opcoes = results
