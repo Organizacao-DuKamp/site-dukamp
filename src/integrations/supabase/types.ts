@@ -14,21 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      _desc_import: {
-        Row: {
-          code: string
-          descr: string
-        }
-        Insert: {
-          code: string
-          descr: string
-        }
-        Update: {
-          code?: string
-          descr?: string
-        }
-        Relationships: []
-      }
       account_requests: {
         Row: {
           apartamento_info: string | null
