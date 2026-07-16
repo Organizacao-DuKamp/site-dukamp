@@ -128,14 +128,25 @@ function CarrinhoPage() {
                         <Minus className="h-3.5 w-3.5" />
                       </Button>
                       <Input
+                        type="text"
                         value={i.quantity}
                         onChange={(e) => {
-                          const n = parseInt(e.target.value.replace(/\D/g, ""), 10);
-                          setQty(i.id, Number.isFinite(n) ? n : 1);
+                          const raw = e.target.value.replace(/\D/g, "");
+                          if (raw === "") {
+                            setQty(i.id, 1);
+                            return;
+                          }
+                          const n = parseInt(raw, 10);
+                          if (Number.isFinite(n) && n > 0) setQty(i.id, n);
                         }}
-                        className="h-8 w-12 text-center border-0 focus-visible:ring-0 px-0"
+                        onBlur={(e) => {
+                          const n = parseInt(e.target.value.replace(/\D/g, ""), 10);
+                          setQty(i.id, Number.isFinite(n) && n > 0 ? n : 1);
+                        }}
+                        className="h-8 w-14 text-center border-0 focus-visible:ring-0 px-0"
                         inputMode="numeric"
                       />
+
                       <Button
                         variant="ghost"
                         size="icon"
