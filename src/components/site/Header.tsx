@@ -145,17 +145,18 @@ export function Header() {
               </>
             )}
 
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative" title="Carrinho">
-                  <ShoppingCart className="h-5 w-5" />
-                  {count > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] rounded-full h-5 min-w-5 px-1 grid place-items-center font-medium">
-                      {count}
-                    </span>
-                  )}
-                </Button>
-              </SheetTrigger>
+            <Button asChild variant="ghost" size="icon" className="relative" title="Carrinho">
+              <Link to="/carrinho">
+                <ShoppingCart className="h-5 w-5" />
+                {count > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] rounded-full h-5 min-w-5 px-1 grid place-items-center font-medium">
+                    {count}
+                  </span>
+                )}
+              </Link>
+            </Button>
+
+            {false && (
               <SheetContent className="flex flex-col">
                 <SheetHeader>
                   <SheetTitle>Carrinho ({count})</SheetTitle>
