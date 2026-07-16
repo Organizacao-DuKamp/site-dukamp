@@ -8,8 +8,11 @@ import { ApprovalNoticeModal } from "./ApprovalNoticeModal";
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
-      <Header />
-      <MainNav />
+      <div className="sticky top-0 z-50 bg-background shadow-sm">
+        <Header />
+        <MainNav />
+      </div>
+
       <div className="mx-auto w-full max-w-[1400px] px-4 py-6 flex-1">
         <div className="layout-grid grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
           <main className="min-w-0 order-1">{children}</main>
