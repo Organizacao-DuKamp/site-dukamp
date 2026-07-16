@@ -182,7 +182,24 @@ export function Header() {
                             >
                               <Minus className="h-3 w-3" />
                             </button>
-                            <span className="w-7 text-center text-xs">{i.quantity}</span>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={i.quantity}
+                              onChange={(e) => {
+                                const raw = e.target.value.replace(/\D/g, "");
+                                if (raw === "") { setQty(i.id, 1); return; }
+                                const n = parseInt(raw, 10);
+                                if (Number.isFinite(n) && n > 0) setQty(i.id, n);
+                              }}
+                              onBlur={(e) => {
+                                const n = parseInt(e.target.value.replace(/\D/g, ""), 10);
+                                setQty(i.id, Number.isFinite(n) && n > 0 ? n : 1);
+                              }}
+                              className="w-8 text-center text-xs bg-transparent outline-none border-0 focus:ring-0"
+                              aria-label="Quantidade"
+                            />
+
                             <button
                               onClick={() => setQty(i.id, i.quantity + 1)}
                               className="h-7 w-7 grid place-items-center"
